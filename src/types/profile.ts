@@ -1,0 +1,117 @@
+// schema/user-profile.schema.json 과 1:1 대응하는 타입 정의.
+// 결과 도출 파트로 넘기는 최종 계약(JSON)의 TS 버전이므로, 스키마를 바꾸면 이 파일도 함께 바꿔야 한다.
+
+export type Gender = "male" | "female" | "other" | "prefer_not_to_say";
+
+export interface BasicInfo {
+  name: string;
+  gender: Gender | "";
+  birth_date: string; // YYYY-MM-DD
+  education: {
+    level: string; // 학력 단계 코드
+    major_category: string; // 전공 대분류 코드
+    major_detail: string; // 학과(자유 입력, 프로토타입 단계)
+  };
+  contact: {
+    phone: string;
+    email: string;
+  };
+}
+
+export interface Filters {
+  region: string[];
+  industry: string[];
+  job_category: string[];
+  company_size: string[];
+  company_type: string[];
+  employment_type: string[];
+}
+
+export interface LanguageScore {
+  test: string;
+  score: string;
+}
+
+export type TechStackCategory =
+  | "언어"
+  | "프레임워크_라이브러리"
+  | "데이터베이스"
+  | "클라우드_인프라"
+  | "AI_데이터"
+  | "협업툴_형상관리";
+
+export type TechStack = Record<TechStackCategory, string[]>;
+
+export interface Qualifications {
+  languages: LanguageScore[];
+  certificates: string[];
+  tech_stack: TechStack;
+}
+
+export type EmploymentTypeKR = "정규직" | "계약직" | "인턴" | "프리랜서";
+
+export interface WorkExperience {
+  id: string;
+  employment_type: EmploymentTypeKR;
+  start_date: string; // YYYY-MM
+  end_date: string | null; // YYYY-MM, 재직중이면 null
+  description: string;
+}
+
+export type CareerStatus = "신입" | "경력";
+
+export interface Career {
+  career_status: CareerStatus;
+  total_career_years: number;
+  work_experiences: WorkExperience[];
+}
+
+export type ExtracurricularType =
+  | "프로젝트"
+  | "동아리_학생회"
+  | "대외활동"
+  | "해외경험"
+  | "교육수강경험";
+
+export interface ExtracurricularItem {
+  id: string;
+  type: ExtracurricularType;
+  description: string;
+}
+
+export interface AwardItem {
+  id: string;
+  description: string;
+}
+
+export interface Activities {
+  academic_extracurricular: ExtracurricularItem[];
+  awards: AwardItem[];
+}
+
+export type SurveyResponse = "그렇다" | "아니다" | "모르겠다" | null;
+
+export interface PersonalityAnswer {
+  question_id: number;
+  option: 1 | 2;
+  tags: string[];
+  response: SurveyResponse;
+}
+
+export interface PersonalitySurvey {
+  answers: PersonalityAnswer[];
+  derived_tag_weights: Record<string, number>;
+}
+
+export interface UserProfileDraft {
+  basic_info: BasicInfo;
+  filters: Filters;
+  qualifications: Qualifications;
+  career: Career;
+  activities: Activities;
+  personality_survey: PersonalitySurvey;
+  meta: {
+    draft_id: string;
+    updated_at: string;
+  };
+}
