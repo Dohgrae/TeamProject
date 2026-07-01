@@ -40,8 +40,8 @@ function startMatchLoadingAnimation(container, name) {
       </div>
       <div class="match-loading-hero">
         <span class="match-loading-heart" aria-hidden="true">❤️</span>
-        <img src="img/qpi-mascot-side-a.png" alt="큐피" class="match-loading-mascot-side match-loading-mascot-a" />
-        <img src="img/qpi-mascot-side-b.png" alt="큐피" class="match-loading-mascot-side match-loading-mascot-b" />
+        <img src="img/qpi-mascot-side-b.png" alt="큐피" class="match-loading-mascot-side match-loading-mascot-a" />
+        <img src="img/qpi-mascot-side-a.png" alt="큐피" class="match-loading-mascot-side match-loading-mascot-b" />
       </div>
       <h2 class="match-loading-title">두근두근, 매칭 중이에요</h2>
       <p class="match-loading-message" id="match-loading-message">${messages[0]}</p>
