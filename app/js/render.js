@@ -227,7 +227,7 @@ function renderWork() {
         <label><input type="checkbox" data-field="ongoing" ${exp.end_date === null ? "checked" : ""} /> 재직중</label>
       </div>
       <div class="interview-answers">
-        ${WORK_INTERVIEW_QUESTIONS.map((q, i) => `<p class="q">${q}</p><p class="a">${exp.answers[i] ?? ""}</p>`).join("")}
+        ${WORK_INTERVIEW_QUESTIONS.map((q, i) => `<p class="q">${q.text}</p><p class="a">${exp.answers[i] ?? ""}</p>`).join("")}
       </div>
     </div>`
     )

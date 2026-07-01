@@ -368,6 +368,49 @@ textarea {
   margin-bottom: 16px;
 }
 
+/* ── 학내외경험/수상공모전: 작성 가이드 안내 박스 ── */
+.guide-box {
+  background: linear-gradient(135deg, #fdf2f8 0%, #f5f3ff 100%);
+  border: 1px solid #fbcfe8;
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+}
+
+.guide-title {
+  font-weight: 700;
+  color: #be185d;
+  margin-bottom: 4px;
+}
+
+.guide-desc {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+
+.guide-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.guide-list li {
+  font-size: 13px;
+  color: #374151;
+  padding-left: 18px;
+  position: relative;
+}
+
+.guide-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #ec4899;
+  font-weight: 700;
+}
+
 /* ── 성향 질문 ── */
 .progress-bar-wrap {
   height: 6px;
@@ -519,6 +562,13 @@ textarea {
   align-self: flex-end;
   background: #ec4899;
   color: #ffffff;
+}
+
+.msg-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #9ca3af;
 }
 
 .modal-form {

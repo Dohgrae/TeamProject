@@ -161,6 +161,22 @@ function advanceToNextPersonalityCard(answeredQuestionId) {
   }
 }
 
+// 화면마다 있는 "중간 저장" 버튼. 이미 입력할 때마다 자동 저장되고 있지만,
+// 지원자가 눈으로 "저장됐다"는 걸 확인하고 안심할 수 있도록 명시적으로 눌러서 확인시켜준다.
+function wireInterimSaveButton(buttonId) {
+  const btn = document.getElementById(buttonId);
+  const original = btn.textContent;
+  btn.addEventListener("click", () => {
+    AppState.save();
+    btn.textContent = "저장됨 ✓";
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.disabled = false;
+    }, 1200);
+  });
+}
+
 // 필수 항목(이름/출생년월일/학력단계)만 유효성 검사, 나머지는 비워도 다음 단계로 넘어갈 수 있다.
 function isBasicInfoValid() {
   const p = AppState.profile;
@@ -275,7 +291,8 @@ function buildInterviewMessages(answers) {
   const messages = [];
   const total = WORK_INTERVIEW_QUESTIONS.length;
   for (let i = 0; i < total; i++) {
-    messages.push({ role: "assistant", text: WORK_INTERVIEW_QUESTIONS[i] });
+    const q = WORK_INTERVIEW_QUESTIONS[i];
+    messages.push({ role: "assistant", text: q.text, hint: q.hint });
     if (i < answers.length) {
       messages.push({ role: "user", text: answers[i] });
       messages.push({
@@ -305,7 +322,12 @@ function closeInterviewModal() {
 function renderInterviewMessages() {
   const box = document.getElementById("interview-messages");
   const messages = buildInterviewMessages(interviewState.answers);
-  box.innerHTML = messages.map((m) => `<div class="msg ${m.role}">${m.text}</div>`).join("");
+  box.innerHTML = messages
+    .map(
+      (m) =>
+        `<div class="msg ${m.role}">${m.text}${m.hint ? `<span class="msg-hint">${m.hint}</span>` : ""}</div>`
+    )
+    .join("");
   document.getElementById("interview-progress").textContent = `${Math.min(interviewState.answers.length + 1, WORK_INTERVIEW_QUESTIONS.length)} / ${WORK_INTERVIEW_QUESTIONS.length}`;
   document.getElementById("btn-interview-prev").disabled = interviewState.answers.length === 0 || interviewState.finishing;
   box.scrollTop = box.scrollHeight;
@@ -500,6 +522,10 @@ document.addEventListener("DOMContentLoaded", () => {
     resultState.currentIndex = 0;
     showScreen("basic-info");
   });
+
+  ["btn-save-basic-info", "btn-save-work", "btn-save-extracurricular", "btn-save-awards", "btn-save-personality"].forEach(
+    wireInterimSaveButton
+  );
 
   document.getElementById("btn-basic-info-next").addEventListener("click", () => {
     if (isBasicInfoValid()) showScreen("work");
