@@ -300,7 +300,10 @@ async function matchJobs(profile) {
         employment_type: job.employment_type,
         career_type: job.career_type,
         career_years: job.career_years,
-        short_description: job.main_tasks.slice(0, 60) + (job.main_tasks.length > 60 ? "..." : ""),
+        short_description: (() => {
+          const clean = splitIntoLines(job.main_tasks).join(" ");
+          return clean.slice(0, 60) + (clean.length > 60 ? "..." : "");
+        })(),
         match_rate: matchRate,
         matched_keywords: matchedKeywords,
         match_reasons: buildMatchReasons(job, breakdown, majorWarning),

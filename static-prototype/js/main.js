@@ -440,15 +440,6 @@ function getMatchComment(score) {
   return "음… 더 좋은 상대가 있을거에요 ^^;;";
 }
 
-// 마스코트 이미지 자체를 표정별로 새로 그릴 수는 없어서(이미지 생성 불가), 매칭률 구간에
-// 맞는 이모지를 아바타 위에 작은 배지로 겹쳐서 "표정"처럼 보이게 하는 절충안을 썼다.
-function getMoodEmoji(score) {
-  if (score >= 90) return "😍";
-  if (score >= 75) return "😊";
-  if (score >= 60) return "🙂";
-  return "😐";
-}
-
 function hashCode(str) {
   let h = 0;
   for (let i = 0; i < str.length; i++) h = ((h << 5) - h + str.charCodeAt(i)) | 0;
@@ -478,7 +469,6 @@ function computeDday(deadlineStr) {
 function buildCardFrontHtml(job) {
   const dday = computeDday(job.deadline);
   const ddayText = dday === null ? "" : dday >= 0 ? `D-${dday}` : "마감";
-  const mood = getMoodEmoji(job.match_rate);
 
   const chips = job.matched_keywords.slice(0, 2).map((k) => `<span class="chip-front">${escapeHtml(k)}</span>`);
   if (dday !== null && dday >= 0 && dday <= 14) chips.push(`<span class="chip-front chip-meta">마감 임박</span>`);
@@ -492,7 +482,6 @@ function buildCardFrontHtml(job) {
     <div class="card-avatar-wrap">
       <div class="card-avatar">
         <img src="img/qpi-mascot.png" alt="큐피" class="card-avatar-mascot" />
-        <span class="card-avatar-mood" aria-hidden="true">${mood}</span>
       </div>
     </div>
     <div class="card-body">

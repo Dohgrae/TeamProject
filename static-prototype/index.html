@@ -199,39 +199,41 @@
             </div>
           </div>
 
-          <div class="card-area" id="card-area">
-            <div class="card-carousel" id="card-carousel">
-              <div class="card-peek card-peek-prev" id="card-peek-prev" aria-hidden="true"></div>
+          <div class="card-carousel-panel" id="card-carousel-panel">
+            <div class="card-area" id="card-area">
+              <div class="card-carousel" id="card-carousel">
+                <div class="card-peek card-peek-prev" id="card-peek-prev" aria-hidden="true"></div>
 
-              <div class="card-wrap" id="card-wrap">
-                <div class="card" id="job-card" role="button" tabindex="0" aria-label="카드 뒤집기 (스페이스바로도 가능)">
-                  <div class="card-inner" id="card-inner">
-                    <div class="card-front" id="card-front">
-                      <div class="loading-state">
-                        <div class="loading-spinner" aria-hidden="true"></div>
-                        <p class="loading-text">채용공고를 찾는 중이에요...</p>
+                <div class="card-wrap" id="card-wrap">
+                  <div class="card" id="job-card" role="button" tabindex="0" aria-label="카드 뒤집기 (스페이스바로도 가능)">
+                    <div class="card-inner" id="card-inner">
+                      <div class="card-front" id="card-front">
+                        <div class="loading-state">
+                          <div class="loading-spinner" aria-hidden="true"></div>
+                          <p class="loading-text">채용공고를 찾는 중이에요...</p>
+                        </div>
                       </div>
+                      <div class="card-back" id="card-back"></div>
                     </div>
-                    <div class="card-back" id="card-back"></div>
                   </div>
                 </div>
+
+                <div class="card-peek card-peek-next" id="card-peek-next" aria-hidden="true"></div>
               </div>
 
-              <div class="card-peek card-peek-next" id="card-peek-next" aria-hidden="true"></div>
+              <div class="card-carousel-controls" id="card-carousel-controls">
+                <button type="button" class="card-nav-btn" id="btn-prev-card" aria-label="이전 공고 다시 보기 (왼쪽 방향키)">‹</button>
+                <div class="card-dots" id="card-dots"></div>
+                <button type="button" class="card-nav-btn" id="btn-next-card" aria-label="다음 공고 (오른쪽 방향키)">›</button>
+              </div>
             </div>
 
-            <div class="card-carousel-controls" id="card-carousel-controls">
-              <button type="button" class="card-nav-btn" id="btn-prev-card" aria-label="이전 공고 다시 보기 (왼쪽 방향키)">‹</button>
-              <div class="card-dots" id="card-dots"></div>
-              <button type="button" class="card-nav-btn" id="btn-next-card" aria-label="다음 공고 (오른쪽 방향키)">›</button>
+            <div class="end-screen" id="end-screen" aria-hidden="true">
+              <div class="end-emoji" aria-hidden="true">🎉</div>
+              <h2 class="end-title">모든 추천 공고를<br />확인했어요!</h2>
+              <p class="end-desc">마음에 드는 공고를 찾으셨나요?<br />저장한 결과에서 다시 확인할 수 있어요.</p>
+              <button class="btn-reset" id="btn-reset-cards">🔄 처음으로 돌아가기</button>
             </div>
-          </div>
-
-          <div class="end-screen" id="end-screen" aria-hidden="true">
-            <div class="end-emoji" aria-hidden="true">🎉</div>
-            <h2 class="end-title">모든 추천 공고를<br />확인했어요!</h2>
-            <p class="end-desc">마음에 드는 공고를 찾으셨나요?<br />저장한 결과에서 다시 확인할 수 있어요.</p>
-            <button class="btn-reset" id="btn-reset-cards">🔄 처음으로 돌아가기</button>
           </div>
 
           <div class="button-area" id="button-area" role="group" aria-label="카드 조작 버튼">
