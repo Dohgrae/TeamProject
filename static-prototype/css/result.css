@@ -16,7 +16,9 @@
   --card-radius:   24px;
   --card-shadow:   0 1px 3px rgba(0, 0, 0, 0.06),
                    0 8px 28px rgba(17, 24, 39, 0.07);
-  --card-height:   520px;
+  /* 화면 높이가 낮아도 결과 화면 전체가 스크롤 없이 한 화면에 들어오도록,
+     카드 높이를 뷰포트 높이에서 헤더/여백 등 나머지 요소 높이를 뺀 값으로 제한한다. */
+  --card-height:   clamp(420px, calc(100vh - 560px), 520px);
 }
 
 /* ── 기본 리셋 ── */
@@ -49,6 +51,13 @@
 #screen-result.active {
   background: transparent;
   box-shadow: none;
+  padding: 16px 24px;
+}
+
+/* 결과 화면은 세로 스크롤이 생기지 않도록 위저드 공통 하단 여백을 줄인다 */
+.wizard-main:has(#screen-result.active) {
+  padding-top: 12px;
+  padding-bottom: 16px;
 }
 
 
@@ -61,7 +70,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
 }
 
 /* 제목/부제는 연보라 캐러셀 바깥, .main 안에 그대로 두고 가운데 정렬만 준다 */
@@ -137,11 +146,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
   background: #ffffff;
   box-shadow: var(--card-shadow);
   border-radius: 24px;
-  padding: 36px 28px;
+  padding: 20px 28px;
 }
 
 #screen-result.is-loading .card-carousel-panel {
@@ -936,7 +945,7 @@
 }
 
 #screen-result.is-loading {
-  --card-height: 680px;
+  --card-height: min(680px, 70vh);
 }
 
 /* 로딩 중에는 흰 카드 박스 없이 캐릭터/하트/문구가 연보라 배경 위에 바로 떠 있도록 한다 */
@@ -1124,7 +1133,7 @@
 
 /* 태블릿 · 데스크톱 (481px 이상) */
 @media (min-width: 481px) {
-  :root { --card-height: 540px; }
+  :root { --card-height: clamp(420px, calc(100vh - 560px), 540px); }
   .card-position-sub { font-size: 21px; }
   .btn { padding: 16px 12px; }
   .btn-view { padding: 18px 14px; }
