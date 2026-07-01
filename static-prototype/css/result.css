@@ -511,6 +511,21 @@ body:has(#screen-result.screen.active) {
 
 .back-section-title:first-child { margin-top: 0; }
 
+/* 상단 줄: "매칭 키워드" 라벨 + 우측의 "N% 일치" */
+.back-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.back-header-row .back-section-title { margin: 0; }
+
+.back-match-percent {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--point);
+}
+
 /* 매칭 키워드 칩 (뒷면) — 버튼과 같은 포인트 컬러로 강조 */
 .keyword-chips-back {
   display: flex;
@@ -530,16 +545,53 @@ body:has(#screen-result.screen.active) {
   box-shadow: 0 2px 8px rgba(125, 0, 184, 0.3);
 }
 
-/* 실제로 매칭된 공고 원문 한 줄을 인용하고, 겹치는 부분을 하이라이트한다 */
-.match-evidence-quote {
-  font-size: 14px;
-  line-height: 1.7;
+/* 매칭 사유 체크리스트 */
+.match-reasons-back {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reason-item-back {
+  font-size: 13px;
+  line-height: 1.55;
   color: var(--text-dark);
+  padding-left: 20px;
+  position: relative;
+}
+
+.reason-item-back::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--point);
+}
+
+/* 공고 원문 발췌 — 실제로 매칭된 원문 한 줄(겹치는 부분 하이라이트) */
+.job-excerpt-box {
   background: #f9fafb;
-  border-left: 3px solid var(--point);
-  border-radius: 0 10px 10px 0;
+  border-radius: 12px;
   padding: 12px 14px;
-  font-style: normal;
+  margin-top: 16px;
+}
+
+.job-excerpt-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.job-excerpt-text {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-dark);
 }
 
 .match-evidence-highlight {
@@ -548,17 +600,6 @@ body:has(#screen-result.screen.active) {
   font-weight: 800;
   padding: 0 2px;
   border-radius: 3px;
-}
-
-.match-evidence-desc {
-  font-size: 13px;
-  line-height: 1.65;
-  color: var(--text-mid);
-  margin-top: 10px;
-}
-
-.match-evidence-desc strong {
-  color: var(--point-deep);
 }
 
 /* 원본 공고 보기 버튼 (뒷면 하단, 앞면 복귀 힌트 바로 위) */

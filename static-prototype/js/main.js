@@ -584,29 +584,37 @@ function renderResultCard(direction = "forward") {
   renderCardPeeks();
   renderCardDots();
 
-  const kw = job.matched_keywords.map((k) => `<span class="keyword-chip-back">#${k}</span>`).join("");
+  const kw = job.matched_keywords.slice(0, 3).map((k) => `<span class="keyword-chip-back">#${escapeHtml(k)}</span>`).join("");
+  const reasons = job.match_reasons.map((r) => `<li class="reason-item-back">${escapeHtml(r)}</li>`).join("");
   const safeUrl = /^https?:\/\//i.test(job.url) ? job.url : "#";
 
-  let evidenceHtml;
+  // "공고 원문 발췌"는 실제로 매칭된 원문 한 줄(겹치는 부분 하이라이트)을 그대로 보여준다.
+  // 매칭된 문장을 못 찾았으면 공고 요약으로 대체.
+  let excerptHtml;
   if (job.evidence) {
-    const { line, highlightStart, highlightEnd, label } = job.evidence;
+    const { line, highlightStart, highlightEnd } = job.evidence;
     const before = escapeHtml(line.slice(0, highlightStart));
     const highlighted = escapeHtml(line.slice(highlightStart, highlightEnd));
     const after = escapeHtml(line.slice(highlightEnd));
-    evidenceHtml = `
-      <blockquote class="match-evidence-quote">"${before}<mark class="match-evidence-highlight">${highlighted}</mark>${after}"</blockquote>
-      <p class="match-evidence-desc">공고 원문의 <strong>#${escapeHtml(label)}</strong> 부분이 회원님의 경험·역량과 겹쳐요.</p>`;
+    excerptHtml = `${before}<mark class="match-evidence-highlight">${highlighted}</mark>${after}`;
   } else {
-    evidenceHtml = `<p class="match-evidence-desc">직무·지역·경력 조건은 맞지만, 공고 원문에서 겹치는 문장은 아직 못 찾았어요.</p>`;
+    excerptHtml = escapeHtml(job.short_description);
   }
 
   back.innerHTML = `
-    <p class="back-section-title">🏷 매칭 키워드</p>
+    <div class="back-header-row">
+      <span class="back-section-title">🏷 매칭 키워드</span>
+      <span class="back-match-percent">${job.match_rate}% 일치</span>
+    </div>
     <div class="keyword-chips-back">${kw}</div>
     <p class="back-section-title">✨ 이 공고가 잘 맞는 이유</p>
-    ${evidenceHtml}
+    <ul class="match-reasons-back">${reasons}</ul>
+    <div class="job-excerpt-box">
+      <p class="job-excerpt-label">공고 원문 발췌</p>
+      <p class="job-excerpt-text">${excerptHtml}</p>
+    </div>
     <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="btn-original" id="btn-original-link">원본 채용공고 보기 →</a>
-    <p class="flip-hint-back">탭해서 앞면으로 👆</p>`;
+    <p class="flip-hint-back">👆 탭해서 앞면으로</p>`;
   document.getElementById("btn-original-link")?.addEventListener("click", (e) => e.stopPropagation());
 
   document.getElementById("card-counter").textContent = `${resultState.currentIndex + 1} / ${resultState.jobs.length}`;
