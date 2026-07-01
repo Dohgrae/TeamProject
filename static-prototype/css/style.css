@@ -121,9 +121,3 @@ hr {
 .screen.active {
   display: block;
 }
-
-#screen-result.active {
-  padding: 0;
-  background: transparent;
-  box-shadow: none;
-}

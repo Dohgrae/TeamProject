@@ -36,91 +36,34 @@
   white-space: nowrap;
 }
 
-/* 원래 feature3에서는 body 전체에 적용됐지만, Next.js 앱 안에서는 다른 화면까지
-   새어나가지 않도록 이 결과 화면 컨테이너(.result-page)에만 스코프한다. */
+/* 입력 위저드와 같은 .screen 흰 카드 안에 그대로 얹히는 콘텐츠 래퍼일 뿐이라
+   자체 배경/전체높이 스타일은 두지 않는다 (다른 화면들과 형태를 통일). */
 .result-page {
   font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
                'Noto Sans KR', 'Segoe UI', sans-serif;
-  background: var(--bg);
-  min-height: 100vh;
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
 }
 
 
 /* ============================================================
-   헤더 — 입력 위저드의 .app-header와 동일한 톤
-   ============================================================ */
-.header {
-  background: #ffffff;
-  border-bottom: 1px solid #f3f4f6;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  padding: 0 20px;
-}
-
-.header-inner {
-  max-width: 480px;
-  margin: 0 auto;
-  height: 58px;
-  display: flex;
-  align-items: center;
-}
-
-.logo {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.logo-icon { font-size: 20px; }
-
-.logo-text {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  color: var(--point);
-}
-
-.logo-tagline {
-  font-size: 12px;
-  color: var(--text-light);
-  font-weight: 500;
-}
-
-
-/* ============================================================
-   메인 레이아웃
+   메인 레이아웃 — .screen이 이미 32px 패딩을 주므로 여기서는 최소한만
    ============================================================ */
 .main {
   max-width: 480px;
   margin: 0 auto;
-  padding: 24px 16px 110px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
 }
 
-
-/* ============================================================
-   히어로 텍스트
-   ============================================================ */
-.hero { text-align: center; }
-
-.hero-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--text-dark);
-  letter-spacing: -0.5px;
-  line-height: 1.3;
-}
-
-.hero-sub {
-  margin-top: 6px;
-  font-size: 14px;
-  color: var(--text-mid);
+/* h1/.sub는 다른 입력 화면들처럼 전체 폭을 차지하는 좌측 정렬 제목으로 둔다
+   (align-items:center 때문에 그냥 두면 짧게 줄어들어 가운데 정렬돼 버림). */
+.main > h1,
+.main > .sub {
+  align-self: stretch;
+  text-align: left;
 }
 
 
@@ -174,10 +117,12 @@
   perspective: 1400px;
 }
 
-/* 이전 공고 다시 보기 — 카드 왼쪽에 겹쳐 뜨는 희미한 삼각형 아이콘 (버튼 박스 없이 아이콘만) */
+/* 이전 공고 다시 보기 — 카드 안쪽이 아니라 카드 바깥(왼쪽 여백)에 뜨는 희미한 삼각형 아이콘
+   (버튼 박스 없이 아이콘만). .screen이 이미 32px 패딩을 주고 .main은 480px로 좁혀져 있어서
+   그 사이 여백에 자리잡는다. */
 .card-nav-prev {
   position: absolute;
-  left: 6px;
+  left: -46px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 5;
@@ -648,14 +593,14 @@
   animation: heartbeat 1.28s ease-in-out infinite;
 }
 
-/* 앞쪽의 큐피 마스코트 — 하트보다 작게 그 앞에서 둥실둥실 떠 있는 느낌 */
+/* 앞쪽의 큐피 마스코트 — 하트보다 작게 그 앞에서 둥실둥실 떠 있는 느낌.
+   기존 drop-shadow 필터가 캐릭터 뒤에 뿌연 후광처럼 번져 하트 모양을 가렸어서 뺐다. */
 .match-loading-mascot {
   position: relative;
   z-index: 2;
   width: 110px;
   height: auto;
   animation: mascotFloat 2.4s ease-in-out infinite;
-  filter: drop-shadow(0 10px 16px rgba(125, 0, 184, 0.22));
 }
 
 @keyframes mascotFloat {
@@ -718,48 +663,40 @@
 }
 
 /* ============================================================
-   매칭 대기 중에는 헤더/히어로/조작 버튼을 다 걷어내고 "두근두근" 카드만
-   화면 가운데 크게 띄운다 (main.js가 #screen-result에 is-loading을 토글).
+   매칭 대기 중에는 제목/문구/조작 버튼을 걷어내고 "두근두근" 카드를 조금 더
+   크게 띄운다 (main.js가 #screen-result에 is-loading을 토글). 다른 화면들과
+   똑같이 위저드 헤더/스텝네비는 항상 그대로 보이도록 유지한다.
    ============================================================ */
-#screen-result.is-loading .header,
-#screen-result.is-loading .hero,
-#screen-result.is-loading .button-area,
-#screen-result.is-loading > .nav-row {
+#screen-result.is-loading .main > h1,
+#screen-result.is-loading .main > .sub,
+#screen-result.is-loading .button-area {
   display: none;
 }
 
 #screen-result.is-loading {
-  --card-height: 640px;
-}
-
-#screen-result.is-loading .main {
-  min-height: 100vh;
-  justify-content: center;
-  max-width: 560px;
-  padding-top: 24px;
-  padding-bottom: 24px;
+  --card-height: 560px;
 }
 
 #screen-result.is-loading .match-loading-hero {
-  width: 320px;
-  height: 320px;
+  width: 240px;
+  height: 240px;
 }
 
 #screen-result.is-loading .match-loading-mascot {
-  width: 170px;
+  width: 130px;
 }
 
 #screen-result.is-loading .match-loading-heart {
-  font-size: 300px;
+  font-size: 220px;
 }
 
 #screen-result.is-loading .match-loading-title {
-  font-size: 24px;
+  font-size: 22px;
 }
 
 #screen-result.is-loading .match-loading-message {
-  font-size: 16px;
-  max-width: 380px;
+  font-size: 15px;
+  max-width: 340px;
 }
 
 
@@ -915,9 +852,8 @@
 
 /* 소형 모바일 (380px 미만) */
 @media (max-width: 380px) {
-  .main { padding: 16px 12px 96px; gap: 16px; }
+  .main { gap: 16px; }
   :root { --card-height: 500px; }
-  .hero-title { font-size: 19px; }
   .card-front, .card-back { padding: 22px 18px; }
   /* 소형 모바일: 회사명 22px, 직무명 16px */
   .card-company-big { font-size: 22px; }
@@ -934,9 +870,7 @@
 
 /* 태블릿 · 데스크톱 (481px 이상) */
 @media (min-width: 481px) {
-  .main { padding: 32px 24px 120px; }
   :root { --card-height: 540px; }
-  .hero-title { font-size: 24px; }
   /* 데스크톱: 회사명 28px, 직무명 20px */
   .card-company-big { font-size: 28px; }
   .card-position-sub { font-size: 20px; }

@@ -189,7 +189,6 @@ function isBasicInfoValid() {
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
   document.getElementById(`screen-${id}`).classList.add("active");
-  document.querySelector(".app-header").style.display = id === "result" ? "none" : "flex";
   renderStepNav(id);
   RENDERERS[id]?.();
   window.scrollTo(0, 0);

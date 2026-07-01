@@ -238,4 +238,5 @@ const WIZARD_SCREENS = [
   { id: "awards", label: "수상·공모전" },
   { id: "personality", label: "성향 질문" },
   { id: "review", label: "완료" },
+  { id: "result", label: "결과" },
 ];
