@@ -19,7 +19,7 @@ const RENDERERS = {
 };
 
 // ============================================================
-// 항목이 여러 장 카드로 나열된 화면(기본 인적사항, 성향질문) 공통:
+// 항목이 여러 장 카드로 나열된 화면(기본 인적사항, 업무 성향 테스트) 공통:
 // 클릭/포커스한 카드만 위로 떠오르며 강조되고 나머지는 은은하게 가라앉는 효과
 // ============================================================
 function setActiveFocusCard(list, card) {
@@ -133,7 +133,7 @@ function setupAutoAdvance(list) {
   );
 }
 
-// ── 성향 질문 ──
+// ── 업무 성향 테스트 ──
 let personalityFocusBound = false;
 
 function activateFirstPersonalityCardIfEmpty() {
@@ -272,9 +272,12 @@ function openPeriodModal() {
     })
   );
 
-  document.getElementById("period-start").value = "";
-  document.getElementById("period-end").value = "";
-  document.getElementById("period-end").disabled = false;
+  document.getElementById("period-start-year").innerHTML = yearOptionsHtml("");
+  document.getElementById("period-start-month").innerHTML = monthOptionsHtml("");
+  document.getElementById("period-end-year").innerHTML = yearOptionsHtml("");
+  document.getElementById("period-end-month").innerHTML = monthOptionsHtml("");
+  document.getElementById("period-end-year").disabled = false;
+  document.getElementById("period-end-month").disabled = false;
   document.getElementById("period-ongoing").checked = false;
   document.getElementById("btn-period-next").disabled = true;
 
@@ -316,6 +319,23 @@ function closeExtracurricularTypeModal() {
 // questions: 이번에 물어볼 질문 세트, onComplete: 4개 다 답하면 호출되는 콜백(answers, keywords)
 const interviewState = { questions: [], answers: [], finishing: false, onComplete: null };
 
+// 문자열을 안정적인(같은 입력엔 항상 같은 결과) 숫자로 바꿔서 배열에서 하나를 고른다.
+// Math.random()을 쓰면 "이전"으로 돌아갔다 다시 렌더링될 때마다 반응 문구가 바뀌어버려서
+// 답변 내용 자체를 시드로 쓴다.
+function pickStableReply(list, seed) {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  return list[hash % list.length];
+}
+
+// 답변 내용에 맞는 반응을 고른다 (규칙 기반, KEYWORD_TRIGGERS와 같은 방식).
+function buildInterviewReaction(answer) {
+  for (const [pattern, replies] of REACTION_TRIGGERS) {
+    if (pattern.test(answer)) return pickStableReply(replies, answer);
+  }
+  return pickStableReply(REACTION_FALLBACKS, answer);
+}
+
 // answers 배열만으로 대화 로그를 매번 다시 만든다 — "이전"으로 되돌아가도 항상 일관된 상태가 되도록.
 function buildInterviewMessages(questions, answers) {
   const messages = [];
@@ -327,7 +347,7 @@ function buildInterviewMessages(questions, answers) {
       messages.push({ role: "user", text: answers[i] });
       messages.push({
         role: "assistant",
-        text: i < total - 1 ? WORK_INTERVIEW_ACKS[i % WORK_INTERVIEW_ACKS.length] : "말씀해주셔서 감사해요! 잘 정리해서 저장할게요.",
+        text: i < total - 1 ? buildInterviewReaction(answers[i]) : "말씀해주셔서 감사해요! 잘 정리해서 저장할게요.",
       });
     } else {
       break; // 아직 답변 안 한 질문에서 멈추고 여기서 입력 대기
@@ -722,16 +742,21 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-add-work").addEventListener("click", openPeriodModal);
   document.getElementById("btn-period-cancel").addEventListener("click", closePeriodModal);
 
-  document.getElementById("period-start").addEventListener("input", (e) => {
-    periodState.start_date = e.target.value;
-    document.getElementById("btn-period-next").disabled = !periodState.start_date;
+  ["period-start-year", "period-start-month"].forEach((id) => {
+    document.getElementById(id).addEventListener("change", () => {
+      periodState.start_date = readYearMonthPicker("period-start");
+      document.getElementById("btn-period-next").disabled = !periodState.start_date;
+    });
   });
-  document.getElementById("period-end").addEventListener("input", (e) => {
-    periodState.end_date = e.target.value;
+  ["period-end-year", "period-end-month"].forEach((id) => {
+    document.getElementById(id).addEventListener("change", () => {
+      periodState.end_date = readYearMonthPicker("period-end");
+    });
   });
   document.getElementById("period-ongoing").addEventListener("change", (e) => {
-    document.getElementById("period-end").disabled = e.target.checked;
-    periodState.end_date = e.target.checked ? null : document.getElementById("period-end").value;
+    document.getElementById("period-end-year").disabled = e.target.checked;
+    document.getElementById("period-end-month").disabled = e.target.checked;
+    periodState.end_date = e.target.checked ? null : readYearMonthPicker("period-end");
   });
   document.getElementById("btn-period-next").addEventListener("click", () => {
     if (!periodState.start_date) return;
