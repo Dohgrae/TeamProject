@@ -325,6 +325,15 @@
   letter-spacing: -0.3px;
 }
 
+/* 지원 마감일 (앞면) */
+.card-deadline-front {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-mid);
+  font-weight: 600;
+  padding-top: 10px;
+}
+
 /* 뒤집기 힌트 */
 .flip-hint {
   margin-top: auto;
@@ -337,19 +346,19 @@
 
 
 /* ============================================================
-   카드 뒷면
+   카드 뒷면 — 앞면과 같은 흰 배경으로 통일
    ============================================================ */
 .card-back {
-  background: var(--point);
+  background: #ffffff;
   transform: rotateY(180deg);
   box-shadow: var(--card-shadow);
-  color: white;
+  color: var(--text-dark);
 }
 
 .back-section-title {
   font-size: 11px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--text-light);
   text-transform: uppercase;
   letter-spacing: 1.2px;
   margin-bottom: 10px;
@@ -358,67 +367,63 @@
 
 .back-section-title:first-child { margin-top: 0; }
 
-/* 매칭 키워드 칩 (뒷면) */
+/* 매칭 키워드 칩 (뒷면) — 버튼과 같은 포인트 컬러로 강조 */
 .keyword-chips-back {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 .keyword-chip-back {
   display: inline-block;
-  padding: 5px 12px;
+  padding: 7px 16px;
   border-radius: 99px;
-  font-size: 12px;
-  font-weight: 700;
-  background: rgba(255, 255, 255, 0.22);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  font-size: 13px;
+  font-weight: 800;
+  background: var(--point);
+  color: #ffffff;
   white-space: nowrap;
-  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(125, 0, 184, 0.3);
 }
 
-/* 매칭 사유 리스트 */
-.match-reasons-back {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* 실제로 매칭된 공고 원문 한 줄을 인용하고, 겹치는 부분을 하이라이트한다 */
+.match-evidence-quote {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-dark);
+  background: #f9fafb;
+  border-left: 3px solid var(--point);
+  border-radius: 0 10px 10px 0;
+  padding: 12px 14px;
+  font-style: normal;
 }
 
-.reason-item-back {
+.match-evidence-highlight {
+  background: rgba(125, 0, 184, 0.16);
+  color: var(--point-deep);
+  font-weight: 800;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+
+.match-evidence-desc {
   font-size: 13px;
   line-height: 1.65;
-  color: rgba(255, 255, 255, 0.92);
-  padding-left: 20px;
-  position: relative;
+  color: var(--text-mid);
+  margin-top: 10px;
 }
 
-.reason-item-back::before {
-  content: '✓';
-  position: absolute;
-  left: 0;
-  top: 1px;
-  font-size: 11px;
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.6);
+.match-evidence-desc strong {
+  color: var(--point-deep);
 }
 
-/* 마감일 */
-.back-deadline {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.72);
-  font-weight: 600;
-  margin-top: 18px;
-}
-
-/* 원본 공고 보기 버튼 (뒷면 내) */
+/* 원본 공고 보기 버튼 (뒷면 하단, 앞면 복귀 힌트 바로 위) */
 .btn-original {
   display: block;
-  margin-top: 14px;
+  margin-top: auto;
   padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--point-deep);
+  background: var(--point);
+  color: #ffffff;
   text-align: center;
   font-size: 14px;
   font-weight: 700;
@@ -430,18 +435,17 @@
 
 .btn-original:hover,
 .btn-original:focus-visible {
-  background: #ffffff;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
+  background: var(--point-deep);
+  box-shadow: 0 4px 18px rgba(125, 0, 184, 0.3);
   outline: none;
 }
 
 /* 앞면 복귀 힌트 (뒷면 하단) */
 .flip-hint-back {
-  margin-top: auto;
-  padding-top: 14px;
+  padding-top: 10px;
   text-align: center;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.42);
+  color: var(--text-light);
   letter-spacing: 0.2px;
 }
 

@@ -205,6 +205,45 @@ function scoreJob(job, userSignals, keywords, personalityKeywords) {
   return { matchRate, matchedKeywords, breakdown: { competency, personality, preferred } };
 }
 
+// 공고 원문을 "한 줄" 단위로 쪼갠다. jobs.json 일부 필드는 실제 개행 문자 대신
+// 이중 이스케이프된 리터럴 "\n"(백슬래시+n 두 글자)을 그대로 담고 있어서 둘 다 구분자로 처리한다.
+// 그 다음 앞의 "•"/"-"/공백 같은 불릿 기호를 정리한다.
+function splitIntoLines(text) {
+  return text
+    .split(/\\n|\n/)
+    .map((line) => line.replace(/^[•\-\s]+/, "").trim())
+    .filter(Boolean);
+}
+
+// matched(카테고리별로 이미 매칭된 키워드 id 목록) 중 하나가 실제로 등장하는 원문 한 줄과,
+// 그 줄에서 하이라이트할 위치(alias가 실제로 발견된 구간)를 찾는다. 역량 > 우대요건 > 업무성향
+// 순으로 찾아보고, 하나도 못 찾으면 null을 돌려준다(카드 뒷면에서 안내 문구로 대체).
+function findMatchEvidence(job, breakdown, keywords, personalityKeywords) {
+  const sources = [
+    { text: joinText([job.qualifications, job.main_tasks]), matched: breakdown.competency.matched, dict: [...keywords, ...COMPETENCY_LABEL_DICT] },
+    { text: joinText([job.preferred_etc, job.preferred_cert, job.preferred_language]), matched: breakdown.preferred.matched, dict: keywords },
+    { text: job.ideal_person || "", matched: breakdown.personality.matched, dict: personalityKeywords },
+  ];
+
+  for (const { text, matched, dict } of sources) {
+    if (!text || matched.length === 0) continue;
+    const lines = splitIntoLines(text);
+    for (const label of matched) {
+      const entry = dict.find((k) => k.id === label);
+      if (!entry) continue;
+      for (const line of lines) {
+        for (const alias of entry.aliases) {
+          const idx = line.toLowerCase().indexOf(alias.toLowerCase());
+          if (idx !== -1) {
+            return { line, highlightStart: idx, highlightEnd: idx + alias.length, label };
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
 function buildMatchReasons(job, breakdown, majorWarning) {
   const reasons = [];
   const topSkills = [...breakdown.competency.matched, ...breakdown.preferred.matched].slice(0, 3);
@@ -252,6 +291,7 @@ async function matchJobs(profile) {
         match_rate: matchRate,
         matched_keywords: matchedKeywords,
         match_reasons: buildMatchReasons(job, breakdown, majorWarning),
+        evidence: findMatchEvidence(job, breakdown, keywords, personalityKeywords),
         major_warning: majorWarning,
       };
     })

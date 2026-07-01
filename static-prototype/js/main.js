@@ -405,6 +405,13 @@ function goToPreviousInterviewAnswer() {
 // ============================================================
 const resultState = { jobs: null, currentIndex: 0, isFlipped: false, error: null };
 
+// 공고 원문 인용문을 innerHTML에 그대로 꽂기 전에 이스케이프한다.
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 function getMatchComment(score) {
   if (score >= 95) return "이건 운명입니다. 놓치지 마세요! 💘";
   if (score >= 90) return "이 정도면 바로 만나봐야 해!";
@@ -491,18 +498,30 @@ function renderResultCard(direction = "forward") {
       <span class="${scoreClass}">${job.match_rate}%</span>
       <span class="score-label">${getMatchComment(job.match_rate)}</span>
     </div>
+    <p class="card-deadline-front">📅 지원 마감 : ${job.deadline}</p>
     <p class="flip-hint">탭해서 상세 보기 👆</p>`;
 
   const kw = job.matched_keywords.map((k) => `<span class="keyword-chip-back">#${k}</span>`).join("");
-  const reasons = job.match_reasons.map((r) => `<li class="reason-item-back">${r}</li>`).join("");
   const safeUrl = /^https?:\/\//i.test(job.url) ? job.url : "#";
+
+  let evidenceHtml;
+  if (job.evidence) {
+    const { line, highlightStart, highlightEnd, label } = job.evidence;
+    const before = escapeHtml(line.slice(0, highlightStart));
+    const highlighted = escapeHtml(line.slice(highlightStart, highlightEnd));
+    const after = escapeHtml(line.slice(highlightEnd));
+    evidenceHtml = `
+      <blockquote class="match-evidence-quote">"${before}<mark class="match-evidence-highlight">${highlighted}</mark>${after}"</blockquote>
+      <p class="match-evidence-desc">공고 원문의 <strong>#${escapeHtml(label)}</strong> 부분이 회원님의 경험·역량과 겹쳐요.</p>`;
+  } else {
+    evidenceHtml = `<p class="match-evidence-desc">직무·지역·경력 조건은 맞지만, 공고 원문에서 겹치는 문장은 아직 못 찾았어요.</p>`;
+  }
 
   back.innerHTML = `
     <p class="back-section-title">🏷 매칭 키워드</p>
     <div class="keyword-chips-back">${kw}</div>
     <p class="back-section-title">✨ 이 공고가 잘 맞는 이유</p>
-    <ul class="match-reasons-back">${reasons}</ul>
-    <p class="back-deadline">📅 지원 마감 : ${job.deadline}</p>
+    ${evidenceHtml}
     <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="btn-original" id="btn-original-link">원본 채용공고 보기 →</a>
     <p class="flip-hint-back">탭해서 앞면으로 👆</p>`;
   document.getElementById("btn-original-link")?.addEventListener("click", (e) => e.stopPropagation());
