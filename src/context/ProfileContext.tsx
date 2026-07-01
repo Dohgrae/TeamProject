@@ -7,15 +7,17 @@ import type {
   ExtracurricularItem,
   Filters,
   LanguageScore,
+  PersonalityChoice,
   Qualifications,
-  SurveyResponse,
   TechStackCategory,
   UserProfileDraft,
   WorkExperience,
 } from "@/types/profile";
 import { computeCareer, computeDerivedTagWeights, createEmptyPersonalityAnswers } from "@/lib/deriveProfile";
 
-const STORAGE_KEY = "bbopaduo_user_profile_draft";
+// 스키마가 바뀔 때마다 버전을 올려서, 예전 구조의 draft가 localStorage에 남아 있어도
+// 새 코드가 없는 필드를 읽다가 조용히 죽는 일이 없게 한다.
+const STORAGE_KEY = "bbopaduo_user_profile_draft_v2";
 
 function emptyProfile(): UserProfileDraft {
   return {
@@ -63,7 +65,7 @@ type Action =
   | { type: "REMOVE_LANGUAGE"; index: number }
   | { type: "ADD_CERTIFICATE"; value: string }
   | { type: "REMOVE_CERTIFICATE"; index: number }
-  | { type: "ADD_WORK_EXPERIENCE" }
+  | { type: "ADD_WORK_EXPERIENCE"; answers: string[]; keywords: string[] }
   | { type: "UPDATE_WORK_EXPERIENCE"; id: string; value: Partial<WorkExperience> }
   | { type: "REMOVE_WORK_EXPERIENCE"; id: string }
   | { type: "ADD_EXTRACURRICULAR" }
@@ -72,7 +74,7 @@ type Action =
   | { type: "ADD_AWARD" }
   | { type: "UPDATE_AWARD"; id: string; value: Partial<AwardItem> }
   | { type: "REMOVE_AWARD"; id: string }
-  | { type: "SET_PERSONALITY_ANSWER"; question_id: number; option: 1 | 2; response: SurveyResponse };
+  | { type: "SET_PERSONALITY_CHOICE"; question_id: number; choice: PersonalityChoice };
 
 function withMeta(profile: UserProfileDraft): UserProfileDraft {
   return {
@@ -150,7 +152,8 @@ function reducer(state: UserProfileDraft, action: Action): UserProfileDraft {
         employment_type: "정규직",
         start_date: "",
         end_date: null,
-        description: "",
+        answers: action.answers,
+        keywords: action.keywords,
       };
       const work_experiences = [...state.career.work_experiences, newExp];
       return withMeta({ ...state, career: { ...state.career, work_experiences, ...computeCareer(work_experiences) } });
@@ -210,9 +213,11 @@ function reducer(state: UserProfileDraft, action: Action): UserProfileDraft {
         ...state,
         activities: { ...state.activities, awards: state.activities.awards.filter((item) => item.id !== action.id) },
       });
-    case "SET_PERSONALITY_ANSWER": {
+    case "SET_PERSONALITY_CHOICE": {
       const answers = state.personality_survey.answers.map((a) =>
-        a.question_id === action.question_id && a.option === action.option ? { ...a, response: action.response } : a
+        a.question_id === action.question_id
+          ? { ...a, choice: a.choice === action.choice ? null : action.choice }
+          : a
       );
       return withMeta({
         ...state,

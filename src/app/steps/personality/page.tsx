@@ -3,23 +3,21 @@
 import { useRouter } from "next/navigation";
 import { useProfile } from "@/context/ProfileContext";
 import { PERSONALITY_QUESTIONS } from "@/lib/constants";
-import type { SurveyResponse } from "@/types/profile";
-
-const RESPONSE_OPTIONS: SurveyResponse[] = ["그렇다", "아니다", "모르겠다"];
+import type { PersonalityChoice } from "@/types/profile";
 
 export default function PersonalityPage() {
   const router = useRouter();
   const { profile, dispatch } = useProfile();
-  const { answers, derived_tag_weights } = profile.personality_survey;
+  const { answers } = profile.personality_survey;
 
-  const answeredCount = answers.filter((a) => a.response !== null).length;
-  const topTags = Object.entries(derived_tag_weights)
-    .filter(([, w]) => w > 0)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8);
+  const answeredCount = answers.filter((a) => a.choice !== null).length;
 
-  function findResponse(questionId: number, option: 1 | 2) {
-    return answers.find((a) => a.question_id === questionId && a.option === option)?.response ?? null;
+  function findChoice(questionId: number) {
+    return answers.find((a) => a.question_id === questionId)?.choice ?? null;
+  }
+
+  function selectChoice(questionId: number, choice: PersonalityChoice) {
+    dispatch({ type: "SET_PERSONALITY_CHOICE", question_id: questionId, choice });
   }
 
   return (
@@ -27,7 +25,7 @@ export default function PersonalityPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">성향 질문</h1>
         <p className="mt-1 text-sm text-gray-500">
-          각 진술이 나와 얼마나 맞는지 응답해주세요. ({answeredCount} / {answers.length})
+          나와 더 가까운 쪽을 골라주세요. ({answeredCount} / {answers.length})
         </p>
         <div className="mt-2 h-1.5 w-full rounded-full bg-gray-100">
           <div
@@ -37,67 +35,44 @@ export default function PersonalityPage() {
         </div>
       </div>
 
-      {topTags.length > 0 && (
-        <div className="rounded-xl bg-purple-50 p-4">
-          <p className="mb-2 text-xs font-semibold text-purple-600">현재까지 파악된 성향 태그</p>
-          <div className="flex flex-wrap gap-2">
-            {topTags.map(([tag, weight]) => (
-              <span key={tag} className="rounded-full bg-white px-3 py-1 text-xs font-medium text-purple-600">
-                #{tag} {weight < 1 ? `(${weight.toFixed(1)})` : ""}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
       <div className="flex flex-col gap-8">
-        {PERSONALITY_QUESTIONS.map((q) => (
-          <div key={q.question_id} className="rounded-xl border border-gray-200 p-4">
-            <p className="mb-3 font-semibold text-gray-900">
-              Q{q.question_id}. {q.question}
-            </p>
-            <div className="flex flex-col gap-3">
-              {q.options.map((opt) => {
-                const response = findResponse(q.question_id, opt.option);
-                return (
-                  <div key={opt.option} className="rounded-lg bg-gray-50 p-3">
-                    <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                      <div>
-                        <p className="text-sm text-gray-800">
-                          ({opt.option}) {opt.statement}
-                        </p>
-                        <p className="mt-1 text-xs text-gray-400">{opt.tags.map((t) => `#${t}`).join(" ")}</p>
-                      </div>
-                      <div className="flex gap-1">
-                        {RESPONSE_OPTIONS.map((r) => (
-                          <button
-                            key={r}
-                            type="button"
-                            onClick={() =>
-                              dispatch({
-                                type: "SET_PERSONALITY_ANSWER",
-                                question_id: q.question_id,
-                                option: opt.option,
-                                response: response === r ? null : r,
-                              })
-                            }
-                            className={`rounded-full border px-3 py-1 text-xs transition ${
-                              response === r
-                                ? "border-pink-500 bg-pink-500 text-white"
-                                : "border-gray-300 bg-white text-gray-600 hover:border-pink-300"
-                            }`}
-                          >
-                            {r}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+        {PERSONALITY_QUESTIONS.map((q) => {
+          const choice = findChoice(q.question_id);
+          return (
+            <div key={q.question_id} className="rounded-xl border border-gray-200 p-4">
+              <p className="mb-3 font-semibold text-gray-900">
+                Q{q.question_id}. {q.question}
+              </p>
+              <div className="flex flex-col gap-2">
+                {q.options.map((opt) => (
+                  <button
+                    key={opt.option}
+                    type="button"
+                    onClick={() => selectChoice(q.question_id, opt.option)}
+                    className={`rounded-lg border p-3 text-left text-sm transition ${
+                      choice === opt.option
+                        ? "border-pink-500 bg-pink-50 text-pink-700"
+                        : "border-gray-200 bg-gray-50 text-gray-700 hover:border-pink-300"
+                    }`}
+                  >
+                    {opt.statement}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => selectChoice(q.question_id, "unknown")}
+                  className={`rounded-lg border p-3 text-left text-sm transition ${
+                    choice === "unknown"
+                      ? "border-gray-400 bg-gray-100 text-gray-700"
+                      : "border-gray-200 bg-white text-gray-400 hover:border-gray-300"
+                  }`}
+                >
+                  잘 모르겠어요
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="flex justify-between pt-4">

@@ -1,4 +1,4 @@
-import { PERSONALITY_QUESTIONS, TAG_WEIGHT_BY_RESPONSE } from "./constants";
+import { PERSONALITY_QUESTIONS } from "./constants";
 import type { CareerStatus, PersonalityAnswer, WorkExperience } from "@/types/profile";
 
 function monthsBetween(start: string, end: string): number {
@@ -29,27 +29,22 @@ export function computeCareer(workExperiences: WorkExperience[]): {
   };
 }
 
-// 그렇다=1.0 / 모르겠다=0.3 / 아니다=0 규칙으로 진술 태그를 가중치로 환산.
-// 같은 태그가 여러 진술에 걸쳐 나오면 가장 강한 신호(최댓값)를 채택한다.
+// 질문마다 고른 진술(1 또는 2)의 태그만 가중치 1.0으로 반영한다.
+// "잘 모르겠다"를 고르거나 아직 답하지 않은 질문은 반영하지 않는다.
 export function computeDerivedTagWeights(answers: PersonalityAnswer[]): Record<string, number> {
   const weights: Record<string, number> = {};
   for (const answer of answers) {
-    if (!answer.response) continue;
-    const weight = TAG_WEIGHT_BY_RESPONSE[answer.response] ?? 0;
-    for (const tag of answer.tags) {
-      weights[tag] = Math.max(weights[tag] ?? 0, weight);
+    if (answer.choice === null || answer.choice === "unknown") continue;
+    const question = PERSONALITY_QUESTIONS.find((q) => q.question_id === answer.question_id);
+    const option = question?.options.find((opt) => opt.option === answer.choice);
+    if (!option) continue;
+    for (const tag of option.tags) {
+      weights[tag] = Math.max(weights[tag] ?? 0, 1.0);
     }
   }
   return weights;
 }
 
 export function createEmptyPersonalityAnswers(): PersonalityAnswer[] {
-  return PERSONALITY_QUESTIONS.flatMap((q) =>
-    q.options.map((opt) => ({
-      question_id: q.question_id,
-      option: opt.option,
-      tags: opt.tags,
-      response: null,
-    }))
-  );
+  return PERSONALITY_QUESTIONS.map((q) => ({ question_id: q.question_id, choice: null }));
 }

@@ -275,7 +275,7 @@ export default function BasicInfoPage() {
         <button
           type="button"
           disabled={!canProceed}
-          onClick={() => router.push("/steps/career")}
+          onClick={() => router.push("/steps/work")}
           className="rounded-full bg-pink-500 px-8 py-3 font-semibold text-white transition hover:bg-pink-600 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
         >
           다음 단계

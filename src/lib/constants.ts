@@ -212,15 +212,68 @@ export const PERSONALITY_QUESTIONS: PersonalityQuestion[] = [
   },
 ];
 
-export const TAG_WEIGHT_BY_RESPONSE: Record<string, number> = {
-  그렇다: 1.0,
-  모르겠다: 0.3,
-  아니다: 0,
-};
+// 직장 경험을 추가할 때 챗봇이 순서대로 묻는 8가지 질문.
+export const WORK_INTERVIEW_QUESTIONS = [
+  "언제, 어디서, 어떤 활동을 했나요?",
+  "해결해야 했던 문제나 목표가 무엇이었나요?",
+  "그중에서 내가 직접 한 일은 무엇인가요?",
+  "어떤 방식으로 행동하거나 판단했나요?",
+  "어떤 툴/스킬을 사용해서 문제를 해결했나요?",
+  "고객, 팀원, 외부기관, 상사 등 누구와 협업했나요?",
+  "어떤 수치, 성과, 개선 결과가 있었나요?",
+  "이 경험을 통해 어떤 역량을 보여줄 수 있나요?",
+] as const;
+
+// 인터뷰 답변 사이사이에 랜덤으로 보여주는 대화체 반응 (API 호출 없이 미리 준비된 문구).
+export const WORK_INTERVIEW_ACKS = [
+  "그렇군요!",
+  "네, 잘 알겠습니다.",
+  "좋은 경험이네요.",
+  "아, 그러셨군요.",
+  "말씀 감사해요.",
+  "흥미로운 이야기네요.",
+] as const;
+
+// 채용공고 키워드와 매칭되는 고정 역량 키워드 사전.
+// 인터뷰 답변을 이 목록 안에 있는 표현으로만 키워드화한다 (자유 생성 금지) —
+// 그래야 서로 다른 문구로 적힌 사용자 경험이 채용공고 키워드와 일치할 수 있다.
+export const COMPETENCY_KEYWORDS = [
+  "자기주도적",
+  "주도적",
+  "리더십",
+  "책임감",
+  "오너십",
+  "협업",
+  "커뮤니케이션",
+  "적극적",
+  "실행력",
+  "문제해결력",
+  "분석력",
+  "논리적사고",
+  "전략적사고",
+  "창의성",
+  "꼼꼼함",
+  "디테일지향",
+  "완성도",
+  "끈기",
+  "적응력",
+  "학습력",
+  "성장지향",
+  "도전정신",
+  "신속성",
+  "멀티태스킹",
+  "고객지향",
+  "데이터기반의사결정",
+  "기획력",
+  "실행경험",
+  "갈등조정",
+  "신뢰성",
+] as const;
 
 export const WIZARD_STEPS = [
   { path: "/steps/basic-info", label: "기본 인적사항" },
-  { path: "/steps/career", label: "경력 및 경험" },
+  { path: "/steps/work", label: "직장 경험" },
+  { path: "/steps/extracurricular", label: "학내외경험" },
   { path: "/steps/awards", label: "수상·공모전" },
   { path: "/steps/personality", label: "성향 질문" },
   { path: "/steps/review", label: "완료" },

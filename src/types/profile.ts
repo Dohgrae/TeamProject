@@ -55,7 +55,10 @@ export interface WorkExperience {
   employment_type: EmploymentTypeKR;
   start_date: string; // YYYY-MM
   end_date: string | null; // YYYY-MM, 재직중이면 null
-  description: string;
+  // WORK_INTERVIEW_QUESTIONS(constants.ts) 8개 질문에 순서대로 대응하는 답변.
+  answers: string[];
+  // 답변을 바탕으로 채용공고 매칭용으로 추출한 역량 키워드. 회사 내부 매칭에만 쓰이며 사용자 화면에는 절대 노출하지 않는다.
+  keywords: string[];
 }
 
 export type CareerStatus = "신입" | "경력";
@@ -89,13 +92,12 @@ export interface Activities {
   awards: AwardItem[];
 }
 
-export type SurveyResponse = "그렇다" | "아니다" | "모르겠다" | null;
+// 질문마다 두 진술 중 하나를 고르거나 "잘 모르겠다"를 고르는 3지선다 구조.
+export type PersonalityChoice = 1 | 2 | "unknown";
 
 export interface PersonalityAnswer {
   question_id: number;
-  option: 1 | 2;
-  tags: string[];
-  response: SurveyResponse;
+  choice: PersonalityChoice | null;
 }
 
 export interface PersonalitySurvey {

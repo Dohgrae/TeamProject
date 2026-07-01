@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useProfile } from "@/context/ProfileContext";
+import { AddExperienceGuideModal } from "@/components/AddExperienceGuideModal";
 
 export default function AwardsPage() {
   const router = useRouter();
   const { profile, dispatch } = useProfile();
   const { awards } = profile.activities;
+  const [showGuide, setShowGuide] = useState(false);
 
   return (
     <div className="flex flex-col gap-10">
@@ -42,7 +45,7 @@ export default function AwardsPage() {
 
         <button
           type="button"
-          onClick={() => dispatch({ type: "ADD_AWARD" })}
+          onClick={() => setShowGuide(true)}
           className="mt-3 w-full rounded-xl border border-dashed border-gray-300 py-2 text-sm text-gray-500 hover:border-pink-400 hover:text-pink-500"
         >
           + 수상/공모전 항목 추가
@@ -50,7 +53,7 @@ export default function AwardsPage() {
       </section>
 
       <div className="flex justify-between pt-4">
-        <button type="button" onClick={() => router.push("/steps/career")} className="rounded-full border border-gray-300 px-8 py-3 font-semibold text-gray-600 hover:bg-gray-50">
+        <button type="button" onClick={() => router.push("/steps/extracurricular")} className="rounded-full border border-gray-300 px-8 py-3 font-semibold text-gray-600 hover:bg-gray-50">
           이전
         </button>
         <button
@@ -61,6 +64,16 @@ export default function AwardsPage() {
           다음 단계
         </button>
       </div>
+
+      {showGuide && (
+        <AddExperienceGuideModal
+          onConfirm={() => {
+            dispatch({ type: "ADD_AWARD" });
+            setShowGuide(false);
+          }}
+          onCancel={() => setShowGuide(false)}
+        />
+      )}
     </div>
   );
 }
