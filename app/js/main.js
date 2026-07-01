@@ -3,7 +3,7 @@
 const RENDERERS = {
   "basic-info": () => {
     renderBasicInfo();
-    setupFieldSteps();
+    setupFocusCards();
   },
   work: renderWork,
   extracurricular: renderExtracurricular,
@@ -14,93 +14,62 @@ const RENDERERS = {
 };
 
 // ============================================================
-// 기본 인적사항: 항목을 한 번에 하나씩 슬라이드로 보여주는 로직
+// 기본 인적사항: 전체 항목을 한 화면에 보여주되, 클릭/포커스한 카드만
+// 위로 살짝 떠오르며 강조되고 나머지는 은은하게 가라앉는 효과
 // ============================================================
-const FIELD_STEP_TRANSITION_MS = 260;
-let fieldStepIndex = 0;
+let focusCardsBound = false;
 
-function getFieldStepEls() {
-  return Array.from(document.querySelectorAll("#field-step-viewport .field-step"));
+function setActiveFocusCard(card) {
+  const list = document.getElementById("basic-info-focus-list");
+  list.querySelectorAll(".focus-card").forEach((c) => c.classList.toggle("active", c === card));
+  list.classList.toggle("has-active", !!card);
 }
 
-// 필수 항목(이름·출생년월일 / 학력단계)만 유효성 검사, 나머지는 항목 없이도 넘어갈 수 있다.
-function isFieldStepValid(index) {
+// 이벤트 위임 방식이라 매번 다시 렌더링돼도 한 번만 바인딩하면 된다.
+function setupFocusCards() {
+  if (focusCardsBound) return;
+  focusCardsBound = true;
+  const list = document.querySelector(".focus-card-list");
+  list.id = "basic-info-focus-list";
+
+  list.addEventListener(
+    "focusin",
+    (e) => {
+      const card = e.target.closest(".focus-card");
+      if (card) setActiveFocusCard(card);
+    },
+    true
+  );
+
+  // 칩 버튼 클릭은 onToggle 안에서 바로 innerHTML을 다시 그려서 자기 자신을 DOM에서
+  // 떼어내 버리므로, 버블링(click)까지 기다리면 e.target의 부모 체인이 이미 끊겨 있다.
+  // 그래서 캡처링 단계(버튼 자체 클릭 핸들러보다 먼저)에서 잡아야 한다.
+  list.addEventListener(
+    "click",
+    (e) => {
+      const card = e.target.closest(".focus-card");
+      if (card) setActiveFocusCard(card);
+    },
+    true
+  );
+
+  // 카드 바깥을 클릭하면 강조를 해제한다. 이것도 캡처링 단계에서 판단해야
+  // 칩 재렌더링으로 e.target이 떨어져나가기 전에 원래 위치를 기준으로 판단할 수 있다.
+  document.addEventListener(
+    "click",
+    (e) => {
+      if (!e.target.closest(".focus-card") && !e.target.closest(".modal-overlay")) {
+        setActiveFocusCard(null);
+      }
+    },
+    true
+  );
+}
+
+// 필수 항목(이름/출생년월일/학력단계)만 유효성 검사, 나머지는 비워도 다음 단계로 넘어갈 수 있다.
+function isBasicInfoValid() {
   const p = AppState.profile;
-  const steps = getFieldStepEls();
-  const el = steps[index];
-  if (!el || el.dataset.required !== "true") return true;
-  if (el.querySelector("#input-name")) {
-    return p.basic_info.name.trim() !== "" && p.basic_info.birth_date !== "";
-  }
-  if (el.querySelector("#education-level-chips")) return p.basic_info.education.level !== "";
-  return true;
-}
-
-function updateFieldStepNav() {
-  const steps = getFieldStepEls();
-  document.getElementById("field-step-counter").textContent = `${fieldStepIndex + 1} / ${steps.length}`;
-  document.getElementById("field-step-progress-bar").style.width = `${((fieldStepIndex + 1) / steps.length) * 100}%`;
-  document.getElementById("btn-basic-info-prev").style.visibility = fieldStepIndex === 0 ? "hidden" : "visible";
-  document.getElementById("btn-basic-info-next").textContent = fieldStepIndex === steps.length - 1 ? "다음 단계" : "다음";
-  document.getElementById("btn-basic-info-next").disabled = !isFieldStepValid(fieldStepIndex);
-}
-
-// 카드가 사라지고/나타날 때 경계가 부드럽게 흐려지도록 하는 블러 세기
-const FIELD_STEP_BLUR_PX = 10;
-
-function resetFieldStepStyle(el) {
-  el.style.transition = "";
-  el.style.transform = "";
-  el.style.opacity = "";
-  el.style.filter = "";
-}
-
-// 첫 진입(또는 다시 이 화면으로 돌아왔을 때) 첫 항목부터 보여주도록 초기화.
-function setupFieldSteps() {
-  const steps = getFieldStepEls();
-  steps.forEach((el, i) => {
-    resetFieldStepStyle(el);
-    el.style.display = i === 0 ? "block" : "none";
-  });
-  fieldStepIndex = 0;
-  updateFieldStepNav();
-}
-
-// direction: 1 = 다음 항목(위로 슬라이드), -1 = 이전 항목(아래로 슬라이드)
-// 카드가 이동하면서 opacity/transform과 함께 filter: blur도 같이 바뀌어, 카드 간 경계가 흐릿하게 겹쳐 보인다.
-function goToFieldStep(newIndex, direction) {
-  const steps = getFieldStepEls();
-  if (newIndex < 0 || newIndex >= steps.length) return;
-
-  const curEl = steps[fieldStepIndex];
-  const nextEl = steps[newIndex];
-  const outY = direction === 1 ? -28 : 28;
-  const inY = direction === 1 ? 28 : -28;
-  const transitionCss = `transform ${FIELD_STEP_TRANSITION_MS}ms ease, opacity ${FIELD_STEP_TRANSITION_MS}ms ease, filter ${FIELD_STEP_TRANSITION_MS}ms ease`;
-
-  curEl.style.transition = transitionCss;
-  curEl.style.transform = `translateY(${outY}px)`;
-  curEl.style.opacity = "0";
-  curEl.style.filter = `blur(${FIELD_STEP_BLUR_PX}px)`;
-
-  setTimeout(() => {
-    curEl.style.display = "none";
-    resetFieldStepStyle(curEl);
-
-    fieldStepIndex = newIndex;
-    nextEl.style.display = "block";
-    nextEl.style.transition = "none";
-    nextEl.style.transform = `translateY(${inY}px)`;
-    nextEl.style.opacity = "0";
-    nextEl.style.filter = `blur(${FIELD_STEP_BLUR_PX}px)`;
-    void nextEl.offsetHeight; // 강제 리플로우로 위 스타일을 먼저 적용시킨 뒤 트랜지션 시작
-    nextEl.style.transition = transitionCss;
-    nextEl.style.transform = "translateY(0)";
-    nextEl.style.opacity = "1";
-    nextEl.style.filter = "blur(0)";
-    updateFieldStepNav();
-    setTimeout(() => resetFieldStepStyle(nextEl), FIELD_STEP_TRANSITION_MS);
-  }, FIELD_STEP_TRANSITION_MS);
+  return p.basic_info.name.trim() !== "" && p.basic_info.birth_date !== "" && p.basic_info.education.level !== "";
 }
 
 function showScreen(id) {
@@ -120,12 +89,12 @@ function bindBasicInfoInputs() {
   document.getElementById("input-name").addEventListener("input", (e) => {
     p().basic_info.name = e.target.value;
     AppState.save();
-    updateFieldStepNav();
+    document.getElementById("btn-basic-info-next").disabled = !isBasicInfoValid();
   });
   document.getElementById("input-birth").addEventListener("input", (e) => {
     p().basic_info.birth_date = e.target.value;
     AppState.save();
-    updateFieldStepNav();
+    document.getElementById("btn-basic-info-next").disabled = !isBasicInfoValid();
   });
   document.getElementById("input-major-detail").addEventListener("input", (e) => {
     p().basic_info.education.major_detail = e.target.value;
@@ -373,13 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindBasicInfoInputs();
 
   document.getElementById("btn-basic-info-next").addEventListener("click", () => {
-    if (!isFieldStepValid(fieldStepIndex)) return;
-    const isLastStep = fieldStepIndex === getFieldStepEls().length - 1;
-    if (isLastStep) showScreen("work");
-    else goToFieldStep(fieldStepIndex + 1, 1);
-  });
-  document.getElementById("btn-basic-info-prev").addEventListener("click", () => {
-    if (fieldStepIndex > 0) goToFieldStep(fieldStepIndex - 1, -1);
+    if (isBasicInfoValid()) showScreen("work");
   });
   document.getElementById("btn-work-prev").addEventListener("click", () => showScreen("basic-info"));
   document.getElementById("btn-work-next").addEventListener("click", () => showScreen("extracurricular"));

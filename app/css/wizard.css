@@ -1,36 +1,43 @@
 /* 뽑아듀오 — 입력 위저드 화면 스타일 */
 
-/* ── 기본 인적사항: 항목을 카드 한 장씩 슬라이드로 보여주는 화면 ── */
-/* 화면 자체는 카드가 떠 있는 배경 역할만 하고, 진짜 "카드"는 .field-step이 맡는다. */
+/* ── 기본 인적사항: 항목 전체가 한 화면에, 포커스한 카드만 떠오르며 강조 ── */
+/* 화면 자체는 카드들이 놓이는 배경 역할만 하고, 진짜 "카드"는 .focus-card가 맡는다. */
 #screen-basic-info.screen.active {
   background: transparent;
   box-shadow: none;
   padding: 0;
 }
 
-.field-step-counter {
-  font-size: 13px;
-  color: #9ca3af;
-  margin-bottom: 6px;
-}
-
-.field-step-viewport {
-  position: relative;
-  overflow: hidden;
-  min-height: 220px;
+.focus-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   padding: 10px 4px 24px;
 }
 
-.field-step {
-  display: none;
+.focus-card {
   background: #ffffff;
   border-radius: 18px;
   padding: 28px;
-  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
-  will-change: transform, opacity, filter;
+  box-shadow: 0 2px 10px rgba(17, 24, 39, 0.05);
+  border: 1px solid transparent;
+  transform: translateY(0) scale(1);
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, opacity 0.28s ease;
 }
 
-.field-step label {
+/* 클릭/포커스로 이 구역에 입력 중일 때: 위로 살짝 떠오르며 그림자가 짙어지고 테두리가 강조됨 */
+.focus-card.active {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 16px 36px rgba(236, 72, 153, 0.18);
+  border-color: #f9a8d4;
+}
+
+/* 다른 카드에 포커스가 가 있는 동안 나머지는 살짝 가라앉은 느낌을 주어 강조 대비를 준다 */
+.focus-card-list.has-active .focus-card:not(.active) {
+  opacity: 0.75;
+}
+
+.focus-card label {
   display: block;
   font-size: 13px;
   font-weight: 600;

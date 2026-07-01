@@ -17,17 +17,14 @@
 
   <main class="wizard-main">
 
-    <!-- ===== 1. 기본 인적사항 (항목별로 한 번에 하나씩, 슬라이드 전환) ===== -->
+    <!-- ===== 1. 기본 인적사항 (전체가 한 화면에, 포커스한 구역만 강조) ===== -->
     <section class="screen active" id="screen-basic-info">
       <h1>기본 인적사항</h1>
-      <p class="sub">취업 방향 추천을 위한 기본 정보를 입력해주세요.</p>
+      <p class="sub">취업 방향 추천을 위한 기본 정보를 입력해주세요. 입력 중인 항목이 살짝 떠오르며 강조돼요.</p>
 
-      <p class="field-step-counter" id="field-step-counter"></p>
-      <div class="progress-bar-wrap"><div class="progress-bar" id="field-step-progress-bar"></div></div>
-
-      <div class="field-step-viewport" id="field-step-viewport">
+      <div class="focus-card-list">
         <!-- 1. 이름/출생년월일/성별/전화번호/이메일 -->
-        <div class="field-step" data-required="true">
+        <div class="focus-card">
           <label for="input-name">이름 *</label>
           <input type="text" id="input-name" placeholder="이름을 입력해주세요" />
           <label for="input-birth" style="margin-top: 16px">출생년월일 *</label>
@@ -41,7 +38,7 @@
         </div>
 
         <!-- 2. 학력/전공 -->
-        <div class="field-step" data-required="true">
+        <div class="focus-card">
           <label>학력 단계 *</label>
           <div class="chip-group" id="education-level-chips"></div>
           <label style="margin-top: 16px">전공 대분류</label>
@@ -51,7 +48,7 @@
         </div>
 
         <!-- 3. 자격증/어학 -->
-        <div class="field-step">
+        <div class="focus-card">
           <label for="input-cert">보유 자격증</label>
           <div class="input-with-button">
             <input type="text" id="input-cert" placeholder="예: 정보처리기사 (Enter로 추가)" />
@@ -68,13 +65,13 @@
         </div>
 
         <!-- 4. 기술스택 -->
-        <div class="field-step">
+        <div class="focus-card">
           <label>기술스택</label>
           <div id="tech-stack-container"></div>
         </div>
 
         <!-- 5. 직무 + 세부직무 -->
-        <div class="field-step">
+        <div class="focus-card">
           <label>직무</label>
           <p class="sub">채용공고 1차 필터링에 쓰이는 선호 조건이에요. 선택 안 하면 전체를 대상으로 매칭해요.</p>
           <div class="chip-group" id="filter-job-category-chips"></div>
@@ -82,7 +79,7 @@
         </div>
 
         <!-- 6. 희망지역/기업규모/희망고용형태 -->
-        <div class="field-step">
+        <div class="focus-card">
           <label>희망 지역</label>
           <div class="chip-group" id="filter-region-chips"></div>
           <label style="margin-top: 16px">기업규모</label>
@@ -92,9 +89,8 @@
         </div>
       </div>
 
-      <div class="nav-row">
-        <button type="button" class="btn btn-outline" id="btn-basic-info-prev">이전</button>
-        <button type="button" class="btn btn-primary" id="btn-basic-info-next">다음</button>
+      <div class="nav-row nav-row-end">
+        <button type="button" class="btn btn-primary" id="btn-basic-info-next">다음 단계</button>
       </div>
     </section>
 

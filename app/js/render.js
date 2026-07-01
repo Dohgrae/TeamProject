@@ -144,8 +144,9 @@ function renderBasicInfo() {
     renderBasicInfo();
   });
 
-  // 항목별 슬라이드 네비게이션(main.js)이 있으면 현재 항목 기준으로 다음 버튼 상태를 갱신한다.
-  if (typeof updateFieldStepNav === "function") updateFieldStepNav();
+  if (typeof isBasicInfoValid === "function") {
+    document.getElementById("btn-basic-info-next").disabled = !isBasicInfoValid();
+  }
 }
 
 // 직무를 하나 이상 고르면, 고른 직무마다 세부직무 선택 칩(전체 포함)을 아래에 띄운다.
