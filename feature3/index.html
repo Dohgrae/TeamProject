@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>뽑아듀오 — 채용공고 매칭 결과</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== 헤더 ===== -->
+  <header class="header" role="banner">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon" aria-hidden="true">💼</span>
+        <span class="logo-text">뽑아듀오</span>
+        <span class="logo-tagline">취업도 매칭처럼 💕</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== 메인 ===== -->
+  <main class="main" role="main">
+
+    <!-- 히어로 텍스트 -->
+    <div class="hero">
+      <h1 class="hero-title">오늘의 매칭 결과 💌</h1>
+      <p class="hero-sub">경험과 선호 조건에 꼭 맞는 공고를 찾았어요!</p>
+    </div>
+
+    <!-- 진행률 (카드 N / 전체) -->
+    <div class="progress-area" id="progress-area" aria-label="공고 탐색 진행률">
+      <span class="card-counter" id="card-counter" aria-live="polite"></span>
+      <div class="progress-bar-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progress-bar-wrap">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </div>
+
+    <!-- ===== 카드 영역 =====
+         .card-area  → perspective 컨테이너
+         .card-wrap  → 카드 전환 애니메이션 대상
+         .card       → 클릭/포커스 영역, perspective 적용
+         .card-inner → 3D flip 대상 (transform-style: preserve-3d)
+    ===== -->
+    <div class="card-area" id="card-area">
+      <div class="card-wrap" id="card-wrap">
+        <div class="card"
+             id="job-card"
+             onclick="flipCard()"
+             role="button"
+             tabindex="0"
+             aria-label="카드 뒤집기 (스페이스바로도 가능)">
+          <div class="card-inner" id="card-inner">
+
+            <!-- 앞면: renderCard() 또는 showLoadingCard() 등이 채웁니다 -->
+            <div class="card-front" id="card-front">
+              <div class="loading-state">
+                <div class="loading-spinner" aria-hidden="true"></div>
+                <p class="loading-text">채용공고를 찾는 중이에요...</p>
+              </div>
+            </div>
+
+            <!-- 뒷면: renderCard()가 채웁니다 -->
+            <div class="card-back" id="card-back"></div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 종료 화면 ===== -->
+    <div class="end-screen" id="end-screen" aria-live="polite" aria-hidden="true">
+      <div class="end-emoji" aria-hidden="true">🎉</div>
+      <h2 class="end-title">모든 추천 공고를<br>확인했어요!</h2>
+      <p class="end-desc">
+        마음에 드는 공고를 찾으셨나요?<br>
+        저장한 결과에서 다시 확인할 수 있어요.
+      </p>
+      <button class="btn-reset" onclick="resetCards()">
+        🔄 처음으로 돌아가기
+      </button>
+    </div>
+
+    <!-- ===== 하단 버튼 영역 ===== -->
+    <div class="button-area" id="button-area" role="group" aria-label="카드 조작 버튼">
+
+      <!-- 관심 없어요: 오른쪽 방향키로도 실행 가능 -->
+      <button class="btn btn-skip"
+              onclick="showNextCard()"
+              aria-label="관심 없어요 — 다음 공고 (오른쪽 방향키)">
+        <span class="btn-icon" aria-hidden="true">👎</span>
+        <span class="btn-label">관심 없어요</span>
+      </button>
+
+      <!-- 카드 뒤집기: 스페이스바로도 실행 가능 -->
+      <button class="btn btn-flip"
+              onclick="flipCard()"
+              aria-label="카드 뒤집기 — 상세 정보 보기 (스페이스바)">
+        <span class="btn-icon" aria-hidden="true">🔄</span>
+        <span class="btn-label">카드 뒤집기</span>
+      </button>
+
+      <!-- 공고 보기: 가장 눈에 띄는 버튼 / 엔터키로도 실행 가능 -->
+      <button class="btn btn-view"
+              onclick="openJobLink()"
+              aria-label="공고 보기 — 원본 채용공고 열기 (엔터키)">
+        <span class="btn-icon" aria-hidden="true">✅</span>
+        <span class="btn-label">공고 보기</span>
+      </button>
+
+    </div>
+
+    <!-- 키보드 단축키 안내 (스크린 리더에서만 읽힘) -->
+    <p class="sr-only">
+      키보드 단축키: 오른쪽 방향키 — 다음 공고, 스페이스바 — 카드 뒤집기, 엔터키 — 공고 열기
+    </p>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

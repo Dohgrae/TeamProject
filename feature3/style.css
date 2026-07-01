@@ -1,0 +1,702 @@
+/* ============================================================
+   뽑아듀오 — style.css
+   테마: 소개팅 앱 스타일 · 핑크 × 보라 그라디언트
+   ============================================================ */
+
+/* ── 디자인 토큰 ── */
+:root {
+  --pink:          #ff6b9d;
+  --pink-light:    #ff8fb3;
+  --pink-deep:     #e8527a;
+  --purple:        #c44dff;
+  --purple-deep:   #9b30e8;
+  --purple-light:  #dbb8ff;
+
+  --grad:          linear-gradient(135deg, #ff6b9d 0%, #c44dff 100%);
+  --grad-card-back: linear-gradient(145deg, #b428ee 0%, #e84b8a 100%);
+
+  --bg:            #fff0f6;
+  --text-dark:     #2d1b3d;
+  --text-mid:      #6b5b7b;
+  --text-light:    #a896bb;
+
+  --card-radius:   24px;
+  --card-shadow:   0 8px 40px rgba(196, 77, 255, 0.18),
+                   0 2px 10px rgba(0, 0, 0, 0.07);
+  --card-height:   520px;
+}
+
+/* ── 기본 리셋 ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 스크린 리더 전용 텍스트 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+               'Noto Sans KR', 'Segoe UI', sans-serif;
+  background: linear-gradient(160deg, #fff0f6 0%, #f6f0ff 100%);
+  min-height: 100vh;
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+
+/* ============================================================
+   헤더
+   ============================================================ */
+.header {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 107, 157, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0 20px;
+}
+
+.header-inner {
+  max-width: 480px;
+  margin: 0 auto;
+  height: 58px;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.logo-icon { font-size: 20px; }
+
+.logo-text {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo-tagline {
+  font-size: 12px;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+
+/* ============================================================
+   메인 레이아웃
+   ============================================================ */
+.main {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px 16px 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+
+/* ============================================================
+   히어로 텍스트
+   ============================================================ */
+.hero { text-align: center; }
+
+.hero-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+}
+
+.hero-sub {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--text-mid);
+}
+
+
+/* ============================================================
+   진행률 표시
+   ============================================================ */
+.progress-area {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-counter {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-mid);
+  letter-spacing: 0.5px;
+}
+
+.progress-bar-wrap {
+  width: 100%;
+  height: 5px;
+  background: rgba(196, 77, 255, 0.12);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--grad);
+  border-radius: 99px;
+  width: 0%;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* ============================================================
+   카드 영역 — 3D 뒤집기 구조
+   ============================================================
+   .card-area  → perspective 컨테이너
+   .card-wrap  → 슬라이드/페이드 애니메이션 대상
+   .card       → 클릭 영역 (perspective 자체는 여기 없음)
+   .card-inner → rotateY 대상 (transform-style: preserve-3d)
+   .card-front/.card-back → 앞/뒷면 (backface-visibility: hidden)
+   ============================================================ */
+.card-area {
+  width: 100%;
+  perspective: 1400px;
+}
+
+.card-wrap { width: 100%; }
+
+/* 카드 퇴장 애니메이션 (다음 카드로 이동 시) */
+@keyframes cardLeave {
+  0%   { opacity: 1; transform: translateX(0) rotate(0deg) scale(1); }
+  100% { opacity: 0; transform: translateX(-90px) rotate(-5deg) scale(0.93); }
+}
+
+/* 카드 입장 애니메이션 */
+@keyframes cardEnter {
+  0%   { opacity: 0; transform: translateX(50px) scale(0.96); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+.card-wrap.leaving {
+  animation: cardLeave 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+
+.card-wrap.entering {
+  animation: cardEnter 0.32s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+/* 카드 기본 */
+.card {
+  width: 100%;
+  height: var(--card-height);
+  cursor: pointer;
+  position: relative;
+  outline: none;
+  border-radius: var(--card-radius);
+}
+
+/* 포커스 링 (키보드 탐색) */
+.card:focus-visible {
+  outline: 3px solid var(--pink);
+  outline-offset: 4px;
+}
+
+/* 카드 내부 — 3D 회전 대상 */
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-inner.flipped { transform: rotateY(180deg); }
+
+/* 앞면 · 뒷면 공통 */
+.card-front,
+.card-back {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--card-radius);
+  padding: 28px 24px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ============================================================
+   카드 앞면
+   ============================================================ */
+.card-front {
+  background: #ffffff;
+  box-shadow: var(--card-shadow);
+}
+
+/* ── 상단: 회사명 + 직무명 (중앙 정렬) ── */
+/* 구분선 제거: border-bottom 삭제, 여백으로 자연스럽게 분리 */
+.card-top {
+  text-align: center;
+  padding-top: 20px;    /* 카드 상단에서 아래로 내려옴 */
+  padding-bottom: 28px; /* 매칭률 영역과의 여백 */
+}
+
+/* 회사명 — H1 수준 (크기 증가: 22px → 26px) */
+.card-company-big {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+}
+
+/* 직무명 — H2 수준 (크기 증가: 16px → 18px) */
+.card-position-sub {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-mid);
+  margin-top: 10px;
+  line-height: 1.45;
+  letter-spacing: -0.2px;
+}
+
+/* ── 중앙: 매칭률 (카드에서 가장 크게) ── */
+.card-score-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 0;
+}
+
+/* 심장 아이콘 — 박동 애니메이션 */
+.score-heart {
+  font-size: 40px;
+  line-height: 1;
+  animation: heartbeat 1.6s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14%       { transform: scale(1.18); }
+  28%       { transform: scale(1); }
+  42%       { transform: scale(1.12); }
+  56%       { transform: scale(1); }
+}
+
+/* 매칭률 숫자 — 그라디언트 텍스트, 초대형 */
+.score-pct {
+  font-size: 80px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -4px;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 90점 이상 — 초록 */
+.score-pct.score-green {
+  background: linear-gradient(135deg, #11d67e 0%, #00a86b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* 75점 미만 — 주황 */
+.score-pct.score-orange {
+  background: linear-gradient(135deg, #ff7675 0%, #fd9644 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* 매칭률 라벨 */
+.score-label {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-mid);
+  letter-spacing: -0.3px;
+}
+
+/* 뒤집기 힌트 */
+.flip-hint {
+  margin-top: auto;
+  padding-top: 14px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-light);
+  letter-spacing: 0.2px;
+}
+
+
+/* ============================================================
+   카드 뒷면
+   ============================================================ */
+.card-back {
+  background: var(--grad-card-back);
+  transform: rotateY(180deg);
+  box-shadow: var(--card-shadow);
+  color: white;
+}
+
+.back-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 10px;
+  margin-top: 18px;
+}
+
+.back-section-title:first-child { margin-top: 0; }
+
+/* 매칭 키워드 칩 (뒷면) */
+.keyword-chips-back {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.keyword-chip-back {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.22);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+/* 매칭 사유 리스트 */
+.match-reasons-back {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reason-item-back {
+  font-size: 13px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.92);
+  padding-left: 20px;
+  position: relative;
+}
+
+.reason-item-back::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  top: 1px;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* 마감일 */
+.back-deadline {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 600;
+  margin-top: 18px;
+}
+
+/* 원본 공고 보기 버튼 (뒷면 내) */
+.btn-original {
+  display: block;
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--purple-deep);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 14px;
+  text-decoration: none;
+  letter-spacing: -0.2px;
+  transition: background 0.18s, box-shadow 0.18s;
+}
+
+.btn-original:hover,
+.btn-original:focus-visible {
+  background: #ffffff;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
+  outline: none;
+}
+
+/* 앞면 복귀 힌트 (뒷면 하단) */
+.flip-hint-back {
+  margin-top: auto;
+  padding-top: 14px;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.42);
+  letter-spacing: 0.2px;
+}
+
+
+/* ============================================================
+   로딩 · 에러 · 빈 데이터 상태
+   ============================================================ */
+.loading-state,
+.error-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  flex: 1;
+  gap: 14px;
+  text-align: center;
+  padding: 16px;
+}
+
+/* 로딩 스피너 */
+.loading-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(196, 77, 255, 0.18);
+  border-top-color: var(--purple);
+  border-radius: 50%;
+  animation: spin 0.85s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text {
+  font-size: 15px;
+  color: var(--text-mid);
+  font-weight: 500;
+}
+
+/* 에러 · 빈 데이터 공통 */
+.state-icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.state-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.state-desc {
+  font-size: 13px;
+  color: var(--text-mid);
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   종료 화면
+   ============================================================ */
+.end-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 52px 28px;
+  gap: 12px;
+  text-align: center;
+  background: white;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+}
+
+.end-emoji {
+  font-size: 64px;
+  line-height: 1;
+  animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes pop {
+  0%   { transform: scale(0.4); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+.end-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-dark);
+  line-height: 1.4;
+  letter-spacing: -0.5px;
+}
+
+.end-desc {
+  font-size: 14px;
+  color: var(--text-mid);
+  line-height: 1.7;
+}
+
+.btn-reset {
+  margin-top: 8px;
+  padding: 14px 32px;
+  background: var(--grad);
+  color: white;
+  border: none;
+  border-radius: 99px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(255, 107, 157, 0.38);
+  transition: transform 0.18s, box-shadow 0.18s;
+  font-family: inherit;
+}
+
+.btn-reset:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(255, 107, 157, 0.48);
+}
+
+.btn-reset:active { transform: scale(0.96); }
+
+
+/* ============================================================
+   하단 버튼 영역
+   ============================================================ */
+.button-area {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.btn {
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-radius: 18px;
+  padding: 14px 10px;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  font-family: inherit;
+  flex: 1;
+}
+
+.btn:active { transform: scale(0.94) !important; }
+
+/* 관심 없어요 */
+.btn-skip {
+  background: white;
+  border: 1.5px solid #ede0f8;
+  color: var(--text-mid);
+}
+
+.btn-skip:hover, .btn-skip:focus-visible {
+  background: #fdf5ff;
+  border-color: var(--purple-light);
+  outline: none;
+}
+
+/* 카드 뒤집기 */
+.btn-flip {
+  background: white;
+  border: 1.5px solid rgba(196, 77, 255, 0.28);
+  color: var(--purple-deep);
+}
+
+.btn-flip:hover, .btn-flip:focus-visible {
+  background: #fdf5ff;
+  border-color: var(--purple);
+  outline: none;
+}
+
+/* 공고 보기 — 가장 눈에 띄게 */
+.btn-view {
+  flex: 1.55;
+  padding: 16px 12px;
+  background: var(--grad);
+  color: white;
+  box-shadow: 0 4px 18px rgba(255, 107, 157, 0.38);
+}
+
+.btn-view:hover, .btn-view:focus-visible {
+  box-shadow: 0 6px 24px rgba(255, 107, 157, 0.52);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.btn-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.btn-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  line-height: 1;
+}
+
+
+/* ============================================================
+   반응형
+   ============================================================ */
+
+/* 소형 모바일 (380px 미만) */
+@media (max-width: 380px) {
+  .main { padding: 16px 12px 96px; gap: 16px; }
+  :root { --card-height: 500px; }
+  .hero-title { font-size: 19px; }
+  .card-front, .card-back { padding: 22px 18px; }
+  /* 소형 모바일: 회사명 22px, 직무명 16px */
+  .card-company-big { font-size: 22px; }
+  .card-position-sub { font-size: 16px; }
+  .score-pct { font-size: 68px; letter-spacing: -3px; }
+  .score-heart { font-size: 34px; }
+  .score-label { font-size: 15px; }
+  .btn-icon { font-size: 20px; }
+  .btn-label { font-size: 11px; }
+}
+
+/* 태블릿 · 데스크톱 (481px 이상) */
+@media (min-width: 481px) {
+  .main { padding: 32px 24px 120px; }
+  :root { --card-height: 540px; }
+  .hero-title { font-size: 24px; }
+  /* 데스크톱: 회사명 28px, 직무명 20px */
+  .card-company-big { font-size: 28px; }
+  .card-position-sub { font-size: 20px; }
+  .score-pct { font-size: 96px; letter-spacing: -5px; }
+  .score-heart { font-size: 48px; }
+  .score-label { font-size: 20px; }
+  .btn { padding: 16px 12px; }
+  .btn-view { padding: 18px 14px; }
+}

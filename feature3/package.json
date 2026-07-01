@@ -1,0 +1,14 @@
+{
+  "name": "bbobadduo-result",
+  "version": "1.0.0",
+  "description": "뽑아듀오 — 취준생 맞춤 채용공고 추천 서비스 (최종 매칭 결과 화면)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  }
+}
