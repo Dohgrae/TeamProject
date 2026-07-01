@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>업무 성향 테스트</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- 시작 화면 -->
+    <section id="intro-screen" class="screen active">
+      <h1>업무 성향 테스트</h1>
+      <p class="desc">
+        총 8개의 질문에 답하면, 당신의 업무 성향을 나타내는 태그를 확인할 수 있어요.<br />
+        이 결과는 구직자에게 적합한 채용공고를 매칭하는 데 활용됩니다.
+      </p>
+      <button id="start-btn" class="btn primary">테스트 시작하기</button>
+    </section>
+
+    <!-- 설문 화면 -->
+    <section id="quiz-screen" class="screen">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        <span id="progress-text" class="progress-text">1 / 8</span>
+      </div>
+
+      <h2 id="question-text" class="question-text"></h2>
+
+      <div id="options" class="options"></div>
+    </section>
+
+    <!-- 결과 화면 -->
+    <section id="result-screen" class="screen">
+      <h1>테스트 결과</h1>
+      <p class="desc">응답을 바탕으로 도출된 업무 성향 태그예요.</p>
+
+      <div id="tag-list" class="tag-list"></div>
+
+      <div id="unsure-note" class="unsure-note"></div>
+
+      <details class="detail-box">
+        <summary>내 응답 전체 보기</summary>
+        <ol id="answer-list" class="answer-list"></ol>
+      </details>
+
+      <details class="detail-box">
+        <summary>결과 데이터 (JSON)</summary>
+        <textarea id="result-json" class="result-json" readonly></textarea>
+        <button id="copy-btn" class="btn small">JSON 복사하기</button>
+      </details>
+
+      <button id="restart-btn" class="btn primary">다시 하기</button>
+    </section>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
