@@ -19,6 +19,12 @@ h1 {
   margin-bottom: 4px;
 }
 
+.title-hint {
+  font-size: 14px;
+  font-weight: 500;
+  color: #9ca3af;
+}
+
 h2 {
   font-size: 18px;
   font-weight: 700;
