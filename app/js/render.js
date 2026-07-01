@@ -198,7 +198,10 @@ function renderWork() {
       (exp) => `
     <div class="entry-card" data-id="${exp.id}">
       <div class="entry-card-head">
-        <div class="chip-group work-emptype-chips"></div>
+        <div>
+          <p class="tech-category-label">고용형태 (정규직, 계약직, 인턴 등)</p>
+          <div class="chip-group work-emptype-chips"></div>
+        </div>
         <button type="button" class="entry-card-remove" data-remove="${exp.id}">삭제</button>
       </div>
       <div class="entry-date-row">

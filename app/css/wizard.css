@@ -283,7 +283,7 @@ textarea {
 
 .entry-card-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 12px;
   flex-wrap: wrap;
