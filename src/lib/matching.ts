@@ -146,6 +146,27 @@ export function scoreJob(job: JobPosting, signals: UserSignal[]): { matchRate: n
   return { matchRate, matchedKeywords: matched.map((s) => s.label) };
 }
 
+// 결과 카드(feature3 UI)에 보여줄 "왜 추천하는지" 문구를 매칭된 신호를 바탕으로 만든다.
+export function buildMatchReasons(job: JobPosting, matchedKeywords: string[], majorWarning: boolean): string[] {
+  const reasons: string[] = [];
+
+  if (matchedKeywords.length > 0) {
+    reasons.push(`${matchedKeywords.slice(0, 3).map((k) => `#${k}`).join(", ")} 관련 역량이 이 공고와 겹쳐요.`);
+  } else {
+    reasons.push("직무·지역·경력 조건은 맞지만, 겹치는 역량 키워드는 아직 못 찾았어요.");
+  }
+
+  reasons.push(`${job.career_type}(${job.career_years}) · ${job.employment_type} 조건이 회원님과 맞아요.`);
+
+  if (majorWarning) {
+    reasons.push("전공 요건이 있는 공고예요 — 실무 경험으로 어필할 수 있는지 확인해보세요.");
+  } else {
+    reasons.push(`지원 마감일(${job.deadline})을 기준으로 실제 지원 가능성을 확인해보세요.`);
+  }
+
+  return reasons;
+}
+
 export function matchJobs(profile: UserProfileDraft, jobs: JobPosting[], keywords: KeywordEntry[]): JobMatch[] {
   const { passed, majorWarnings } = filterJobs(profile, jobs);
   const majorWarningIds = new Set(majorWarnings.map((j) => j.id));

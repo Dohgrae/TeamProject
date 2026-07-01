@@ -7,7 +7,7 @@ import { useProfile } from "@/context/ProfileContext";
 interface MatchResult {
   id: number;
   company_name: string;
-  posting_title: string;
+  job_title: string;
   url: string;
   match_rate: number;
   matched_keywords: string[];
@@ -111,7 +111,7 @@ export default function ReviewPage() {
                     매칭 {r.match_rate}%
                   </span>
                 </div>
-                <p className="mt-1 text-sm text-gray-600">{r.posting_title}</p>
+                <p className="mt-1 text-sm text-gray-600">{r.job_title}</p>
                 {r.matched_keywords.length > 0 && (
                   <p className="mt-1 text-xs text-gray-400">{r.matched_keywords.map((k) => `#${k}`).join(" ")}</p>
                 )}
@@ -119,6 +119,16 @@ export default function ReviewPage() {
             ))}
           </div>
         )}
+      </div>
+
+      <div className="flex justify-center">
+        <button
+          type="button"
+          onClick={() => router.push("/result")}
+          className="rounded-full bg-purple-500 px-8 py-3 font-semibold text-white transition hover:bg-purple-600"
+        >
+          카드로 결과 보기 →
+        </button>
       </div>
 
       <div className="flex justify-between pt-4">

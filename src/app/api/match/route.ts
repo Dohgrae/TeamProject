@@ -1,5 +1,5 @@
 import { loadJobs, loadKeywords } from "@/lib/jobsData";
-import { matchJobs } from "@/lib/matching";
+import { buildMatchReasons, matchJobs } from "@/lib/matching";
 import type { UserProfileDraft } from "@/types/profile";
 
 export async function POST(request: Request) {
@@ -15,10 +15,14 @@ export async function POST(request: Request) {
     results: allMatches.slice(0, 20).map((r) => ({
       id: r.job.id,
       company_name: r.job.company_name,
-      posting_title: r.job.posting_title,
+      job_title: r.job.job_title,
       url: r.job.url,
+      region: r.job.region,
+      deadline: r.job.deadline,
+      short_description: r.job.main_tasks.slice(0, 60) + (r.job.main_tasks.length > 60 ? "..." : ""),
       match_rate: r.matchRate,
       matched_keywords: r.matchedKeywords,
+      match_reasons: buildMatchReasons(r.job, r.matchedKeywords, r.majorWarning),
       major_warning: r.majorWarning,
     })),
   });
