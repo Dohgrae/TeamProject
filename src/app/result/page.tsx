@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useProfile } from "@/context/ProfileContext";
+import { MatchLoadingScreen } from "@/components/MatchLoadingScreen";
 import "./result.css";
 
 interface MatchResult {
@@ -47,16 +48,21 @@ export default function ResultPage() {
 
   useEffect(() => {
     if (!profile.meta.draft_id) return;
-    fetch("/api/match", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(profile),
-    })
-      .then((res) => {
+    // 매칭 자체는 순식간에 끝나지만, 대기 화면(마스코트·하트·효과음)이 눈에 보일 정도의
+    // 최소 시간은 보장해준다. 그래야 응답이 빠른 경우에도 화면이 스치듯 지나가지 않는다.
+    const minDelay = new Promise((resolve) => setTimeout(resolve, 1800));
+    Promise.all([
+      fetch("/api/match", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profile),
+      }).then((res) => {
         if (!res.ok) throw new Error(`API 오류 (${res.status})`);
-        return res.json();
-      })
-      .then((data: MatchResponse) => setJobs(data.results))
+        return res.json() as Promise<MatchResponse>;
+      }),
+      minDelay,
+    ])
+      .then(([data]) => setJobs(data.results))
       .catch((err) => setError(err instanceof Error ? err.message : "매칭 결과를 불러오지 못했어요"));
   }, [profile]);
 
@@ -159,12 +165,7 @@ export default function ResultPage() {
                         <p className="state-title">{error}</p>
                       </div>
                     )}
-                    {!error && !jobs && (
-                      <div className="loading-state">
-                        <div className="loading-spinner" aria-hidden="true" />
-                        <p className="loading-text">채용공고를 찾는 중이에요...</p>
-                      </div>
-                    )}
+                    {!error && !jobs && <MatchLoadingScreen name={profile.basic_info.name} />}
                     {!error && jobs && jobs.length === 0 && (
                       <div className="empty-state">
                         <span className="state-icon" aria-hidden="true">🔍</span>

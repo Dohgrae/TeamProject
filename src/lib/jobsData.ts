@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
 
-// johyejune이 만든 공유 데이터 파일. 파일명에 확장자가 없어 정적 import가 안 되므로
-// 텍스트로 읽어 JSON.parse 한다. 서버 전용(Route Handler/Server Component)에서만 사용할 것.
-const JOBS_PATH = path.join(process.cwd(), "src/data");
+// johyejune이 만든 공유 데이터 파일. src/data/jobs.json으로 rename되어 확장자가 생겼으니
+// 정적 import도 가능하지만, 서버 전용 코드라는 걸 명확히 하기 위해 fs 텍스트 읽기를 유지한다.
+const JOBS_PATH = path.join(process.cwd(), "src/data/jobs.json");
 const KEYWORDS_PATH = path.join(process.cwd(), "src/keywords.json");
 
 export interface JobPosting {
