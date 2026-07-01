@@ -109,7 +109,10 @@ function setupAutoAdvance(list) {
   // 카드2(학력/전공) 마지막 항목: 학과
   document.getElementById("input-major-detail").addEventListener("blur", () => advanceTo(2));
   // 카드3(자격증/어학) 마지막 항목: 어학 점수/등급
-  document.getElementById("input-lang-score").addEventListener("blur", () => advanceTo(3));
+  // "추가" 버튼을 누르면 그 클릭 자체가 이 입력의 blur를 먼저 발생시키는데, 그 즉시 카드가
+  // scrollIntoView로 이동해버리면 클릭 중간에 버튼이 밀려나 첫 클릭이 씹힌 것처럼 보인다.
+  // 그래서 "추가" 클릭이 완전히 처리될 시간을 준 뒤에 넘어가도록 살짝 지연시킨다.
+  document.getElementById("input-lang-score").addEventListener("blur", () => setTimeout(() => advanceTo(3), 200));
   // 칩 클릭은 onToggle 안에서 바로 컨테이너를 다시 그려 자기 자신을 DOM에서 떼어내므로,
   // 여기서도 버블링을 기다리지 않고 캡처링 단계에서 먼저 판단해야 한다.
   // 카드4(기술스택) 마지막 항목: 협업툴·형상관리 칩 (컨테이너에 위임, 안에서 매번 다시 그려지므로)

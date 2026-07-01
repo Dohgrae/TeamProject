@@ -92,9 +92,10 @@
         </div>
       </div>
 
-      <div class="nav-row">
-        <button type="button" class="btn btn-outline" id="btn-save-basic-info">💾 중간 저장</button>
-        <button type="button" class="btn btn-primary" id="btn-basic-info-next">다음 단계</button>
+      <button type="button" class="btn-save-tab" id="btn-save-basic-info">중간 저장</button>
+
+      <div class="nav-row-end">
+        <button type="button" class="btn btn-primary" id="btn-basic-info-next">다음</button>
       </div>
     </section>
 
@@ -108,36 +109,27 @@
 
       <button type="button" class="btn btn-dashed" id="btn-add-work">+ 직장 경험 추가</button>
 
+      <button type="button" class="btn-save-tab" id="btn-save-work">중간 저장</button>
+
       <div class="nav-row">
         <button type="button" class="btn btn-outline" id="btn-work-prev">이전</button>
-        <button type="button" class="btn btn-outline" id="btn-save-work">💾 중간 저장</button>
-        <button type="button" class="btn btn-primary" id="btn-work-next">다음 단계</button>
+        <button type="button" class="btn btn-primary" id="btn-work-next">다음</button>
       </div>
     </section>
 
     <!-- ===== 3. 학내외경험 ===== -->
     <section class="screen" id="screen-extracurricular">
-      <h1>학내외경험</h1>
+      <h1>학내외경험 <span class="title-hint">(프로젝트, 동아리·학생회, 대외활동, 해외경험, 교육 수강경험)</span></h1>
       <p class="sub">항목을 추가하면 챗봇이 몇 가지 질문을 물어봐요.</p>
-
-      <div class="guide-box">
-        <p class="guide-title">구체적으로 서술할수록 매칭 확률이 높아져요!</p>
-        <p class="guide-desc">다음 내용들을 최대한 넣어서 작성해주세요.</p>
-        <ul class="guide-list">
-          <li>분야/주제 (예: AI, 마케팅, 데이터분석, ESG 등)</li>
-          <li>사용한 기술/툴/방법론 (예: Python, Figma, SQL 등)</li>
-          <li>본인 역할 및 담당 업무 (예: 팀장, 데이터 분석 담당)</li>
-          <li>성과</li>
-        </ul>
-      </div>
 
       <div id="extracurricular-list"></div>
       <button type="button" class="btn btn-dashed" id="btn-add-extracurricular">+ 학내외경험 추가</button>
 
+      <button type="button" class="btn-save-tab" id="btn-save-extracurricular">중간 저장</button>
+
       <div class="nav-row">
         <button type="button" class="btn btn-outline" id="btn-extracurricular-prev">이전</button>
-        <button type="button" class="btn btn-outline" id="btn-save-extracurricular">💾 중간 저장</button>
-        <button type="button" class="btn btn-primary" id="btn-extracurricular-next">다음 단계</button>
+        <button type="button" class="btn btn-primary" id="btn-extracurricular-next">다음</button>
       </div>
     </section>
 
@@ -146,24 +138,14 @@
       <h1>수상/공모전 경험</h1>
       <p class="sub">항목을 추가하면 챗봇이 몇 가지 질문을 물어봐요. 없다면 그냥 다음 단계로 넘어가도 돼요.</p>
 
-      <div class="guide-box">
-        <p class="guide-title">구체적으로 서술할수록 매칭 확률이 높아져요!</p>
-        <p class="guide-desc">다음 내용들을 최대한 넣어서 작성해주세요.</p>
-        <ul class="guide-list">
-          <li>분야/주제 (예: AI, 마케팅, 데이터분석, ESG 등)</li>
-          <li>사용한 기술/툴/방법론 (예: Python, Figma, SQL 등)</li>
-          <li>본인 역할 및 담당 업무 (예: 팀장, 데이터 분석 담당)</li>
-          <li>성과</li>
-        </ul>
-      </div>
-
       <div id="award-list"></div>
       <button type="button" class="btn btn-dashed" id="btn-add-award">+ 수상/공모전 항목 추가</button>
 
+      <button type="button" class="btn-save-tab" id="btn-save-awards">중간 저장</button>
+
       <div class="nav-row">
         <button type="button" class="btn btn-outline" id="btn-awards-prev">이전</button>
-        <button type="button" class="btn btn-outline" id="btn-save-awards">💾 중간 저장</button>
-        <button type="button" class="btn btn-primary" id="btn-awards-next">다음 단계</button>
+        <button type="button" class="btn btn-primary" id="btn-awards-next">다음</button>
       </div>
     </section>
 
@@ -175,9 +157,10 @@
 
       <div id="personality-questions" class="focus-card-list"></div>
 
+      <button type="button" class="btn-save-tab" id="btn-save-personality">중간 저장</button>
+
       <div class="nav-row">
         <button type="button" class="btn btn-outline" id="btn-personality-prev">이전</button>
-        <button type="button" class="btn btn-outline" id="btn-save-personality">💾 중간 저장</button>
         <button type="button" class="btn btn-primary" id="btn-personality-next">완료</button>
       </div>
     </section>
