@@ -215,33 +215,42 @@ function splitIntoLines(text) {
     .filter(Boolean);
 }
 
-// matched(카테고리별로 이미 매칭된 키워드 id 목록) 중 하나가 실제로 등장하는 원문 한 줄과,
-// 그 줄에서 하이라이트할 위치(alias가 실제로 발견된 구간)를 찾는다. 역량 > 우대요건 > 업무성향
-// 순으로 찾아보고, 하나도 못 찾으면 null을 돌려준다(카드 뒷면에서 안내 문구로 대체).
-function findMatchEvidence(job, breakdown, keywords, personalityKeywords) {
+// 특정 키워드 하나가 실제로 등장하는 원문 한 줄과, 그 줄에서 하이라이트할 위치(alias가
+// 실제로 발견된 구간)를 찾는다. 역량 > 우대요건 > 업무성향 순으로 텍스트를 뒤져보고,
+// 못 찾으면 null.
+function findEvidenceForKeyword(job, keywordLabel, keywords, personalityKeywords) {
   const sources = [
-    { text: joinText([job.qualifications, job.main_tasks]), matched: breakdown.competency.matched, dict: [...keywords, ...COMPETENCY_LABEL_DICT] },
-    { text: joinText([job.preferred_etc, job.preferred_cert, job.preferred_language]), matched: breakdown.preferred.matched, dict: keywords },
-    { text: job.ideal_person || "", matched: breakdown.personality.matched, dict: personalityKeywords },
+    { text: joinText([job.qualifications, job.main_tasks]), dict: [...keywords, ...COMPETENCY_LABEL_DICT] },
+    { text: joinText([job.preferred_etc, job.preferred_cert, job.preferred_language]), dict: keywords },
+    { text: job.ideal_person || "", dict: personalityKeywords },
   ];
 
-  for (const { text, matched, dict } of sources) {
-    if (!text || matched.length === 0) continue;
+  for (const { text, dict } of sources) {
+    if (!text) continue;
+    const entry = dict.find((k) => k.id === keywordLabel);
+    if (!entry) continue;
     const lines = splitIntoLines(text);
-    for (const label of matched) {
-      const entry = dict.find((k) => k.id === label);
-      if (!entry) continue;
-      for (const line of lines) {
-        for (const alias of entry.aliases) {
-          const idx = line.toLowerCase().indexOf(alias.toLowerCase());
-          if (idx !== -1) {
-            return { line, highlightStart: idx, highlightEnd: idx + alias.length, label };
-          }
+    for (const line of lines) {
+      for (const alias of entry.aliases) {
+        const idx = line.toLowerCase().indexOf(alias.toLowerCase());
+        if (idx !== -1) {
+          return { keyword: keywordLabel, line, highlightStart: idx, highlightEnd: idx + alias.length };
         }
       }
     }
   }
   return null;
+}
+
+// "공고 원문 발췌"용 - 매칭된 키워드 각각에 대해(최대 개수 제한) 원문에서 등장하는 줄을
+// 하나씩 찾아 배열로 돌려준다. 못 찾은 키워드는 건너뛴다.
+function findMatchEvidenceList(job, matchedKeywords, keywords, personalityKeywords) {
+  const results = [];
+  for (const keywordLabel of matchedKeywords) {
+    const evidence = findEvidenceForKeyword(job, keywordLabel, keywords, personalityKeywords);
+    if (evidence) results.push(evidence);
+  }
+  return results;
 }
 
 function buildMatchReasons(job, breakdown, majorWarning) {
@@ -295,7 +304,7 @@ async function matchJobs(profile) {
         match_rate: matchRate,
         matched_keywords: matchedKeywords,
         match_reasons: buildMatchReasons(job, breakdown, majorWarning),
-        evidence: findMatchEvidence(job, breakdown, keywords, personalityKeywords),
+        evidence_list: findMatchEvidenceList(job, matchedKeywords.slice(0, 3), keywords, personalityKeywords),
         major_warning: majorWarning,
       };
     })

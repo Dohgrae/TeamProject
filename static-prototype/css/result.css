@@ -588,10 +588,15 @@ body:has(#screen-result.screen.active) {
   margin-bottom: 6px;
 }
 
-.job-excerpt-text {
+/* 매칭 키워드별로 한 줄씩 나열되는 발췌 문장 */
+.job-excerpt-line {
   font-size: 13px;
-  line-height: 1.65;
+  line-height: 1.55;
   color: var(--text-dark);
+}
+
+.job-excerpt-line + .job-excerpt-line {
+  margin-top: 6px;
 }
 
 .match-evidence-highlight {

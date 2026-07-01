@@ -412,6 +412,23 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// 공고 원문 발췌용 한 줄이 너무 길면, 하이라이트 구간이 잘리지 않도록 그 주변을 중심으로 잘라낸다.
+function truncateAroundHighlight(line, highlightStart, highlightEnd, maxLength) {
+  if (line.length <= maxLength) return { text: line, start: highlightStart, end: highlightEnd };
+  const highlightLen = highlightEnd - highlightStart;
+  const context = Math.max(0, Math.floor((maxLength - highlightLen) / 2));
+  let start = Math.max(0, highlightStart - context);
+  let end = Math.min(line.length, start + maxLength);
+  start = Math.max(0, end - maxLength);
+  const prefix = start > 0 ? "…" : "";
+  const suffix = end < line.length ? "…" : "";
+  return {
+    text: prefix + line.slice(start, end) + suffix,
+    start: highlightStart - start + prefix.length,
+    end: highlightEnd - start + prefix.length,
+  };
+}
+
 function getMatchComment(score) {
   if (score >= 95) return "이건 운명입니다. 놓치지 마세요! 💘";
   if (score >= 90) return "이 정도면 바로 만나봐야 해!";
@@ -588,18 +605,18 @@ function renderResultCard(direction = "forward") {
   const reasons = job.match_reasons.map((r) => `<li class="reason-item-back">${escapeHtml(r)}</li>`).join("");
   const safeUrl = /^https?:\/\//i.test(job.url) ? job.url : "#";
 
-  // "공고 원문 발췌"는 실제로 매칭된 원문 한 줄(겹치는 부분 하이라이트)을 그대로 보여준다.
-  // 매칭된 문장을 못 찾았으면 공고 요약으로 대체.
-  let excerptHtml;
-  if (job.evidence) {
-    const { line, highlightStart, highlightEnd } = job.evidence;
-    const before = escapeHtml(line.slice(0, highlightStart));
-    const highlighted = escapeHtml(line.slice(highlightStart, highlightEnd));
-    const after = escapeHtml(line.slice(highlightEnd));
-    excerptHtml = `${before}<mark class="match-evidence-highlight">${highlighted}</mark>${after}`;
-  } else {
-    excerptHtml = escapeHtml(job.short_description);
-  }
+  // "공고 원문 발췌"는 매칭된 키워드 하나당 그 키워드가 실제로 등장하는 원문 한 줄을
+  // (겹치는 부분 하이라이트해서) 각각 보여준다. 매칭 문장을 하나도 못 찾았으면 공고 요약으로 대체.
+  const excerptRows =
+    job.evidence_list && job.evidence_list.length > 0
+      ? job.evidence_list.map(({ line, highlightStart, highlightEnd }) => {
+          const truncated = truncateAroundHighlight(line, highlightStart, highlightEnd, 46);
+          const before = escapeHtml(truncated.text.slice(0, truncated.start));
+          const highlighted = escapeHtml(truncated.text.slice(truncated.start, truncated.end));
+          const after = escapeHtml(truncated.text.slice(truncated.end));
+          return `<p class="job-excerpt-line">${before}<mark class="match-evidence-highlight">${highlighted}</mark>${after}</p>`;
+        })
+      : [`<p class="job-excerpt-line">${escapeHtml(job.short_description)}</p>`];
 
   back.innerHTML = `
     <div class="back-header-row">
@@ -611,7 +628,7 @@ function renderResultCard(direction = "forward") {
     <ul class="match-reasons-back">${reasons}</ul>
     <div class="job-excerpt-box">
       <p class="job-excerpt-label">공고 원문 발췌</p>
-      <p class="job-excerpt-text">${excerptHtml}</p>
+      ${excerptRows.join("")}
     </div>
     <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="btn-original" id="btn-original-link">원본 채용공고 보기 →</a>
     <p class="flip-hint-back">👆 탭해서 앞면으로</p>`;
