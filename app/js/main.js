@@ -4,6 +4,7 @@ const RENDERERS = {
   "basic-info": () => {
     renderBasicInfo();
     setupFocusCards();
+    activateFirstCardIfEmpty();
   },
   work: renderWork,
   extracurricular: renderExtracurricular,
@@ -23,6 +24,18 @@ function setActiveFocusCard(card) {
   const list = document.getElementById("basic-info-focus-list");
   list.querySelectorAll(".focus-card").forEach((c) => c.classList.toggle("active", c === card));
   list.classList.toggle("has-active", !!card);
+}
+
+// 이름/생년월일/성별/전화/이메일 중 아무것도 입력 안 된 완전히 빈 상태로 이 화면에 들어오면,
+// 어디부터 채워야 할지 알 수 있게 첫 번째 카드를 기본으로 띄워둔다. 이미 뭔가 활성화돼 있으면(=
+// 사용자가 직접 클릭해뒀으면) 건드리지 않는다.
+function activateFirstCardIfEmpty() {
+  const list = document.getElementById("basic-info-focus-list");
+  if (list.querySelector(".focus-card.active")) return;
+
+  const b = AppState.profile.basic_info;
+  const isEmpty = !b.name && !b.birth_date && !b.gender && !b.contact.phone && !b.contact.email;
+  if (isEmpty) setActiveFocusCard(list.querySelector(".focus-card"));
 }
 
 // 이벤트 위임 방식이라 매번 다시 렌더링돼도 한 번만 바인딩하면 된다.
