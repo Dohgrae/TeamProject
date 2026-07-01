@@ -56,7 +56,7 @@
    메인 레이아웃 — .screen이 이미 32px 패딩을 주므로 여기서는 최소한만
    ============================================================ */
 .main {
-  max-width: 480px;
+  max-width: 640px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -65,12 +65,12 @@
 }
 
 /* 첨부 이미지 기준: 제목/부제는 가운데 정렬 (align-items:center로 이미 가운데 정렬됨) */
-.main > h1 {
+.card-carousel-panel > h1 {
   font-size: 22px;
   text-align: center;
 }
 
-.main > .sub {
+.card-carousel-panel > .sub {
   text-align: center;
 }
 
@@ -119,9 +119,13 @@
 /* 결과 카드들이 담기는 넓찍한 패널. 연보라 배경은 여기에만 준다(로딩 중에는 뺌). */
 .card-carousel-panel {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
   background: linear-gradient(160deg, #f1e9fb 0%, #eae3fb 100%);
   border-radius: 24px;
-  padding: 32px 20px;
+  padding: 36px 28px;
 }
 
 #screen-result.is-loading .card-carousel-panel {
@@ -129,8 +133,12 @@
   padding: 0;
 }
 
+/* 카드 자체는 패널보다 좁게 유지해서(세로형 "카드" 비율), 미리보기 카드가
+   퍼져도 패널 테두리 안에 완전히 담기도록 여유 공간을 준다. */
 .card-area {
   width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -185,8 +193,7 @@
 .card-peek .card-body { padding: 8px 16px 16px; }
 .card-peek .card-company-big { font-size: 14px; }
 .card-peek .card-position-sub { font-size: 13px; margin-top: 4px; }
-.card-peek .card-rate-big,
-.card-peek .card-comment,
+.card-peek .card-rate-center-wrap,
 .card-peek .card-chips-front,
 .card-peek .flip-hint,
 .card-peek .card-deadline-front { display: none; }
@@ -426,12 +433,22 @@
 }
 
 /* 매칭률 큰 숫자 — 카드 가운데, 직무명 바로 아래 */
+/* 매칭 키워드와 "탭해서 상세 보기" 사이 남는 공간의 정중앙에 매칭률+코멘트가 오도록
+   이 래퍼가 flex:1로 남는 공간을 다 차지하면서 내용을 세로 중앙 정렬한다. */
+.card-rate-center-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 .card-rate-big {
   font-size: 68px;
   font-weight: 900;
   color: var(--point);
   line-height: 1.1;
-  margin-top: 10px;
+  margin-top: 24px;
 }
 
 /* 한 줄 코멘트 — 매칭률 구간별 멘트, 포인트 컬러로 강조 */
@@ -589,6 +606,12 @@
 
 .job-excerpt-line + .job-excerpt-line {
   margin-top: 6px;
+}
+
+.nav-row-back {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
 }
 
 /* "← 입력으로 돌아가기"는 카드처럼 안 보이게 배경/테두리 없는 순수 텍스트 링크로 둔다 */
@@ -888,11 +911,11 @@
    크게 띄운다 (main.js가 #screen-result에 is-loading을 토글). 다른 화면들과
    똑같이 위저드 헤더/스텝네비는 항상 그대로 보이도록 유지한다.
    ============================================================ */
-#screen-result.is-loading .main > h1,
-#screen-result.is-loading .main > .sub,
+#screen-result.is-loading .card-carousel-panel > h1,
+#screen-result.is-loading .card-carousel-panel > .sub,
 #screen-result.is-loading .button-area,
 #screen-result.is-loading .card-carousel-controls,
-#screen-result.is-loading > .nav-row {
+#screen-result.is-loading .nav-row-back {
   display: none;
 }
 

@@ -189,17 +189,17 @@
     <section class="screen" id="screen-result">
       <div class="result-page">
         <main class="main" role="main">
-          <h1 id="result-title">오늘의 매칭 결과 💜</h1>
-          <p class="sub" id="result-subtitle">경험과 선호 조건에 꼭 맞는 공고를 찾았어요!</p>
-
-          <div class="progress-area" id="result-progress-area">
-            <span class="card-counter" id="card-counter"></span>
-            <div class="progress-bar-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-              <div class="progress-bar" id="result-progress-bar"></div>
-            </div>
-          </div>
-
           <div class="card-carousel-panel" id="card-carousel-panel">
+            <h1 id="result-title">오늘의 매칭 결과 💜</h1>
+            <p class="sub" id="result-subtitle">경험과 선호 조건에 꼭 맞는 공고를 찾았어요!</p>
+
+            <div class="progress-area" id="result-progress-area">
+              <span class="card-counter" id="card-counter"></span>
+              <div class="progress-bar-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar" id="result-progress-bar"></div>
+              </div>
+            </div>
+
             <div class="card-area" id="card-area">
               <div class="card-carousel" id="card-carousel">
                 <div class="card-peek card-peek-prev" id="card-peek-prev" aria-hidden="true"></div>
@@ -234,20 +234,21 @@
               <p class="end-desc">마음에 드는 공고를 찾으셨나요?<br />저장한 결과에서 다시 확인할 수 있어요.</p>
               <button class="btn-reset" id="btn-reset-cards">🔄 처음으로 돌아가기</button>
             </div>
-          </div>
 
-          <div class="button-area" id="button-area" role="group" aria-label="카드 조작 버튼">
-            <button class="btn btn-skip" id="btn-skip-card" aria-label="관심 없어요 — 다음 공고 (오른쪽 방향키)">
-              <span class="btn-icon" aria-hidden="true">✕</span><span class="btn-label">관심 없어요</span>
-            </button>
-            <button class="btn btn-view" id="btn-view-card" aria-label="공고 보기 — 원본 채용공고 열기 (엔터키)">
-              <span class="btn-label">공고 자세히 보기 →</span>
-            </button>
+            <div class="button-area" id="button-area" role="group" aria-label="카드 조작 버튼">
+              <button class="btn btn-skip" id="btn-skip-card" aria-label="관심 없어요 — 다음 공고 (오른쪽 방향키)">
+                <span class="btn-icon" aria-hidden="true">✕</span><span class="btn-label">관심 없어요</span>
+              </button>
+              <button class="btn btn-view" id="btn-view-card" aria-label="공고 보기 — 원본 채용공고 열기 (엔터키)">
+                <span class="btn-label">공고 자세히 보기 →</span>
+              </button>
+            </div>
+
+            <div class="nav-row-back">
+              <button type="button" class="btn btn-outline" id="btn-result-back-to-review">← 입력으로 돌아가기</button>
+            </div>
           </div>
         </main>
-      </div>
-      <div class="nav-row" style="max-width:640px;margin:0 auto;padding:16px">
-        <button type="button" class="btn btn-outline" id="btn-result-back-to-review">← 입력으로 돌아가기</button>
       </div>
     </section>
 

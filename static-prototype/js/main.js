@@ -488,8 +488,10 @@ function buildCardFrontHtml(job) {
       <p class="card-company-big">${escapeHtml(job.company_name)}</p>
       <p class="card-position-sub">${escapeHtml(job.job_title)}</p>
       <div class="card-chips-front">${chips.join("")}</div>
-      <p class="card-rate-big">${job.match_rate}%</p>
-      <p class="card-comment">${getMatchComment(job.match_rate)}</p>
+      <div class="card-rate-center-wrap">
+        <p class="card-rate-big">${job.match_rate}%</p>
+        <p class="card-comment">${getMatchComment(job.match_rate)}</p>
+      </div>
       <p class="flip-hint">👆 탭해서 상세 보기</p>
       <p class="card-deadline-front">📅 지원 마감 · ${escapeHtml(job.deadline)}</p>
     </div>`;
