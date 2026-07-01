@@ -424,8 +424,11 @@ async function startResultScreen() {
   document.getElementById("button-area").style.display = "flex";
   renderResultCard();
 
+  // 매칭 자체는 순식간에 끝나지만, 대기 화면(마스코트·하트·효과음)이 눈에 보일 정도의
+  // 최소 시간은 보장해준다. 그래야 응답이 빠른 경우에도 화면이 스치듯 지나가지 않는다.
+  const minDelay = new Promise((resolve) => setTimeout(resolve, 1800));
   try {
-    const data = await matchJobs(AppState.profile);
+    const [data] = await Promise.all([matchJobs(AppState.profile), minDelay]);
     resultState.jobs = data.results;
   } catch (err) {
     resultState.error = "매칭 결과를 불러오지 못했어요: " + err.message;
@@ -442,6 +445,9 @@ function renderResultCard() {
   cardInner.classList.remove("flipped");
   resultState.isFlipped = false;
 
+  // 대기 화면(마스코트/하트/효과음)을 벗어나는 모든 경우에 인터벌·오디오를 정리한다.
+  stopMatchLoadingAnimation();
+
   if (resultState.error) {
     front.innerHTML = `<div class="error-state"><span class="state-icon">😥</span><p class="state-title">${resultState.error}</p></div>`;
     progressArea.style.display = "none";
@@ -449,7 +455,7 @@ function renderResultCard() {
     return;
   }
   if (resultState.jobs === null) {
-    front.innerHTML = `<div class="loading-state"><div class="loading-spinner"></div><p class="loading-text">채용공고를 찾는 중이에요...</p></div>`;
+    startMatchLoadingAnimation(front, AppState.profile.basic_info.name);
     progressArea.style.display = "none";
     return;
   }

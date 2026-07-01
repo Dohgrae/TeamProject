@@ -523,6 +523,150 @@
 
 
 /* ============================================================
+   매칭 대기 화면 (로딩)
+   ============================================================ */
+.match-loading {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  flex: 1;
+  gap: 10px;
+  text-align: center;
+  padding: 16px;
+  overflow: hidden;
+}
+
+/* 효과음 on/off 토글 */
+.match-loading-sound-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(196, 77, 255, 0.1);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.match-loading-sound-toggle:hover { background: rgba(196, 77, 255, 0.18); }
+.match-loading-sound-toggle:active { transform: scale(0.9); }
+
+/* 떠다니는 하트 파티클 */
+.match-loading-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.match-loading-particle {
+  position: absolute;
+  bottom: -20px;
+  font-size: 16px;
+  opacity: 0;
+  animation: floatUpFade 4.5s ease-in infinite;
+}
+
+.match-loading-particle.p0 { left: 10%; animation-delay: 0s;   font-size: 14px; }
+.match-loading-particle.p1 { left: 26%; animation-delay: 0.8s; font-size: 20px; }
+.match-loading-particle.p2 { left: 48%; animation-delay: 1.6s; font-size: 15px; }
+.match-loading-particle.p3 { left: 66%; animation-delay: 2.4s; font-size: 22px; }
+.match-loading-particle.p4 { left: 82%; animation-delay: 0.4s; font-size: 16px; }
+.match-loading-particle.p5 { left: 38%; animation-delay: 3.2s; font-size: 18px; }
+
+@keyframes floatUpFade {
+  0%   { transform: translateY(0) scale(0.8); opacity: 0; }
+  12%  { opacity: 0.75; }
+  85%  { opacity: 0.35; }
+  100% { transform: translateY(-320px) scale(1.05); opacity: 0; }
+}
+
+/* 큐피 마스코트 — 둥실둥실 떠 있는 느낌 */
+.match-loading-mascot {
+  width: 124px;
+  height: auto;
+  animation: mascotFloat 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 10px 16px rgba(196, 77, 255, 0.22));
+}
+
+@keyframes mascotFloat {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-10px) rotate(2deg); }
+}
+
+/* 중앙 대형 하트 — 기존 heartbeat 키프레임 재사용(효과음과 박자를 맞춤) */
+.match-loading-heart {
+  font-size: 54px;
+  line-height: 1;
+  margin-top: -4px;
+  animation: heartbeat 1.6s ease-in-out infinite;
+}
+
+.match-loading-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.3px;
+}
+
+.match-loading-message {
+  min-height: 42px;
+  font-size: 14px;
+  color: var(--text-mid);
+  line-height: 1.6;
+  max-width: 300px;
+  animation: fadeSlideIn 0.4s ease both;
+}
+
+@keyframes fadeSlideIn {
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* 말줄임 점 3개가 통통 튀는 효과 */
+.match-loading-dots {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.match-loading-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--grad);
+  animation: dotBounce 1.2s ease-in-out infinite;
+}
+
+.match-loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+.match-loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes dotBounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+  40%           { transform: translateY(-6px); opacity: 1; }
+}
+
+/* 애니메이션을 원치 않는 사용자를 위한 배려 */
+@media (prefers-reduced-motion: reduce) {
+  .match-loading-mascot,
+  .match-loading-heart,
+  .match-loading-particle,
+  .match-loading-dots span {
+    animation: none;
+  }
+}
+
+
+/* ============================================================
    종료 화면
    ============================================================ */
 .end-screen {
@@ -686,6 +830,9 @@
   .score-label { font-size: 15px; }
   .btn-icon { font-size: 20px; }
   .btn-label { font-size: 11px; }
+  .match-loading-mascot { width: 96px; }
+  .match-loading-heart { font-size: 44px; }
+  .match-loading-title { font-size: 17px; }
 }
 
 /* 태블릿 · 데스크톱 (481px 이상) */
