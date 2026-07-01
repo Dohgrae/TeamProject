@@ -468,13 +468,9 @@ function buildCardFrontHtml(job) {
   if (job.company_size === "D") chips.push(`<span class="chip-front chip-meta">성장 단계</span>`);
 
   return `
-    <div class="card-banner" style="background:${getBannerColor(job.id)}">
-      <span class="card-badge-hiring">지금 채용중</span>
+    <div class="card-top-badges">
+      <span class="card-badge-hiring">● 지금 채용중</span>
       <span class="card-badge-ddate">${ddayText}</span>
-      <div class="card-banner-rate">
-        <span class="card-banner-rate-label">매칭률</span>
-        <span class="card-banner-rate-value">${job.match_rate}%</span>
-      </div>
     </div>
     <div class="card-avatar-wrap">
       <div class="card-avatar">
@@ -485,9 +481,9 @@ function buildCardFrontHtml(job) {
     <div class="card-body">
       <p class="card-company-big">${escapeHtml(job.company_name)}</p>
       <p class="card-position-sub">${escapeHtml(job.job_title)}</p>
+      <div class="card-chips-front">${chips.join("")}</div>
       <p class="card-rate-big">${job.match_rate}%</p>
       <p class="card-comment">${getMatchComment(job.match_rate)}</p>
-      <div class="card-chips-front">${chips.join("")}</div>
       <p class="flip-hint">👆 탭해서 상세 보기</p>
       <p class="card-deadline-front">📅 지원 마감 · ${escapeHtml(job.deadline)}</p>
     </div>`;

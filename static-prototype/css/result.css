@@ -169,10 +169,10 @@ body:has(#screen-result.screen.active) {
 .card-peek-prev { left: -22%; }
 .card-peek-next { right: -22%; }
 
-.card-peek .card-banner { padding: 14px 16px 34px; }
-.card-peek .card-avatar-wrap { margin-top: -32px; }
+.card-peek .card-top-badges { padding: 14px 16px 0; }
+.card-peek .card-avatar-wrap { margin-top: 4px; }
 .card-peek .card-avatar { width: 56px; height: 56px; }
-.card-peek .card-avatar-mascot { width: 40px; }
+.card-peek .card-avatar-mascot { width: 42px; }
 .card-peek .card-avatar-mood { font-size: 13px; }
 .card-peek .card-body { padding: 8px 16px 16px; }
 .card-peek .card-company-big { font-size: 14px; }
@@ -339,15 +339,12 @@ body:has(#screen-result.screen.active) {
   box-shadow: var(--card-shadow);
 }
 
-/* 상단 컬러 배너: 채용중 배지 + D-day + 매칭률 */
-.card-banner {
-  position: relative;
-  border-radius: var(--card-radius) var(--card-radius) 0 0;
-  padding: 16px 20px 46px;
+/* 상단 배지 줄: 색 배너 없이 채용중 배지 + D-day만 흰 카드 위에 얹는다 */
+.card-top-badges {
+  padding: 18px 20px 0;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  color: #ffffff;
 }
 
 .card-badge-hiring {
@@ -356,54 +353,31 @@ body:has(#screen-result.screen.active) {
   gap: 5px;
   font-size: 11px;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.25);
+  color: #16a085;
+  background: #e6f7f1;
   padding: 4px 10px;
   border-radius: 99px;
-}
-
-.card-badge-hiring::before {
-  content: "●";
-  font-size: 7px;
 }
 
 .card-badge-ddate {
   font-size: 12px;
   font-weight: 700;
-  opacity: 0.9;
+  color: var(--text-mid);
 }
 
-.card-banner-rate {
-  position: absolute;
-  right: 20px;
-  top: 38px;
-  text-align: right;
-}
-
-.card-banner-rate-label {
-  display: block;
-  font-size: 11px;
-  opacity: 0.85;
-}
-
-.card-banner-rate-value {
-  font-size: 22px;
-  font-weight: 900;
-  line-height: 1.1;
-}
-
-/* 배너와 본문 경계에 걸쳐 겹쳐지는 원형 마스코트 아바타 */
+/* 마스코트 아바타 — 색 배너가 없어졌으니 그냥 카드 상단에 자연스럽게 얹는다 */
 .card-avatar-wrap {
   display: flex;
   justify-content: center;
-  margin-top: -40px;
+  margin-top: 8px;
   position: relative;
   z-index: 2;
 }
 
 .card-avatar {
   position: relative;
-  width: 76px;
-  height: 76px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   background: #ffffff;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
@@ -413,7 +387,7 @@ body:has(#screen-result.screen.active) {
 }
 
 .card-avatar-mascot {
-  width: 56px;
+  width: 78px;
   height: auto;
 }
 
@@ -421,7 +395,7 @@ body:has(#screen-result.screen.active) {
   position: absolute;
   bottom: -2px;
   right: -4px;
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1;
   background: #ffffff;
   border-radius: 50%;
@@ -457,11 +431,11 @@ body:has(#screen-result.screen.active) {
 
 /* 매칭률 큰 숫자 — 카드 가운데, 직무명 바로 아래 */
 .card-rate-big {
-  font-size: 48px;
+  font-size: 68px;
   font-weight: 900;
   color: var(--point);
   line-height: 1.1;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 /* 한 줄 코멘트 — 매칭률 구간별 멘트, 포인트 컬러로 강조 */
