@@ -440,6 +440,15 @@ function getMatchComment(score) {
   return "음… 더 좋은 상대가 있을거에요 ^^;;";
 }
 
+// 매칭률 구간별로 표정이 다른 큐피 이미지를 보여준다(5=제일 좋아함 ~ 1=제일 시무룩).
+function getMascotImage(score) {
+  if (score >= 85) return "img/qpi-mascot-tier-5.png";
+  if (score >= 70) return "img/qpi-mascot-tier-4.png";
+  if (score >= 50) return "img/qpi-mascot-tier-3.png";
+  if (score >= 30) return "img/qpi-mascot-tier-2.png";
+  return "img/qpi-mascot-tier-1.png";
+}
+
 function hashCode(str) {
   let h = 0;
   for (let i = 0; i < str.length; i++) h = ((h << 5) - h + str.charCodeAt(i)) | 0;
@@ -481,7 +490,7 @@ function buildCardFrontHtml(job) {
     </div>
     <div class="card-avatar-wrap">
       <div class="card-avatar">
-        <img src="img/qpi-mascot.png" alt="큐피" class="card-avatar-mascot" />
+        <img src="${getMascotImage(job.match_rate)}" alt="큐피" class="card-avatar-mascot" />
       </div>
     </div>
     <div class="card-body">

@@ -5,21 +5,23 @@
 
 /* ── 디자인 토큰 ── */
 :root {
-  --point:         #7d00b8;
-  --point-deep:    #5c008a;
+  --point: #7d00b8;
+  --point-deep: #5c008a;
 
-  --bg:            #f9fafb;
-  --text-dark:     #1f2937;
-  --text-mid:      #6b7280;
-  --text-light:    #9ca3af;
+  --bg: #f9fafb;
+  --text-dark: #1f2937;
+  --text-mid: #6b7280;
+  --text-light: #9ca3af;
 
-  --card-radius:   24px;
-  --card-shadow:   0 1px 3px rgba(0, 0, 0, 0.06),
-                   0 8px 28px rgba(17, 24, 39, 0.07);
+  --card-radius: 24px;
+  --card-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 28px rgba(17, 24, 39, 0.07);
 }
 
 /* ── 기본 리셋 ── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -36,8 +38,9 @@
 }
 
 .result-page {
-  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
-               'Noto Sans KR', 'Segoe UI', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR",
+    "Segoe UI", sans-serif;
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
   flex: 1;
@@ -56,18 +59,21 @@
 #screen-result.active {
   background: transparent;
   box-shadow: none;
-  padding: 16px 24px;
+  padding: 6px 24px;
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 /* 헤더 실제 높이를 추측해서 빼는 대신, body 자체를 뷰포트 높이로 고정하고
-   헤더는 auto, wizard-main은 flex:1로 "남는 만큼"을 정확히 채우게 한다. */
+   헤더는 auto, wizard-main은 flex:1로 "남는 만큼"을 정확히 채우게 한다.
+   내용이 실제로 다 들어갈 최소 높이(아래 min-height 체인)보다 뷰포트가 낮으면
+   body에서만 스크롤이 생기게 한다(중간 컨테이너들은 overflow를 안 걸어서
+   그 스크롤이 항상 body까지 올라가도록 한다 — 그래야 형제 요소끼리 겹치는
+   대신 안전하게 스크롤된다). */
 body:has(#screen-result.active) {
   height: 100vh;
-  overflow: hidden;
+  overflow: auto;
   display: flex;
   flex-direction: column;
 }
@@ -76,12 +82,10 @@ body:has(#screen-result.active) {
   flex: 1;
   min-height: 0;
   height: auto;
-  padding-top: 12px;
-  padding-bottom: 16px;
-  overflow: hidden;
+  padding-top: 6px;
+  padding-bottom: 8px;
   display: flex;
 }
-
 
 /* ============================================================
    메인 레이아웃 — .screen이 이미 32px 패딩을 주므로 여기서는 최소한만
@@ -93,9 +97,11 @@ body:has(#screen-result.active) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
   flex: 1;
-  min-height: 0;
+  /* 안의 형제 요소(제목/패널/뒤로가기 링크)들이 서로 겹치지 않도록,
+     패널의 최소 높이를 포함한 실제 필요 높이를 min-height로 보장한다. */
+  min-height: 791px;
 }
 
 /* 제목/부제는 연보라 캐러셀 바깥, .main 안에 그대로 두고 가운데 정렬만 준다 */
@@ -113,8 +119,8 @@ body:has(#screen-result.active) {
 
 #result-subtitle {
   text-align: center;
+  margin-bottom: 0;
 }
-
 
 /* ============================================================
    진행률 표시
@@ -147,7 +153,6 @@ body:has(#screen-result.active) {
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-
 /* ============================================================
    카드 영역 — 3D 뒤집기 구조
    ============================================================
@@ -171,18 +176,26 @@ body:has(#screen-result.active) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
   background: #ffffff;
   box-shadow: var(--card-shadow);
   border-radius: 24px;
-  padding: 20px 28px;
+  padding: 10px 28px;
   flex: 1;
-  min-height: 0;
+  /* 안의 형제 요소(진행률/카드 영역/버튼 영역)가 서로 겹치지 않도록
+     card-area의 최소 높이를 포함한 실제 필요 높이를 보장한다. */
+  min-height: 677px;
 }
 
 #screen-result.is-loading .card-carousel-panel {
   background: transparent;
+  border-radius: 24px;
   padding: 0;
+  min-height: 0;
+}
+
+#screen-result.is-loading .main {
+  min-height: 0;
 }
 
 /* 카드 자체는 패널보다 좁게 유지해서(세로형 "카드" 비율), 미리보기 카드가
@@ -194,9 +207,11 @@ body:has(#screen-result.active) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   flex: 1;
-  min-height: 0;
+  /* 안의 형제 요소(카드 캐러셀/캐러셀 컨트롤)가 서로 겹치지 않도록
+     card-carousel의 최소 높이를 포함한 실제 필요 높이를 보장한다. */
+  min-height: 574px;
 }
 
 /* 카드 캐러셀 — 가운데 카드(.card-wrap)는 실제 뒤집기가 되는 카드, 양옆의 .card-peek는
@@ -206,10 +221,13 @@ body:has(#screen-result.active) {
   width: 100%;
   display: flex;
   align-items: stretch;
+  border-radius: 24px;
   justify-content: center;
   perspective: 1400px;
   flex: 1;
-  min-height: 0;
+  /* 카드 내용(아바타·본문 텍스트)이 다 들어갈 최소 높이는 보장한다.
+     화면이 아주 낮으면 이 아래로는 body의 overflow:auto가 받아 스크롤된다. */
+  min-height: 526px;
 }
 
 .card-wrap {
@@ -236,30 +254,57 @@ body:has(#screen-result.active) {
   transition: opacity 0.15s ease;
 }
 
-.card-peek:hover { opacity: 0.85; }
-.card-peek:empty { visibility: hidden; }
+.card-peek:hover {
+  opacity: 0.85;
+}
+.card-peek:empty {
+  visibility: hidden;
+}
 
 /* 카드끼리 덜 겹치고 양옆으로 더 퍼지도록 오프셋을 늘림(기존 -8% -> -22%) */
-.card-peek-prev { left: -22%; }
-.card-peek-next { right: -22%; }
+.card-peek-prev {
+  left: -22%;
+}
+.card-peek-next {
+  right: -22%;
+}
 
-.card-peek .card-top-badges { padding: 14px 16px 0; }
-.card-peek .card-avatar-wrap { margin-top: 4px; }
-.card-peek .card-avatar { width: 68px; height: 68px; }
-.card-peek .card-avatar-mascot { width: 52px; }
-.card-peek .card-body { padding: 8px 16px 16px; }
-.card-peek .card-company-big { font-size: 14px; }
-.card-peek .card-position-sub { font-size: 13px; margin-top: 4px; }
+.card-peek .card-top-badges {
+  padding: 14px 16px 0;
+}
+.card-peek .card-avatar-wrap {
+  margin-top: 4px;
+}
+.card-peek .card-avatar {
+  width: 68px;
+  height: 68px;
+}
+.card-peek .card-avatar-mascot {
+  width: 52px;
+}
+.card-peek .card-body {
+  padding: 8px 16px 16px;
+}
+.card-peek .card-company-big {
+  font-size: 14px;
+}
+.card-peek .card-position-sub {
+  font-size: 13px;
+  margin-top: 4px;
+}
 .card-peek .card-rate-center-wrap,
 .card-peek .card-chips-front,
 .card-peek .flip-hint,
-.card-peek .card-deadline-front { display: none; }
+.card-peek .card-deadline-front {
+  display: none;
+}
 
 /* 카드 아래 원형 이전/다음 버튼 + 점 페이지네이션 */
 .card-carousel-controls {
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 24px;
   gap: 16px;
 }
 
@@ -278,7 +323,9 @@ body:has(#screen-result.active) {
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(125, 0, 184, 0.12);
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .card-nav-btn:hover {
@@ -307,7 +354,9 @@ body:has(#screen-result.active) {
   height: 6px;
   border-radius: 99px;
   background: #d8c7ef;
-  transition: width 0.2s ease, background 0.2s ease;
+  transition:
+    width 0.2s ease,
+    background 0.2s ease;
   flex-shrink: 0;
 }
 
@@ -318,14 +367,26 @@ body:has(#screen-result.active) {
 
 /* 카드 퇴장 애니메이션 (다음 카드로 이동 시) */
 @keyframes cardLeave {
-  0%   { opacity: 1; transform: translateX(0) rotate(0deg) scale(1); }
-  100% { opacity: 0; transform: translateX(-90px) rotate(-5deg) scale(0.93); }
+  0% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-90px) rotate(-5deg) scale(0.93);
+  }
 }
 
 /* 카드 입장 애니메이션 */
 @keyframes cardEnter {
-  0%   { opacity: 0; transform: translateX(50px) scale(0.96); }
-  100% { opacity: 1; transform: translateX(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateX(50px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
 
 .card-wrap.leaving {
@@ -339,13 +400,25 @@ body:has(#screen-result.active) {
 
 /* "이전" 카드로 되돌아갈 때는 반대 방향(오른쪽으로 퇴장 → 왼쪽에서 등장)으로 슬라이드한다 */
 @keyframes cardLeaveReverse {
-  0%   { opacity: 1; transform: translateX(0) rotate(0deg) scale(1); }
-  100% { opacity: 0; transform: translateX(90px) rotate(5deg) scale(0.93); }
+  0% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(90px) rotate(5deg) scale(0.93);
+  }
 }
 
 @keyframes cardEnterReverse {
-  0%   { opacity: 0; transform: translateX(-50px) scale(0.96); }
-  100% { opacity: 1; transform: translateX(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateX(-50px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
 
 .card-wrap.leaving-reverse {
@@ -384,7 +457,9 @@ body:has(#screen-result.active) {
   transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.card-inner.flipped { transform: rotateY(180deg); }
+.card-inner.flipped {
+  transform: rotateY(180deg);
+}
 
 /* 앞면 · 뒷면 공통 */
 .card-front,
@@ -403,7 +478,6 @@ body:has(#screen-result.active) {
 .card-back {
   padding: 28px 24px;
 }
-
 
 /* ============================================================
    카드 앞면 — 상단 컬러 배너 + 겹쳐진 마스코트 아바타 + 본문
@@ -556,7 +630,6 @@ body:has(#screen-result.active) {
   letter-spacing: 0.2px;
 }
 
-
 /* ============================================================
    카드 뒷면 — 앞면과 같은 흰 배경으로 통일
    ============================================================ */
@@ -577,7 +650,9 @@ body:has(#screen-result.active) {
   margin-top: 18px;
 }
 
-.back-section-title:first-child { margin-top: 0; }
+.back-section-title:first-child {
+  margin-top: 0;
+}
 
 /* 상단 줄: "매칭 키워드" 라벨 + 우측의 "N% 일치" */
 .back-header-row {
@@ -586,7 +661,9 @@ body:has(#screen-result.active) {
   justify-content: space-between;
 }
 
-.back-header-row .back-section-title { margin: 0; }
+.back-header-row .back-section-title {
+  margin: 0;
+}
 
 .back-match-percent {
   font-size: 14px;
@@ -630,7 +707,7 @@ body:has(#screen-result.active) {
 }
 
 .reason-item-back::before {
-  content: '✓';
+  content: "✓";
   position: absolute;
   left: 0;
   top: 0;
@@ -708,7 +785,9 @@ body:has(#screen-result.active) {
   border-radius: 14px;
   text-decoration: none;
   letter-spacing: -0.2px;
-  transition: background 0.18s, box-shadow 0.18s;
+  transition:
+    background 0.18s,
+    box-shadow 0.18s;
 }
 
 .btn-original:hover,
@@ -726,7 +805,6 @@ body:has(#screen-result.active) {
   color: var(--text-light);
   letter-spacing: 0.2px;
 }
-
 
 /* ============================================================
    로딩 · 에러 · 빈 데이터 상태
@@ -755,7 +833,11 @@ body:has(#screen-result.active) {
   animation: spin 0.85s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 .loading-text {
   font-size: 15px;
@@ -782,7 +864,6 @@ body:has(#screen-result.active) {
   color: var(--text-mid);
   line-height: 1.6;
 }
-
 
 /* ============================================================
    매칭 대기 화면 (로딩)
@@ -817,11 +898,17 @@ body:has(#screen-result.active) {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, transform 0.15s;
+  transition:
+    background 0.15s,
+    transform 0.15s;
 }
 
-.match-loading-sound-toggle:hover { background: rgba(125, 0, 184, 0.18); }
-.match-loading-sound-toggle:active { transform: scale(0.9); }
+.match-loading-sound-toggle:hover {
+  background: rgba(125, 0, 184, 0.18);
+}
+.match-loading-sound-toggle:active {
+  transform: scale(0.9);
+}
 
 /* 떠다니는 하트 파티클 */
 .match-loading-particles {
@@ -838,18 +925,52 @@ body:has(#screen-result.active) {
   animation: floatUpFade 4.5s ease-in infinite;
 }
 
-.match-loading-particle.p0 { left: 10%; animation-delay: 0s;   font-size: 14px; }
-.match-loading-particle.p1 { left: 26%; animation-delay: 0.8s; font-size: 20px; }
-.match-loading-particle.p2 { left: 48%; animation-delay: 1.6s; font-size: 15px; }
-.match-loading-particle.p3 { left: 66%; animation-delay: 2.4s; font-size: 22px; }
-.match-loading-particle.p4 { left: 82%; animation-delay: 0.4s; font-size: 16px; }
-.match-loading-particle.p5 { left: 38%; animation-delay: 3.2s; font-size: 18px; }
+.match-loading-particle.p0 {
+  left: 10%;
+  animation-delay: 0s;
+  font-size: 14px;
+}
+.match-loading-particle.p1 {
+  left: 26%;
+  animation-delay: 0.8s;
+  font-size: 20px;
+}
+.match-loading-particle.p2 {
+  left: 48%;
+  animation-delay: 1.6s;
+  font-size: 15px;
+}
+.match-loading-particle.p3 {
+  left: 66%;
+  animation-delay: 2.4s;
+  font-size: 22px;
+}
+.match-loading-particle.p4 {
+  left: 82%;
+  animation-delay: 0.4s;
+  font-size: 16px;
+}
+.match-loading-particle.p5 {
+  left: 38%;
+  animation-delay: 3.2s;
+  font-size: 18px;
+}
 
 @keyframes floatUpFade {
-  0%   { transform: translateY(0) scale(0.8); opacity: 0; }
-  12%  { opacity: 0.75; }
-  85%  { opacity: 0.35; }
-  100% { transform: translateY(-320px) scale(1.05); opacity: 0; }
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.75;
+  }
+  85% {
+    opacity: 0.35;
+  }
+  100% {
+    transform: translateY(-320px) scale(1.05);
+    opacity: 0;
+  }
 }
 
 /* 큐피 마스코트 + 하트를 한 덩어리로 겹쳐서, 두근거리는 대형 하트를 배경 삼아
@@ -876,11 +997,22 @@ body:has(#screen-result.active) {
 }
 
 @keyframes heartbeat {
-  0%, 100% { transform: scale(1); }
-  14%       { transform: scale(1.18); }
-  28%       { transform: scale(1); }
-  42%       { transform: scale(1.12); }
-  56%       { transform: scale(1); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.18);
+  }
+  28% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.12);
+  }
+  56% {
+    transform: scale(1);
+  }
 }
 
 /* 하트 양옆에 비대칭하게 떠서 하트 주변을 맴도는 느낌의 두 캐릭터.
@@ -891,28 +1023,39 @@ body:has(#screen-result.active) {
   height: auto;
 }
 
+/* 왼쪽 아래 캐릭터는 좌우 반전(scaleX(-1))해서 오른쪽 위 캐릭터를 바라보게 한다. */
 .match-loading-mascot-a {
-  width: 78px;
+  width: 100px;
   left: 4px;
   bottom: 18px;
   animation: mascotOrbitA 6s ease-in-out infinite;
 }
 
 .match-loading-mascot-b {
-  width: 96px;
+  width: 122px;
   right: -6px;
   top: 8px;
   animation: mascotOrbitB 6.8s ease-in-out infinite;
 }
 
 @keyframes mascotOrbitA {
-  0%, 100% { transform: translateY(0)    translateX(0)   rotate(-4deg); }
-  50%      { transform: translateY(-16px) translateX(8px) rotate(5deg); }
+  0%,
+  100% {
+    transform: scaleX(-1) translateY(0) translateX(0) rotate(4deg);
+  }
+  50% {
+    transform: scaleX(-1) translateY(-16px) translateX(-8px) rotate(-5deg);
+  }
 }
 
 @keyframes mascotOrbitB {
-  0%, 100% { transform: translateY(0)   translateX(0)    rotate(5deg); }
-  50%      { transform: translateY(-10px) translateX(-10px) rotate(-4deg); }
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) rotate(5deg);
+  }
+  50% {
+    transform: translateY(-10px) translateX(-10px) rotate(-4deg);
+  }
 }
 
 .match-loading-title {
@@ -932,8 +1075,14 @@ body:has(#screen-result.active) {
 }
 
 @keyframes fadeSlideIn {
-  0%   { opacity: 0; transform: translateY(6px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* 말줄임 점 3개가 통통 튀는 효과 */
@@ -951,12 +1100,24 @@ body:has(#screen-result.active) {
   animation: dotBounce 1.2s ease-in-out infinite;
 }
 
-.match-loading-dots span:nth-child(2) { animation-delay: 0.15s; }
-.match-loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+.match-loading-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.match-loading-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
 
 @keyframes dotBounce {
-  0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
-  40%           { transform: translateY(-6px); opacity: 1; }
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
 }
 
 /* 애니메이션을 원치 않는 사용자를 위한 배려 */
@@ -996,13 +1157,13 @@ body:has(#screen-result.active) {
 }
 
 #screen-result.is-loading .match-loading-mascot-a {
-  width: 140px;
+  width: 175px;
   left: 4px;
   bottom: 30px;
 }
 
 #screen-result.is-loading .match-loading-mascot-b {
-  width: 172px;
+  width: 210px;
   right: -10px;
   top: 16px;
 }
@@ -1021,7 +1182,6 @@ body:has(#screen-result.active) {
   font-size: 15px;
   max-width: 340px;
 }
-
 
 /* ============================================================
    종료 화면
@@ -1049,8 +1209,14 @@ body:has(#screen-result.active) {
 }
 
 @keyframes pop {
-  0%   { transform: scale(0.4); opacity: 0; }
-  100% { transform: scale(1);   opacity: 1; }
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .end-title {
@@ -1078,7 +1244,9 @@ body:has(#screen-result.active) {
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 18px rgba(125, 0, 184, 0.35);
-  transition: transform 0.18s, box-shadow 0.18s;
+  transition:
+    transform 0.18s,
+    box-shadow 0.18s;
   font-family: inherit;
 }
 
@@ -1087,8 +1255,9 @@ body:has(#screen-result.active) {
   box-shadow: 0 6px 22px rgba(125, 0, 184, 0.48);
 }
 
-.btn-reset:active { transform: scale(0.96); }
-
+.btn-reset:active {
+  transform: scale(0.96);
+}
 
 /* ============================================================
    하단 버튼 영역
@@ -1111,12 +1280,17 @@ body:has(#screen-result.active) {
   gap: 6px;
   border-radius: 14px;
   padding: 15px 10px;
-  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s,
+    background 0.15s;
   font-family: inherit;
   flex: 1;
 }
 
-.btn:active { transform: scale(0.97) !important; }
+.btn:active {
+  transform: scale(0.97) !important;
+}
 
 /* 관심 없어요 */
 .btn-skip {
@@ -1125,7 +1299,8 @@ body:has(#screen-result.active) {
   color: var(--text-mid);
 }
 
-.btn-skip:hover, .btn-skip:focus-visible {
+.btn-skip:hover,
+.btn-skip:focus-visible {
   background: #faf5ff;
   border-color: var(--point);
   outline: none;
@@ -1139,7 +1314,8 @@ body:has(#screen-result.active) {
   box-shadow: 0 4px 18px rgba(125, 0, 184, 0.35);
 }
 
-.btn-view:hover, .btn-view:focus-visible {
+.btn-view:hover,
+.btn-view:focus-visible {
   box-shadow: 0 6px 24px rgba(125, 0, 184, 0.48);
   transform: translateY(-2px);
   outline: none;
@@ -1157,27 +1333,50 @@ body:has(#screen-result.active) {
   line-height: 1;
 }
 
-
 /* ============================================================
    반응형
    ============================================================ */
 
 /* 소형 모바일 (380px 미만) */
 @media (max-width: 380px) {
-  .main { gap: 16px; }
-  .card-back { padding: 22px 18px; }
-  .card-position-sub { font-size: 17px; }
-  .btn-icon { font-size: 20px; }
-  .btn-label { font-size: 11px; }
-  .match-loading-mascot-a { width: 58px; }
-  .match-loading-mascot-b { width: 70px; }
-  .match-loading-heart { font-size: 130px; }
-  .match-loading-title { font-size: 17px; }
+  .main {
+    gap: 16px;
+  }
+  .card-back {
+    padding: 22px 18px;
+  }
+  .card-position-sub {
+    font-size: 17px;
+  }
+  .btn-icon {
+    font-size: 20px;
+  }
+  .btn-label {
+    font-size: 11px;
+  }
+  .match-loading-mascot-a {
+    width: 74px;
+  }
+  .match-loading-mascot-b {
+    width: 88px;
+  }
+  .match-loading-heart {
+    font-size: 130px;
+  }
+  .match-loading-title {
+    font-size: 17px;
+  }
 }
 
 /* 태블릿 · 데스크톱 (481px 이상) */
 @media (min-width: 481px) {
-  .card-position-sub { font-size: 21px; }
-  .btn { padding: 16px 12px; }
-  .btn-view { padding: 18px 14px; }
+  .card-position-sub {
+    font-size: 21px;
+  }
+  .btn {
+    padding: 13px 12px;
+  }
+  .btn-view {
+    padding: 14px 14px;
+  }
 }
