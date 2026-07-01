@@ -341,6 +341,14 @@ document.addEventListener("DOMContentLoaded", () => {
   AppState.load();
   bindBasicInfoInputs();
 
+  document.getElementById("btn-reset-profile").addEventListener("click", () => {
+    if (!window.confirm("입력한 내용을 전부 지우고 처음부터 다시 시작할까요?")) return;
+    AppState.reset();
+    resultState.jobs = null;
+    resultState.currentIndex = 0;
+    showScreen("basic-info");
+  });
+
   document.getElementById("btn-basic-info-next").addEventListener("click", () => {
     if (isBasicInfoValid()) showScreen("work");
   });

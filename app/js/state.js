@@ -105,6 +105,13 @@ const AppState = {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(this.profile));
   },
 
+  // localStorage에 남아있는 이전 입력을 지우고 완전히 초기화된 상태로 되돌린다.
+  reset() {
+    window.localStorage.removeItem(STORAGE_KEY);
+    this.profile = touchMeta(emptyProfile());
+    this.save();
+  },
+
   // 배열 토글(선택/해제) 헬퍼 — 필터, 기술스택 등에서 공통으로 사용
   toggleInArray(arr, value) {
     const i = arr.indexOf(value);
