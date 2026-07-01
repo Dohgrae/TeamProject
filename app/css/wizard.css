@@ -109,6 +109,28 @@ textarea {
   min-width: 120px;
 }
 
+.input-with-button button {
+  border: none;
+  border-radius: 999px;
+  padding: 0 20px;
+  background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
+}
+
+.input-with-button button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4);
+}
+
+.input-with-button button:active {
+  transform: translateY(0);
+}
+
 /* ── 칩(버튼 다중/단일 선택) ── */
 .chip-group {
   display: flex;
@@ -283,7 +305,7 @@ textarea {
 
 .entry-card-head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
   flex-wrap: wrap;
@@ -475,6 +497,11 @@ textarea {
   gap: 10px;
 }
 
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
 .msg {
   max-width: 80%;
   border-radius: 16px;
@@ -515,6 +542,13 @@ textarea {
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+}
+
+/* 인터뷰 모달의 "이전"은 전송/시작하기 버튼과 구분되도록 아웃라인 스타일로 둔다 */
+#btn-interview-prev {
+  background: #ffffff;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
 }
 
 .modal-form button:disabled {

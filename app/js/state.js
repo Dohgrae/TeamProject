@@ -120,12 +120,13 @@ const AppState = {
     this.save();
   },
 
-  addWorkExperience(answers, keywords) {
+  // period = { employment_type, start_date, end_date } — 인터뷰 시작 전 미니 모달에서 먼저 받아온 값
+  addWorkExperience(period, answers, keywords) {
     this.profile.career.work_experiences.push({
       id: uuid(),
-      employment_type: "정규직",
-      start_date: "",
-      end_date: null,
+      employment_type: period.employment_type,
+      start_date: period.start_date,
+      end_date: period.end_date,
       answers,
       keywords,
     });

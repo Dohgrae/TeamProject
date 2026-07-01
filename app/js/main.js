@@ -9,22 +9,69 @@ const RENDERERS = {
   work: renderWork,
   extracurricular: renderExtracurricular,
   awards: renderAwards,
-  personality: renderPersonality,
+  personality: () => {
+    renderPersonality();
+    setupPersonalityFocusCards();
+    activateFirstPersonalityCardIfEmpty();
+  },
   review: renderReview,
   result: () => startResultScreen(),
 };
 
 // ============================================================
-// 기본 인적사항: 전체 항목을 한 화면에 보여주되, 클릭/포커스한 카드만
-// 위로 살짝 떠오르며 강조되고 나머지는 은은하게 가라앉는 효과
+// 항목이 여러 장 카드로 나열된 화면(기본 인적사항, 성향질문) 공통:
+// 클릭/포커스한 카드만 위로 떠오르며 강조되고 나머지는 은은하게 가라앉는 효과
 // ============================================================
-let focusCardsBound = false;
-
-function setActiveFocusCard(card) {
-  const list = document.getElementById("basic-info-focus-list");
+function setActiveFocusCard(list, card) {
   list.querySelectorAll(".focus-card").forEach((c) => c.classList.toggle("active", c === card));
   list.classList.toggle("has-active", !!card);
 }
+
+// 카드 바깥(어느 화면의 focus-card-list든)을 클릭하면 강조를 해제한다. 한 번만 등록하면 된다.
+let focusCardOutsideClickBound = false;
+function bindFocusCardOutsideClick() {
+  if (focusCardOutsideClickBound) return;
+  focusCardOutsideClickBound = true;
+  document.addEventListener(
+    "click",
+    (e) => {
+      if (!e.target.closest(".focus-card") && !e.target.closest(".modal-overlay")) {
+        document.querySelectorAll(".focus-card-list").forEach((list) => setActiveFocusCard(list, null));
+      }
+    },
+    true
+  );
+}
+
+// list 하나에 클릭/포커스로 카드를 강조하는 이벤트 위임을 붙인다. 매번 다시 렌더링돼도
+// list 자체(컨테이너)는 안 바뀌니 한 번만 바인딩하면 된다.
+function bindFocusCardList(list) {
+  list.addEventListener(
+    "focusin",
+    (e) => {
+      const card = e.target.closest(".focus-card");
+      if (card) setActiveFocusCard(list, card);
+    },
+    true
+  );
+
+  // 칩/옵션 버튼 클릭은 onToggle 안에서 바로 innerHTML을 다시 그려서 자기 자신을 DOM에서
+  // 떼어내 버리므로, 버블링(click)까지 기다리면 e.target의 부모 체인이 이미 끊겨 있다.
+  // 그래서 캡처링 단계(버튼 자체 클릭 핸들러보다 먼저)에서 잡아야 한다.
+  list.addEventListener(
+    "click",
+    (e) => {
+      const card = e.target.closest(".focus-card");
+      if (card) setActiveFocusCard(list, card);
+    },
+    true
+  );
+
+  bindFocusCardOutsideClick();
+}
+
+// ── 기본 인적사항 ──
+let basicInfoFocusBound = false;
 
 // 이름/생년월일/성별/전화/이메일 중 아무것도 입력 안 된 완전히 빈 상태로 이 화면에 들어오면,
 // 어디부터 채워야 할지 알 수 있게 첫 번째 카드를 기본으로 띄워둔다. 이미 뭔가 활성화돼 있으면(=
@@ -35,49 +82,15 @@ function activateFirstCardIfEmpty() {
 
   const b = AppState.profile.basic_info;
   const isEmpty = !b.name && !b.birth_date && !b.gender && !b.contact.phone && !b.contact.email;
-  if (isEmpty) setActiveFocusCard(list.querySelector(".focus-card"));
+  if (isEmpty) setActiveFocusCard(list, list.querySelector(".focus-card"));
 }
 
-// 이벤트 위임 방식이라 매번 다시 렌더링돼도 한 번만 바인딩하면 된다.
 function setupFocusCards() {
-  if (focusCardsBound) return;
-  focusCardsBound = true;
+  if (basicInfoFocusBound) return;
+  basicInfoFocusBound = true;
   const list = document.querySelector(".focus-card-list");
   list.id = "basic-info-focus-list";
-
-  list.addEventListener(
-    "focusin",
-    (e) => {
-      const card = e.target.closest(".focus-card");
-      if (card) setActiveFocusCard(card);
-    },
-    true
-  );
-
-  // 칩 버튼 클릭은 onToggle 안에서 바로 innerHTML을 다시 그려서 자기 자신을 DOM에서
-  // 떼어내 버리므로, 버블링(click)까지 기다리면 e.target의 부모 체인이 이미 끊겨 있다.
-  // 그래서 캡처링 단계(버튼 자체 클릭 핸들러보다 먼저)에서 잡아야 한다.
-  list.addEventListener(
-    "click",
-    (e) => {
-      const card = e.target.closest(".focus-card");
-      if (card) setActiveFocusCard(card);
-    },
-    true
-  );
-
-  // 카드 바깥을 클릭하면 강조를 해제한다. 이것도 캡처링 단계에서 판단해야
-  // 칩 재렌더링으로 e.target이 떨어져나가기 전에 원래 위치를 기준으로 판단할 수 있다.
-  document.addEventListener(
-    "click",
-    (e) => {
-      if (!e.target.closest(".focus-card") && !e.target.closest(".modal-overlay")) {
-        setActiveFocusCard(null);
-      }
-    },
-    true
-  );
-
+  bindFocusCardList(list);
   setupAutoAdvance(list);
 }
 
@@ -87,7 +100,7 @@ function setupAutoAdvance(list) {
   function advanceTo(index) {
     const target = list.querySelectorAll(".focus-card")[index];
     if (!target) return;
-    setActiveFocusCard(target);
+    setActiveFocusCard(list, target);
     target.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
@@ -115,6 +128,37 @@ function setupAutoAdvance(list) {
     },
     true
   );
+}
+
+// ── 성향 질문 ──
+let personalityFocusBound = false;
+
+function activateFirstPersonalityCardIfEmpty() {
+  const list = document.getElementById("personality-questions");
+  if (list.querySelector(".focus-card.active")) return;
+  const allUnanswered = AppState.profile.personality_survey.answers.every((a) => a.choice === null);
+  if (allUnanswered) setActiveFocusCard(list, list.querySelector(".focus-card"));
+}
+
+function setupPersonalityFocusCards() {
+  const list = document.getElementById("personality-questions");
+  if (personalityFocusBound) return;
+  personalityFocusBound = true;
+  bindFocusCardList(list);
+}
+
+// 문항 하나는 버튼 하나 고르는 게 곧 "완료"이므로, 답을 고르면 바로 다음 문항이 떠오른다.
+// render.js가 renderPersonality()로 카드를 통째로 다시 그린 "직후"에 호출되므로,
+// (bindFocusCardList의 클릭 강조 로직보다 늦게 실행돼도) 새로 그려진 카드에 안전하게 강조를 입힐 수 있다.
+function advanceToNextPersonalityCard(answeredQuestionId) {
+  const list = document.getElementById("personality-questions");
+  const cards = Array.from(list.querySelectorAll(".focus-card"));
+  const idx = PERSONALITY_QUESTIONS.findIndex((q) => q.question_id === answeredQuestionId);
+  const next = cards[idx + 1];
+  if (next) {
+    setActiveFocusCard(list, next);
+    next.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
 }
 
 // 필수 항목(이름/출생년월일/학력단계)만 유효성 검사, 나머지는 비워도 다음 단계로 넘어갈 수 있다.
@@ -189,12 +233,63 @@ function bindBasicInfoInputs() {
 }
 
 // ============================================================
-// 직장경험 인터뷰 모달
+// 직장경험 추가: 1) 기간/고용형태 미니 모달 -> 2) 인터뷰 챗봇 모달
 // ============================================================
-const interviewState = { messages: [], answers: [], finishing: false };
+const periodState = { employment_type: "정규직", start_date: "", end_date: null };
+
+function openPeriodModal() {
+  periodState.employment_type = "정규직";
+  periodState.start_date = "";
+  periodState.end_date = null;
+
+  const chips = document.getElementById("period-emptype-chips");
+  chips.innerHTML = chipGroupHtml(
+    WORK_EMPLOYMENT_TYPE_OPTIONS.map((v) => ({ value: v, label: v })),
+    [periodState.employment_type]
+  );
+  chips.querySelectorAll("button").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      periodState.employment_type = btn.dataset.value;
+      chips.querySelectorAll("button").forEach((b) => b.classList.toggle("selected", b === btn));
+    })
+  );
+
+  document.getElementById("period-start").value = "";
+  document.getElementById("period-end").value = "";
+  document.getElementById("period-end").disabled = false;
+  document.getElementById("period-ongoing").checked = false;
+  document.getElementById("btn-period-next").disabled = true;
+
+  document.getElementById("period-modal").hidden = false;
+}
+
+function closePeriodModal() {
+  document.getElementById("period-modal").hidden = true;
+}
+
+// ── 인터뷰 챗봇 (기간 입력 다음 단계) ──
+const interviewState = { answers: [], finishing: false };
+
+// answers 배열만으로 대화 로그를 매번 다시 만든다 — "이전"으로 되돌아가도 항상 일관된 상태가 되도록.
+function buildInterviewMessages(answers) {
+  const messages = [];
+  const total = WORK_INTERVIEW_QUESTIONS.length;
+  for (let i = 0; i < total; i++) {
+    messages.push({ role: "assistant", text: WORK_INTERVIEW_QUESTIONS[i] });
+    if (i < answers.length) {
+      messages.push({ role: "user", text: answers[i] });
+      messages.push({
+        role: "assistant",
+        text: i < total - 1 ? WORK_INTERVIEW_ACKS[i % WORK_INTERVIEW_ACKS.length] : "말씀해주셔서 감사해요! 잘 정리해서 저장할게요.",
+      });
+    } else {
+      break; // 아직 답변 안 한 질문에서 멈추고 여기서 입력 대기
+    }
+  }
+  return messages;
+}
 
 function openInterviewModal() {
-  interviewState.messages = [{ role: "assistant", text: WORK_INTERVIEW_QUESTIONS[0] }];
   interviewState.answers = [];
   interviewState.finishing = false;
   renderInterviewMessages();
@@ -209,8 +304,10 @@ function closeInterviewModal() {
 
 function renderInterviewMessages() {
   const box = document.getElementById("interview-messages");
-  box.innerHTML = interviewState.messages.map((m) => `<div class="msg ${m.role}">${m.text}</div>`).join("");
+  const messages = buildInterviewMessages(interviewState.answers);
+  box.innerHTML = messages.map((m) => `<div class="msg ${m.role}">${m.text}</div>`).join("");
   document.getElementById("interview-progress").textContent = `${Math.min(interviewState.answers.length + 1, WORK_INTERVIEW_QUESTIONS.length)} / ${WORK_INTERVIEW_QUESTIONS.length}`;
+  document.getElementById("btn-interview-prev").disabled = interviewState.answers.length === 0 || interviewState.finishing;
   box.scrollTop = box.scrollHeight;
 }
 
@@ -221,25 +318,29 @@ function submitInterviewAnswer() {
 
   interviewState.answers.push(answer);
   input.value = "";
-  interviewState.messages.push({ role: "user", text: answer });
+  renderInterviewMessages();
 
-  if (interviewState.answers.length < WORK_INTERVIEW_QUESTIONS.length) {
-    const ack = WORK_INTERVIEW_ACKS[Math.floor(Math.random() * WORK_INTERVIEW_ACKS.length)];
-    interviewState.messages.push({ role: "assistant", text: ack });
-    interviewState.messages.push({ role: "assistant", text: WORK_INTERVIEW_QUESTIONS[interviewState.answers.length] });
-    renderInterviewMessages();
-  } else {
-    interviewState.messages.push({ role: "assistant", text: "말씀해주셔서 감사해요! 잘 정리해서 저장할게요." });
+  if (interviewState.answers.length === WORK_INTERVIEW_QUESTIONS.length) {
     interviewState.finishing = true;
     renderInterviewMessages();
     // 서버가 없으므로 규칙 기반 mock 추출만 사용 (Dohgrae의 keywordExtractionMock과 동일한 방식)
     const keywords = mockExtractKeywords(interviewState.answers);
-    AppState.addWorkExperience(interviewState.answers, keywords);
+    AppState.addWorkExperience({ ...periodState }, interviewState.answers, keywords);
     setTimeout(() => {
       closeInterviewModal();
       renderWork();
     }, 400);
   }
+}
+
+// 직전 질문으로 돌아가서 방금 쓴 답변을 입력창에 다시 채워 수정할 수 있게 한다.
+function goToPreviousInterviewAnswer() {
+  if (interviewState.answers.length === 0 || interviewState.finishing) return;
+  const lastAnswer = interviewState.answers.pop();
+  renderInterviewMessages();
+  const input = document.getElementById("interview-input");
+  input.value = lastAnswer;
+  input.focus();
 }
 
 // ============================================================
@@ -416,8 +517,28 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-go-result").addEventListener("click", () => showScreen("result"));
   document.getElementById("btn-result-back-to-review").addEventListener("click", () => showScreen("review"));
 
-  document.getElementById("btn-add-work").addEventListener("click", openInterviewModal);
+  document.getElementById("btn-add-work").addEventListener("click", openPeriodModal);
+  document.getElementById("btn-period-cancel").addEventListener("click", closePeriodModal);
+
+  document.getElementById("period-start").addEventListener("input", (e) => {
+    periodState.start_date = e.target.value;
+    document.getElementById("btn-period-next").disabled = !periodState.start_date;
+  });
+  document.getElementById("period-end").addEventListener("input", (e) => {
+    periodState.end_date = e.target.value;
+  });
+  document.getElementById("period-ongoing").addEventListener("change", (e) => {
+    document.getElementById("period-end").disabled = e.target.checked;
+    periodState.end_date = e.target.checked ? null : document.getElementById("period-end").value;
+  });
+  document.getElementById("btn-period-next").addEventListener("click", () => {
+    if (!periodState.start_date) return;
+    closePeriodModal();
+    openInterviewModal();
+  });
+
   document.getElementById("btn-interview-cancel").addEventListener("click", closeInterviewModal);
+  document.getElementById("btn-interview-prev").addEventListener("click", goToPreviousInterviewAnswer);
   document.getElementById("interview-form").addEventListener("submit", (e) => {
     e.preventDefault();
     submitInterviewAnswer();

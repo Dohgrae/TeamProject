@@ -176,13 +176,33 @@ function renderJobSubcategories() {
 
   p.filters.job_category.forEach((code) => {
     const options = (JOB_SUBCATEGORY_OPTIONS[code] || []).map((o) => ({ value: o.value, label: o.value }));
-    const selected = p.filters.job_subcategory[code] || "전체";
-    bindChipGroup(`job-subcategory-${code}`, options, () => [selected], (v) => {
-      p.filters.job_subcategory[code] = v;
-      AppState.save();
+    if (!p.filters.job_subcategory[code] || p.filters.job_subcategory[code].length === 0) {
+      p.filters.job_subcategory[code] = ["전체"];
+    }
+    const selected = p.filters.job_subcategory[code];
+    bindChipGroup(`job-subcategory-${code}`, options, () => selected, (v) => {
+      toggleJobSubcategory(code, v);
       renderJobSubcategories();
     });
   });
+}
+
+// 세부직무는 카테고리별 복수선택이 가능하되, "전체"를 고르면 다른 선택은 다 지워지고,
+// 특정 세부직무를 고르면 "전체"는 자동으로 빠진다 (전체 vs 특정은 서로 배타적).
+function toggleJobSubcategory(code, value) {
+  const p = AppState.profile;
+  const current = p.filters.job_subcategory[code] || [];
+
+  if (value === "전체") {
+    p.filters.job_subcategory[code] = current.includes("전체") ? [] : ["전체"];
+  } else {
+    const withoutAll = current.filter((v) => v !== "전체");
+    p.filters.job_subcategory[code] = withoutAll.includes(value)
+      ? withoutAll.filter((v) => v !== value)
+      : [...withoutAll, value];
+  }
+  if (p.filters.job_subcategory[code].length === 0) p.filters.job_subcategory[code] = ["전체"];
+  AppState.save();
 }
 
 // ============================================================
@@ -198,10 +218,7 @@ function renderWork() {
       (exp) => `
     <div class="entry-card" data-id="${exp.id}">
       <div class="entry-card-head">
-        <div>
-          <p class="tech-category-label">고용형태 (정규직, 계약직, 인턴 등)</p>
-          <div class="chip-group work-emptype-chips"></div>
-        </div>
+        <div class="chip-group work-emptype-chips"></div>
         <button type="button" class="entry-card-remove" data-remove="${exp.id}">삭제</button>
       </div>
       <div class="entry-date-row">
@@ -344,7 +361,7 @@ function renderPersonality() {
       )
       .join("");
     return `
-      <div class="question-card">
+      <div class="question-card focus-card">
         <p class="q-title">Q${q.question_id}. ${q.question}</p>
         ${optionsHtml}
         <button type="button" class="option-btn ${choice === "unknown" ? "selected" : ""}" data-q="${q.question_id}" data-choice="unknown">잘 모르겠어요</button>
@@ -357,6 +374,9 @@ function renderPersonality() {
       const choice = btn.dataset.choice === "unknown" ? "unknown" : Number(btn.dataset.choice);
       AppState.setPersonalityChoice(qId, choice);
       renderPersonality();
+      // renderPersonality()가 카드를 통째로 다시 그려서 이전에 표시해둔 강조(active) 클래스가
+      // 사라지므로, 다시 그려진 "다음" 카드에 강조를 새로 입혀야 한다 (main.js).
+      if (typeof advanceToNextPersonalityCard === "function") advanceToNextPersonalityCard(qId);
     });
   });
 }

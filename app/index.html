@@ -99,7 +99,7 @@
 
     <!-- ===== 2. 직장 경험 ===== -->
     <section class="screen" id="screen-work">
-      <h1>직장 경험</h1>
+      <h1>직장 경험 <span class="title-hint">(정규직, 계약직, 인턴 등)</span></h1>
       <p class="sub">직장 경험이 있으면 자동으로 "경력"으로 분류되고, 근무기간을 합산해 총 경력연차를 계산해요.</p>
 
       <div class="career-badge" id="career-badge"></div>
@@ -147,7 +147,7 @@
       <p class="sub" id="personality-progress-text"></p>
       <div class="progress-bar-wrap"><div class="progress-bar" id="personality-progress-bar"></div></div>
 
-      <div id="personality-questions"></div>
+      <div id="personality-questions" class="focus-card-list"></div>
 
       <div class="nav-row">
         <button type="button" class="btn btn-outline" id="btn-personality-prev">이전</button>
@@ -243,6 +243,40 @@
 
   </main>
 
+  <!-- ===== 직장경험: 기간/고용형태 먼저 입력하는 모달 ===== -->
+  <div class="modal-overlay" id="period-modal" hidden>
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h2>근무 기간을 알려주세요</h2>
+        </div>
+        <button type="button" class="btn-text" id="btn-period-cancel">취소</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label>고용형태</label>
+          <div class="chip-group" id="period-emptype-chips"></div>
+        </div>
+        <div class="form-field">
+          <label for="period-start">입사년월 *</label>
+          <input type="month" id="period-start" />
+        </div>
+        <div class="form-field">
+          <label for="period-end">퇴사년월</label>
+          <input type="month" id="period-end" />
+          <label style="margin-top: 8px; font-weight: 400">
+            <input type="checkbox" id="period-ongoing" /> 재직중
+          </label>
+        </div>
+      </div>
+      <div class="modal-form">
+        <button type="button" class="btn btn-primary" id="btn-period-next" disabled style="width: 100%">
+          다음: 경험 인터뷰 시작하기 →
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== 직장경험 인터뷰 모달 ===== -->
   <div class="modal-overlay" id="interview-modal" hidden>
     <div class="modal-box">
@@ -255,6 +289,7 @@
       </div>
       <div class="modal-messages" id="interview-messages"></div>
       <form class="modal-form" id="interview-form">
+        <button type="button" id="btn-interview-prev" disabled>이전</button>
         <input type="text" id="interview-input" placeholder="답변을 입력해주세요" autocomplete="off" />
         <button type="submit">전송</button>
       </form>
