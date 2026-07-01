@@ -424,9 +424,9 @@ async function startResultScreen() {
   document.getElementById("button-area").style.display = "flex";
   renderResultCard();
 
-  // 매칭 자체는 순식간에 끝나지만, 대기 화면(마스코트·하트·효과음)이 눈에 보일 정도의
-  // 최소 시간은 보장해준다. 그래야 응답이 빠른 경우에도 화면이 스치듯 지나가지 않는다.
-  const minDelay = new Promise((resolve) => setTimeout(resolve, 1800));
+  // 매칭 자체는 순식간에 끝나지만, "분석 중" 느낌이 나도록 대기 화면(마스코트·하트·효과음)을
+  // 충분히 오래 보여준다. 문구가 2.6초마다 바뀌므로(matchLoading.js) 7.8초 = 정확히 3번 바뀔 시간.
+  const minDelay = new Promise((resolve) => setTimeout(resolve, 7800));
   try {
     const [data] = await Promise.all([matchJobs(AppState.profile), minDelay]);
     resultState.jobs = data.results;
@@ -576,7 +576,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-awards-prev").addEventListener("click", () => showScreen("extracurricular"));
   document.getElementById("btn-awards-next").addEventListener("click", () => showScreen("personality"));
   document.getElementById("btn-personality-prev").addEventListener("click", () => showScreen("awards"));
-  document.getElementById("btn-personality-next").addEventListener("click", () => showScreen("review"));
+  document.getElementById("btn-personality-next").addEventListener("click", () => showScreen("result"));
   document.getElementById("btn-review-prev").addEventListener("click", () => showScreen("personality"));
   document.getElementById("btn-review-restart").addEventListener("click", () => showScreen("basic-info"));
   document.getElementById("btn-go-result").addEventListener("click", () => showScreen("result"));
