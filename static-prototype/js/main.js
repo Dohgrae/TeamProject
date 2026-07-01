@@ -423,6 +423,95 @@ function getMatchComment(score) {
   return "음… 더 좋은 상대가 있을거에요 ^^;;";
 }
 
+// 마스코트 이미지 자체를 표정별로 새로 그릴 수는 없어서(이미지 생성 불가), 매칭률 구간에
+// 맞는 이모지를 아바타 위에 작은 배지로 겹쳐서 "표정"처럼 보이게 하는 절충안을 썼다.
+function getMoodEmoji(score) {
+  if (score >= 90) return "😍";
+  if (score >= 75) return "😊";
+  if (score >= 60) return "🙂";
+  return "😐";
+}
+
+function hashCode(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+  return h;
+}
+
+// 카드 상단 배너 색 — job.id 기준으로 고정된 색을 골라 카드마다 자연스럽게 다양한 색이 나오게 한다.
+const CARD_BANNER_COLORS = ["#16a085", "#4a5a6a", "#a97142", "#7d00b8", "#c2185b", "#2e7d6e"];
+function getBannerColor(jobId) {
+  const idx = Math.abs(hashCode(String(jobId))) % CARD_BANNER_COLORS.length;
+  return CARD_BANNER_COLORS[idx];
+}
+
+// jobs.json의 deadline은 "2026.07.18" 형식의 점 구분 문자열이다.
+function computeDday(deadlineStr) {
+  const parts = (deadlineStr || "").split(".").map(Number);
+  if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
+  const deadline = new Date(parts[0], parts[1] - 1, parts[2]);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  deadline.setHours(0, 0, 0, 0);
+  return Math.round((deadline - today) / 86400000);
+}
+
+// 앞면 카드 콘텐츠(배너+아바타+본문)를 만든다. 메인 카드와 좌우 미리보기 카드(.card-peek)가
+// 이 함수를 그대로 공유하고, .card-peek 쪽은 CSS에서 코멘트/칩/힌트/마감일만 숨겨 축소판으로 보여준다.
+function buildCardFrontHtml(job) {
+  const dday = computeDday(job.deadline);
+  const ddayText = dday === null ? "" : dday >= 0 ? `D-${dday}` : "마감";
+  const mood = getMoodEmoji(job.match_rate);
+
+  const chips = job.matched_keywords.slice(0, 2).map((k) => `<span class="chip-front">${escapeHtml(k)}</span>`);
+  if (dday !== null && dday >= 0 && dday <= 14) chips.push(`<span class="chip-front chip-meta">마감 임박</span>`);
+  if (job.company_size === "D") chips.push(`<span class="chip-front chip-meta">성장 단계</span>`);
+
+  return `
+    <div class="card-banner" style="background:${getBannerColor(job.id)}">
+      <span class="card-badge-hiring">지금 채용중</span>
+      <span class="card-badge-ddate">${ddayText}</span>
+      <div class="card-banner-rate">
+        <span class="card-banner-rate-label">매칭률</span>
+        <span class="card-banner-rate-value">${job.match_rate}%</span>
+      </div>
+    </div>
+    <div class="card-avatar-wrap">
+      <div class="card-avatar">
+        <img src="img/qpi-mascot.png" alt="큐피" class="card-avatar-mascot" />
+        <span class="card-avatar-mood" aria-hidden="true">${mood}</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="card-company-big">${escapeHtml(job.company_name)}</p>
+      <p class="card-position-sub">${escapeHtml(job.job_title)}</p>
+      <p class="card-comment">${getMatchComment(job.match_rate)}</p>
+      <div class="card-chips-front">${chips.join("")}</div>
+      <p class="flip-hint">👆 탭해서 상세 보기</p>
+      <p class="card-deadline-front">📅 지원 마감 · ${escapeHtml(job.deadline)}</p>
+    </div>`;
+}
+
+// 현재 카드 좌우로 살짝 보이는 이전/다음 공고 미리보기 카드를 채운다.
+function renderCardPeeks() {
+  const prevJob = resultState.jobs && resultState.currentIndex > 0 ? resultState.jobs[resultState.currentIndex - 1] : null;
+  const nextJob =
+    resultState.jobs && resultState.currentIndex < resultState.jobs.length - 1 ? resultState.jobs[resultState.currentIndex + 1] : null;
+  document.getElementById("card-peek-prev").innerHTML = prevJob ? buildCardFrontHtml(prevJob) : "";
+  document.getElementById("card-peek-next").innerHTML = nextJob ? buildCardFrontHtml(nextJob) : "";
+}
+
+function renderCardDots() {
+  const dotsEl = document.getElementById("card-dots");
+  if (!resultState.jobs) {
+    dotsEl.innerHTML = "";
+    return;
+  }
+  dotsEl.innerHTML = resultState.jobs
+    .map((_, i) => `<span class="card-dot ${i === resultState.currentIndex ? "active" : ""}"></span>`)
+    .join("");
+}
+
 async function startResultScreen() {
   resultState.jobs = null;
   resultState.currentIndex = 0;
@@ -464,18 +553,24 @@ function renderResultCard(direction = "forward") {
     front.innerHTML = `<div class="error-state"><span class="state-icon">😥</span><p class="state-title">${resultState.error}</p></div>`;
     progressArea.style.display = "none";
     document.getElementById("button-area").style.display = "none";
+    renderCardPeeks();
+    renderCardDots();
     return;
   }
   if (resultState.jobs === null) {
     startMatchLoadingAnimation(front, AppState.profile.basic_info.name);
     progressArea.style.display = "none";
     document.getElementById("button-area").style.display = "none";
+    renderCardPeeks();
+    renderCardDots();
     return;
   }
   if (resultState.jobs.length === 0) {
     front.innerHTML = `<div class="empty-state"><span class="state-icon">🔍</span><p class="state-title">현재 조건에 맞는 공고가 없습니다.</p><p class="state-desc">조건을 변경하거나 잠시 후 다시 시도해보세요.</p></div>`;
     progressArea.style.display = "none";
     document.getElementById("button-area").style.display = "none";
+    renderCardPeeks();
+    renderCardDots();
     return;
   }
   if (resultState.currentIndex >= resultState.jobs.length) {
@@ -485,21 +580,12 @@ function renderResultCard(direction = "forward") {
 
   progressArea.style.display = "flex";
   document.getElementById("button-area").style.display = "flex";
+  document.getElementById("result-subtitle").textContent = `경험과 선호 조건에 꼭 맞는 공고 ${resultState.jobs.length}건을 찾았어요`;
   const job = resultState.jobs[resultState.currentIndex];
-  const scoreClass = job.match_rate >= 90 ? "score-pct score-green" : job.match_rate < 75 ? "score-pct score-orange" : "score-pct";
 
-  front.innerHTML = `
-    <div class="card-top">
-      <p class="card-company-big">${job.company_name}</p>
-      <p class="card-position-sub">${job.job_title}</p>
-    </div>
-    <div class="card-score-center">
-      <span class="score-heart">❤️</span>
-      <span class="${scoreClass}">${job.match_rate}%</span>
-      <span class="score-label">${getMatchComment(job.match_rate)}</span>
-    </div>
-    <p class="card-deadline-front">📅 지원 마감 : ${job.deadline}</p>
-    <p class="flip-hint">탭해서 상세 보기 👆</p>`;
+  front.innerHTML = buildCardFrontHtml(job);
+  renderCardPeeks();
+  renderCardDots();
 
   const kw = job.matched_keywords.map((k) => `<span class="keyword-chip-back">#${k}</span>`).join("");
   const safeUrl = /^https?:\/\//i.test(job.url) ? job.url : "#";
@@ -527,7 +613,6 @@ function renderResultCard(direction = "forward") {
   document.getElementById("btn-original-link")?.addEventListener("click", (e) => e.stopPropagation());
 
   document.getElementById("card-counter").textContent = `${resultState.currentIndex + 1} / ${resultState.jobs.length}`;
-  document.getElementById("result-progress-bar").style.width = `${((resultState.currentIndex + 1) / resultState.jobs.length) * 100}%`;
   document.getElementById("btn-prev-card").disabled = resultState.currentIndex === 0;
 
   const wrap = document.getElementById("card-wrap");
@@ -684,7 +769,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // 결과 카드 조작
   document.getElementById("job-card").addEventListener("click", flipResultCard);
   document.getElementById("btn-prev-card").addEventListener("click", showPreviousResultCard);
-  document.getElementById("btn-flip-card").addEventListener("click", flipResultCard);
+  document.getElementById("btn-next-card").addEventListener("click", showNextResultCard);
+  document.getElementById("card-peek-prev").addEventListener("click", showPreviousResultCard);
+  document.getElementById("card-peek-next").addEventListener("click", showNextResultCard);
   document.getElementById("btn-skip-card").addEventListener("click", showNextResultCard);
   document.getElementById("btn-view-card").addEventListener("click", openCurrentJobLink);
   document.getElementById("btn-reset-cards").addEventListener("click", () => {

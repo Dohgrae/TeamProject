@@ -36,13 +36,19 @@
   white-space: nowrap;
 }
 
-/* 입력 위저드와 같은 .screen 흰 카드 안에 그대로 얹히는 콘텐츠 래퍼일 뿐이라
-   자체 배경/전체높이 스타일은 두지 않는다 (다른 화면들과 형태를 통일). */
 .result-page {
   font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
                'Noto Sans KR', 'Segoe UI', sans-serif;
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
+}
+
+/* 결과 화면만 위저드의 흰 배경 대신 연보라 그라디언트를 쓴다(첨부 디자인 기준).
+   위저드 공통 헤더+스텝네비는 #screen-result 바깥에 있어서 그대로 유지된다. */
+#screen-result.active {
+  background: linear-gradient(160deg, #f1e9fb 0%, #eae3fb 100%);
+  padding: 40px 24px;
+  box-shadow: none;
 }
 
 
@@ -58,12 +64,14 @@
   gap: 20px;
 }
 
-/* h1/.sub는 다른 입력 화면들처럼 전체 폭을 차지하는 좌측 정렬 제목으로 둔다
-   (align-items:center 때문에 그냥 두면 짧게 줄어들어 가운데 정렬돼 버림). */
-.main > h1,
+/* 첨부 이미지 기준: 제목/부제는 가운데 정렬 (align-items:center로 이미 가운데 정렬됨) */
+.main > h1 {
+  font-size: 22px;
+  text-align: center;
+}
+
 .main > .sub {
-  align-self: stretch;
-  text-align: left;
+  text-align: center;
 }
 
 
@@ -79,18 +87,15 @@
 }
 
 .card-counter {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-mid);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--point);
   letter-spacing: 0.5px;
 }
 
+/* 첨부 디자인은 막대 진행률 대신 카운터 텍스트 + 아래 점 페이지네이션만 쓴다 */
 .progress-bar-wrap {
-  width: 100%;
-  height: 5px;
-  background: rgba(125, 0, 184, 0.12);
-  border-radius: 99px;
-  overflow: hidden;
+  display: none;
 }
 
 .progress-bar {
@@ -113,42 +118,125 @@
    ============================================================ */
 .card-area {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+/* 카드 캐러셀 — 가운데 카드(.card-wrap)는 실제 뒤집기가 되는 카드, 양옆의 .card-peek는
+   앞/뒷 공고를 살짝 흐릿하게 미리 보여주는 장식용 카드(클릭하면 그쪽으로 이동). */
+.card-carousel {
   position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   perspective: 1400px;
 }
 
-/* 이전 공고 다시 보기 — 카드 안쪽이 아니라 카드 바깥(왼쪽 여백)에 뜨는 희미한 삼각형 아이콘
-   (버튼 박스 없이 아이콘만). .screen이 이미 32px 패딩을 주고 .main은 480px로 좁혀져 있어서
-   그 사이 여백에 자리잡는다. */
-.card-nav-prev {
+.card-wrap {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+}
+
+.card-peek {
   position: absolute;
-  left: -46px;
   top: 50%;
-  transform: translateY(-50%);
-  z-index: 5;
-  border: none;
-  background: none;
-  padding: 10px 8px;
-  font-size: 26px;
-  line-height: 1;
-  color: var(--text-light);
-  opacity: 0.45;
+  width: 82%;
+  height: calc(var(--card-height) - 48px);
+  transform: translateY(-45%) scale(0.92);
+  border-radius: var(--card-radius);
+  background: #ffffff;
+  box-shadow: var(--card-shadow);
+  opacity: 0.65;
+  overflow: hidden;
+  z-index: 1;
   cursor: pointer;
-  transition: opacity 0.15s ease, color 0.15s ease;
+  filter: saturate(0.6);
+  transition: opacity 0.15s ease;
 }
 
-.card-nav-prev:hover, .card-nav-prev:focus-visible {
-  opacity: 0.9;
+.card-peek:hover { opacity: 0.85; }
+.card-peek:empty { visibility: hidden; }
+
+.card-peek-prev { left: -8%; }
+.card-peek-next { right: -8%; }
+
+.card-peek .card-banner { padding: 14px 16px 34px; }
+.card-peek .card-avatar-wrap { margin-top: -32px; }
+.card-peek .card-avatar { width: 56px; height: 56px; }
+.card-peek .card-avatar-mascot { width: 40px; }
+.card-peek .card-avatar-mood { font-size: 13px; }
+.card-peek .card-body { padding: 8px 16px 16px; }
+.card-peek .card-company-big { font-size: 14px; }
+.card-peek .card-position-sub { font-size: 13px; margin-top: 4px; }
+.card-peek .card-comment,
+.card-peek .card-chips-front,
+.card-peek .flip-hint,
+.card-peek .card-deadline-front { display: none; }
+
+/* 카드 아래 원형 이전/다음 버튼 + 점 페이지네이션 */
+.card-carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.card-nav-btn {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid #e5d9f7;
+  background: #ffffff;
   color: var(--point);
-  outline: none;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(125, 0, 184, 0.12);
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
-.card-nav-prev:disabled {
-  opacity: 0.15;
+.card-nav-btn:hover {
+  background: var(--point);
+  color: #ffffff;
+}
+
+.card-nav-btn:disabled {
+  opacity: 0.35;
   cursor: not-allowed;
+  background: #ffffff;
+  color: var(--point);
 }
 
-.card-wrap { width: 100%; }
+.card-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 220px;
+}
+
+.card-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 99px;
+  background: #d8c7ef;
+  transition: width 0.2s ease, background 0.2s ease;
+  flex-shrink: 0;
+}
+
+.card-dot.active {
+  width: 18px;
+  background: var(--point);
+}
 
 /* 카드 퇴장 애니메이션 (다음 카드로 이동 시) */
 @keyframes cardLeave {
@@ -224,105 +312,172 @@
   position: absolute;
   inset: 0;
   border-radius: var(--card-radius);
-  padding: 28px 24px;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
 }
 
+.card-back {
+  padding: 28px 24px;
+}
+
 
 /* ============================================================
-   카드 앞면
+   카드 앞면 — 상단 컬러 배너 + 겹쳐진 마스코트 아바타 + 본문
    ============================================================ */
 .card-front {
   background: #ffffff;
   box-shadow: var(--card-shadow);
 }
 
-/* ── 상단: 회사명 + 직무명 (중앙 정렬) ── */
-/* 구분선 제거: border-bottom 삭제, 여백으로 자연스럽게 분리 */
-.card-top {
-  text-align: center;
-  padding-top: 20px;    /* 카드 상단에서 아래로 내려옴 */
-  padding-bottom: 28px; /* 매칭률 영역과의 여백 */
+/* 상단 컬러 배너: 채용중 배지 + D-day + 매칭률 */
+.card-banner {
+  position: relative;
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
+  padding: 16px 20px 46px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  color: #ffffff;
 }
 
-/* 회사명 — H1 수준 (크기 증가: 22px → 26px) */
-.card-company-big {
-  font-size: 26px;
-  font-weight: 800;
-  color: var(--text-dark);
-  letter-spacing: -0.5px;
-  line-height: 1.3;
+.card-badge-hiring {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 4px 10px;
+  border-radius: 99px;
 }
 
-/* 직무명 — H2 수준 (크기 증가: 16px → 18px) */
-.card-position-sub {
+.card-badge-hiring::before {
+  content: "●";
+  font-size: 7px;
+}
+
+.card-badge-ddate {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.card-banner-rate {
+  position: absolute;
+  right: 20px;
+  top: 38px;
+  text-align: right;
+}
+
+.card-banner-rate-label {
+  display: block;
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.card-banner-rate-value {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+/* 배너와 본문 경계에 걸쳐 겹쳐지는 원형 마스코트 아바타 */
+.card-avatar-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: -40px;
+  position: relative;
+  z-index: 2;
+}
+
+.card-avatar {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-avatar-mascot {
+  width: 56px;
+  height: auto;
+}
+
+.card-avatar-mood {
+  position: absolute;
+  bottom: -2px;
+  right: -4px;
   font-size: 18px;
-  font-weight: 600;
-  color: var(--text-mid);
-  margin-top: 10px;
-  line-height: 1.45;
-  letter-spacing: -0.2px;
+  line-height: 1;
+  background: #ffffff;
+  border-radius: 50%;
+  padding: 2px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
 }
 
-/* ── 중앙: 매칭률 (카드에서 가장 크게) ── */
-.card-score-center {
+/* 본문: 회사명/직무명/코멘트/칩/힌트/마감일 */
+.card-body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  text-align: center;
+  padding: 10px 24px 20px;
+}
+
+/* 회사명 */
+.card-company-big {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-mid);
+}
+
+/* 직무명 — 카드에서 가장 강조되는 텍스트 */
+.card-position-sub {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-top: 2px;
+  line-height: 1.35;
+  letter-spacing: -0.3px;
+}
+
+/* 한 줄 코멘트 — 매칭률 구간별 멘트, 포인트 컬러로 강조 */
+.card-comment {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--point);
+  margin-top: 6px;
+}
+
+/* 앞면 태그 칩(매칭 키워드 + 마감임박/성장단계 같은 메타 태그) */
+.card-chips-front {
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 6px;
-  padding: 12px 0;
+  margin-top: 16px;
 }
 
-/* 심장 아이콘 — 박동 애니메이션 */
-.score-heart {
-  font-size: 40px;
-  line-height: 1;
-  animation: heartbeat 1.6s ease-in-out infinite;
-}
-
-@keyframes heartbeat {
-  0%, 100% { transform: scale(1); }
-  14%       { transform: scale(1.18); }
-  28%       { transform: scale(1); }
-  42%       { transform: scale(1.12); }
-  56%       { transform: scale(1); }
-}
-
-/* 매칭률 숫자 — 초대형. 기본은 포인트 컬러, 점수 구간별로 아래에서 초록/주황으로 덮어씀 */
-.score-pct {
-  font-size: 80px;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: -4px;
-  color: var(--point);
-}
-
-/* 90점 이상 — 초록 */
-.score-pct.score-green {
-  background: linear-gradient(135deg, #11d67e 0%, #00a86b 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-/* 75점 미만 — 주황 */
-.score-pct.score-orange {
-  background: linear-gradient(135deg, #ff7675 0%, #fd9644 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-/* 매칭률 라벨 */
-.score-label {
-  font-size: 18px;
+.chip-front {
+  font-size: 12px;
   font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 99px;
+  background: #f3f0fb;
   color: var(--text-mid);
-  letter-spacing: -0.3px;
+}
+
+.chip-front.chip-meta {
+  background: #fdf2f8;
+  color: #be185d;
 }
 
 /* 지원 마감일 (앞면) */
@@ -597,6 +752,14 @@
   animation: heartbeat 1.28s ease-in-out infinite;
 }
 
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14%       { transform: scale(1.18); }
+  28%       { transform: scale(1); }
+  42%       { transform: scale(1.12); }
+  56%       { transform: scale(1); }
+}
+
 /* 앞쪽의 큐피 마스코트 — 하트보다 작게 그 앞에서 둥실둥실 떠 있는 느낌.
    기존 drop-shadow 필터가 캐릭터 뒤에 뿌연 후광처럼 번져 하트 모양을 가렸어서 뺐다. */
 .match-loading-mascot {
@@ -776,25 +939,24 @@
   width: 100%;
   display: flex;
   align-items: stretch;
-  gap: 10px;
+  gap: 12px;
 }
 
 .btn {
   border: none;
   cursor: pointer;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  border-radius: 18px;
-  padding: 14px 10px;
+  gap: 6px;
+  border-radius: 14px;
+  padding: 15px 10px;
   transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
   font-family: inherit;
   flex: 1;
 }
 
-.btn:active { transform: scale(0.94) !important; }
+.btn:active { transform: scale(0.97) !important; }
 
 /* 관심 없어요 */
 .btn-skip {
@@ -809,24 +971,10 @@
   outline: none;
 }
 
-/* 카드 뒤집기 */
-.btn-flip {
-  background: white;
-  border: 1.5px solid rgba(125, 0, 184, 0.28);
-  color: var(--point-deep);
-}
-
-.btn-flip:hover, .btn-flip:focus-visible {
-  background: #faf5ff;
-  border-color: var(--point);
-  outline: none;
-}
-
-/* 공고 보기 — 가장 눈에 띄게 */
+/* 공고 자세히 보기 — 가장 눈에 띄게 */
 .btn-view {
-  flex: 1.55;
-  padding: 16px 12px;
-  background: var(--point);
+  flex: 1.3;
+  background: linear-gradient(135deg, var(--point) 0%, #a855f7 100%);
   color: white;
   box-shadow: 0 4px 18px rgba(125, 0, 184, 0.35);
 }
@@ -838,12 +986,12 @@
 }
 
 .btn-icon {
-  font-size: 22px;
+  font-size: 16px;
   line-height: 1;
 }
 
 .btn-label {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: -0.2px;
   line-height: 1;
@@ -857,14 +1005,9 @@
 /* 소형 모바일 (380px 미만) */
 @media (max-width: 380px) {
   .main { gap: 16px; }
-  :root { --card-height: 500px; }
-  .card-front, .card-back { padding: 22px 18px; }
-  /* 소형 모바일: 회사명 22px, 직무명 16px */
-  .card-company-big { font-size: 22px; }
-  .card-position-sub { font-size: 16px; }
-  .score-pct { font-size: 68px; letter-spacing: -3px; }
-  .score-heart { font-size: 34px; }
-  .score-label { font-size: 15px; }
+  :root { --card-height: 480px; }
+  .card-back { padding: 22px 18px; }
+  .card-position-sub { font-size: 17px; }
   .btn-icon { font-size: 20px; }
   .btn-label { font-size: 11px; }
   .match-loading-mascot { width: 80px; }
@@ -875,12 +1018,7 @@
 /* 태블릿 · 데스크톱 (481px 이상) */
 @media (min-width: 481px) {
   :root { --card-height: 540px; }
-  /* 데스크톱: 회사명 28px, 직무명 20px */
-  .card-company-big { font-size: 28px; }
-  .card-position-sub { font-size: 20px; }
-  .score-pct { font-size: 96px; letter-spacing: -5px; }
-  .score-heart { font-size: 48px; }
-  .score-label { font-size: 20px; }
+  .card-position-sub { font-size: 21px; }
   .btn { padding: 16px 12px; }
   .btn-view { padding: 18px 14px; }
 }

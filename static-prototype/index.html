@@ -189,8 +189,8 @@
     <section class="screen" id="screen-result">
       <div class="result-page">
         <main class="main" role="main">
-          <h1>오늘의 매칭 결과 💌</h1>
-          <p class="sub">경험과 선호 조건에 꼭 맞는 공고를 찾았어요!</p>
+          <h1 id="result-title">오늘의 매칭 결과 💜</h1>
+          <p class="sub" id="result-subtitle">경험과 선호 조건에 꼭 맞는 공고를 찾았어요!</p>
 
           <div class="progress-area" id="result-progress-area">
             <span class="card-counter" id="card-counter"></span>
@@ -200,19 +200,30 @@
           </div>
 
           <div class="card-area" id="card-area">
-            <button type="button" class="card-nav-prev" id="btn-prev-card" aria-label="이전 공고 다시 보기 (왼쪽 방향키)">◀</button>
-            <div class="card-wrap" id="card-wrap">
-              <div class="card" id="job-card" role="button" tabindex="0" aria-label="카드 뒤집기 (스페이스바로도 가능)">
-                <div class="card-inner" id="card-inner">
-                  <div class="card-front" id="card-front">
-                    <div class="loading-state">
-                      <div class="loading-spinner" aria-hidden="true"></div>
-                      <p class="loading-text">채용공고를 찾는 중이에요...</p>
+            <div class="card-carousel" id="card-carousel">
+              <div class="card-peek card-peek-prev" id="card-peek-prev" aria-hidden="true"></div>
+
+              <div class="card-wrap" id="card-wrap">
+                <div class="card" id="job-card" role="button" tabindex="0" aria-label="카드 뒤집기 (스페이스바로도 가능)">
+                  <div class="card-inner" id="card-inner">
+                    <div class="card-front" id="card-front">
+                      <div class="loading-state">
+                        <div class="loading-spinner" aria-hidden="true"></div>
+                        <p class="loading-text">채용공고를 찾는 중이에요...</p>
+                      </div>
                     </div>
+                    <div class="card-back" id="card-back"></div>
                   </div>
-                  <div class="card-back" id="card-back"></div>
                 </div>
               </div>
+
+              <div class="card-peek card-peek-next" id="card-peek-next" aria-hidden="true"></div>
+            </div>
+
+            <div class="card-carousel-controls" id="card-carousel-controls">
+              <button type="button" class="card-nav-btn" id="btn-prev-card" aria-label="이전 공고 다시 보기 (왼쪽 방향키)">‹</button>
+              <div class="card-dots" id="card-dots"></div>
+              <button type="button" class="card-nav-btn" id="btn-next-card" aria-label="다음 공고 (오른쪽 방향키)">›</button>
             </div>
           </div>
 
@@ -225,13 +236,10 @@
 
           <div class="button-area" id="button-area" role="group" aria-label="카드 조작 버튼">
             <button class="btn btn-skip" id="btn-skip-card" aria-label="관심 없어요 — 다음 공고 (오른쪽 방향키)">
-              <span class="btn-icon" aria-hidden="true">👎</span><span class="btn-label">관심 없어요</span>
-            </button>
-            <button class="btn btn-flip" id="btn-flip-card" aria-label="카드 뒤집기 — 상세 정보 보기 (스페이스바)">
-              <span class="btn-icon" aria-hidden="true">🔄</span><span class="btn-label">카드 뒤집기</span>
+              <span class="btn-icon" aria-hidden="true">✕</span><span class="btn-label">관심 없어요</span>
             </button>
             <button class="btn btn-view" id="btn-view-card" aria-label="공고 보기 — 원본 채용공고 열기 (엔터키)">
-              <span class="btn-icon" aria-hidden="true">✅</span><span class="btn-label">공고 보기</span>
+              <span class="btn-label">공고 자세히 보기 →</span>
             </button>
           </div>
         </main>

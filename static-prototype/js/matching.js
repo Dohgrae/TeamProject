@@ -287,6 +287,7 @@ async function matchJobs(profile) {
         url: job.url,
         region: job.region,
         deadline: job.deadline,
+        company_size: job.filter_company_size,
         short_description: job.main_tasks.slice(0, 60) + (job.main_tasks.length > 60 ? "..." : ""),
         match_rate: matchRate,
         matched_keywords: matchedKeywords,
