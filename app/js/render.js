@@ -279,7 +279,9 @@ function renderExtracurricular() {
         <div class="chip-group ext-type-chips"></div>
         <button type="button" class="entry-card-remove" data-remove="${item.id}">삭제</button>
       </div>
-      <textarea rows="3" placeholder="경험을 자유롭게 설명해주세요" data-field="description">${item.description}</textarea>
+      <div class="interview-answers">
+        ${ACTIVITY_INTERVIEW_QUESTIONS.map((q, i) => `<p class="q">${q.text}</p><p class="a">${item.answers?.[i] ?? ""}</p>`).join("")}
+      </div>
     </div>`
     )
     .join("");
@@ -293,15 +295,10 @@ function renderExtracurricular() {
     );
     typeGroup.querySelectorAll("button").forEach((btn) =>
       btn.addEventListener("click", () => {
-        item.type = btn.dataset.value;
-        AppState.save();
+        AppState.updateExtracurricularType(item.id, btn.dataset.value);
         renderExtracurricular();
       })
     );
-    card.querySelector("textarea").addEventListener("input", (e) => {
-      item.description = e.target.value;
-      AppState.save();
-    });
     card.querySelector("[data-remove]").addEventListener("click", () => {
       AppState.removeExtracurricular(item.id);
       renderExtracurricular();
@@ -323,17 +320,15 @@ function renderAwards() {
         <span style="font-size:13px;font-weight:600;color:#374151">수상/공모전 ${i + 1}</span>
         <button type="button" class="entry-card-remove" data-remove="${item.id}">삭제</button>
       </div>
-      <textarea rows="3" placeholder="수상/공모전 내용을 자유롭게 설명해주세요" data-field="description">${item.description}</textarea>
+      <div class="interview-answers">
+        ${ACTIVITY_INTERVIEW_QUESTIONS.map((q, i2) => `<p class="q">${q.text}</p><p class="a">${item.answers?.[i2] ?? ""}</p>`).join("")}
+      </div>
     </div>`
     )
     .join("");
 
   p.activities.awards.forEach((item) => {
     const card = list.querySelector(`.entry-card[data-id="${item.id}"]`);
-    card.querySelector("textarea").addEventListener("input", (e) => {
-      item.description = e.target.value;
-      AppState.save();
-    });
     card.querySelector("[data-remove]").addEventListener("click", () => {
       AppState.removeAward(item.id);
       renderAwards();

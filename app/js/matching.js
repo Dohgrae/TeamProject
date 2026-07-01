@@ -105,8 +105,13 @@ function buildUserSignals(profile, keywords) {
     }
   }
 
-  const workKeywords = new Set(profile.career.work_experiences.flatMap((e) => e.keywords));
-  for (const phrase of workKeywords) {
+  // 직장경험/학내외경험/수상공모전 모두 인터뷰 챗봇 답변에서 mock 추출된 키워드를 가지고 있다.
+  const experienceKeywords = new Set([
+    ...profile.career.work_experiences.flatMap((e) => e.keywords),
+    ...profile.activities.academic_extracurricular.flatMap((e) => e.keywords ?? []),
+    ...profile.activities.awards.flatMap((e) => e.keywords ?? []),
+  ]);
+  for (const phrase of experienceKeywords) {
     signals.push({ label: phrase, weight: 1.0, matchesJobText: (t) => t.includes(phrase) });
   }
 

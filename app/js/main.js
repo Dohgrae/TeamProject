@@ -283,15 +283,43 @@ function closePeriodModal() {
   document.getElementById("period-modal").hidden = true;
 }
 
-// ── 인터뷰 챗봇 (기간 입력 다음 단계) ──
-const interviewState = { answers: [], finishing: false };
+// ============================================================
+// 학내외경험 추가: 1) 유형 미니 모달 -> 2) 인터뷰 챗봇 모달
+// ============================================================
+const extracurricularTypeState = { type: "프로젝트" };
+
+function openExtracurricularTypeModal() {
+  extracurricularTypeState.type = "프로젝트";
+
+  const chips = document.getElementById("extracurricular-type-chips");
+  chips.innerHTML = chipGroupHtml(
+    EXTRACURRICULAR_TYPE_OPTIONS.map((v) => ({ value: v, label: EXTRACURRICULAR_TYPE_LABELS[v] })),
+    [extracurricularTypeState.type]
+  );
+  chips.querySelectorAll("button").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      extracurricularTypeState.type = btn.dataset.value;
+      chips.querySelectorAll("button").forEach((b) => b.classList.toggle("selected", b === btn));
+    })
+  );
+
+  document.getElementById("extracurricular-type-modal").hidden = false;
+}
+
+function closeExtracurricularTypeModal() {
+  document.getElementById("extracurricular-type-modal").hidden = true;
+}
+
+// ── 인터뷰 챗봇 (직장경험/학내외경험/수상공모전이 공통으로 쓰는 범용 모달) ──
+// questions: 이번에 물어볼 질문 세트, onComplete: 4개 다 답하면 호출되는 콜백(answers, keywords)
+const interviewState = { questions: [], answers: [], finishing: false, onComplete: null };
 
 // answers 배열만으로 대화 로그를 매번 다시 만든다 — "이전"으로 되돌아가도 항상 일관된 상태가 되도록.
-function buildInterviewMessages(answers) {
+function buildInterviewMessages(questions, answers) {
   const messages = [];
-  const total = WORK_INTERVIEW_QUESTIONS.length;
+  const total = questions.length;
   for (let i = 0; i < total; i++) {
-    const q = WORK_INTERVIEW_QUESTIONS[i];
+    const q = questions[i];
     messages.push({ role: "assistant", text: q.text, hint: q.hint });
     if (i < answers.length) {
       messages.push({ role: "user", text: answers[i] });
@@ -306,9 +334,13 @@ function buildInterviewMessages(answers) {
   return messages;
 }
 
-function openInterviewModal() {
+// questions: WORK_INTERVIEW_QUESTIONS 또는 ACTIVITY_INTERVIEW_QUESTIONS
+// onComplete(answers, keywords): 4개 질문에 다 답하고 나면 호출되어 실제 저장을 담당
+function openInterviewModal(questions, onComplete) {
+  interviewState.questions = questions;
   interviewState.answers = [];
   interviewState.finishing = false;
+  interviewState.onComplete = onComplete;
   renderInterviewMessages();
   document.getElementById("interview-modal").hidden = false;
   document.getElementById("interview-input").value = "";
@@ -321,14 +353,15 @@ function closeInterviewModal() {
 
 function renderInterviewMessages() {
   const box = document.getElementById("interview-messages");
-  const messages = buildInterviewMessages(interviewState.answers);
+  const total = interviewState.questions.length;
+  const messages = buildInterviewMessages(interviewState.questions, interviewState.answers);
   box.innerHTML = messages
     .map(
       (m) =>
         `<div class="msg ${m.role}">${m.text}${m.hint ? `<span class="msg-hint">${m.hint}</span>` : ""}</div>`
     )
     .join("");
-  document.getElementById("interview-progress").textContent = `${Math.min(interviewState.answers.length + 1, WORK_INTERVIEW_QUESTIONS.length)} / ${WORK_INTERVIEW_QUESTIONS.length}`;
+  document.getElementById("interview-progress").textContent = `${Math.min(interviewState.answers.length + 1, total)} / ${total}`;
   document.getElementById("btn-interview-prev").disabled = interviewState.answers.length === 0 || interviewState.finishing;
   box.scrollTop = box.scrollHeight;
 }
@@ -342,15 +375,15 @@ function submitInterviewAnswer() {
   input.value = "";
   renderInterviewMessages();
 
-  if (interviewState.answers.length === WORK_INTERVIEW_QUESTIONS.length) {
+  if (interviewState.answers.length === interviewState.questions.length) {
     interviewState.finishing = true;
     renderInterviewMessages();
     // 서버가 없으므로 규칙 기반 mock 추출만 사용 (Dohgrae의 keywordExtractionMock과 동일한 방식)
     const keywords = mockExtractKeywords(interviewState.answers);
-    AppState.addWorkExperience({ ...periodState }, interviewState.answers, keywords);
+    const onComplete = interviewState.onComplete;
     setTimeout(() => {
       closeInterviewModal();
-      renderWork();
+      onComplete(interviewState.answers, keywords);
     }, 400);
   }
 }
@@ -560,7 +593,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-period-next").addEventListener("click", () => {
     if (!periodState.start_date) return;
     closePeriodModal();
-    openInterviewModal();
+    document.getElementById("interview-modal-title").textContent = "직장 경험 기록하기";
+    openInterviewModal(WORK_INTERVIEW_QUESTIONS, (answers, keywords) => {
+      AppState.addWorkExperience({ ...periodState }, answers, keywords);
+      renderWork();
+    });
   });
 
   document.getElementById("btn-interview-cancel").addEventListener("click", closeInterviewModal);
@@ -570,13 +607,25 @@ document.addEventListener("DOMContentLoaded", () => {
     submitInterviewAnswer();
   });
 
-  document.getElementById("btn-add-extracurricular").addEventListener("click", () => {
-    AppState.addExtracurricular();
-    renderExtracurricular();
+  // 학내외경험: 유형을 먼저 고르고 나서 인터뷰 챗봇으로 이어진다.
+  document.getElementById("btn-add-extracurricular").addEventListener("click", openExtracurricularTypeModal);
+  document.getElementById("btn-extracurricular-type-cancel").addEventListener("click", closeExtracurricularTypeModal);
+  document.getElementById("btn-extracurricular-type-next").addEventListener("click", () => {
+    closeExtracurricularTypeModal();
+    document.getElementById("interview-modal-title").textContent = "학내외경험 기록하기";
+    openInterviewModal(ACTIVITY_INTERVIEW_QUESTIONS, (answers, keywords) => {
+      AppState.addExtracurricular(extracurricularTypeState.type, answers, keywords);
+      renderExtracurricular();
+    });
   });
+
+  // 수상/공모전: 별도 분류가 없어서 바로 인터뷰 챗봇으로 들어간다.
   document.getElementById("btn-add-award").addEventListener("click", () => {
-    AppState.addAward();
-    renderAwards();
+    document.getElementById("interview-modal-title").textContent = "수상·공모전 기록하기";
+    openInterviewModal(ACTIVITY_INTERVIEW_QUESTIONS, (answers, keywords) => {
+      AppState.addAward(answers, keywords);
+      renderAwards();
+    });
   });
 
   document.getElementById("btn-copy-json").addEventListener("click", async () => {

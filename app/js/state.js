@@ -161,8 +161,16 @@ const AppState = {
     this.save();
   },
 
-  addExtracurricular() {
-    this.profile.activities.academic_extracurricular.push({ id: uuid(), type: "프로젝트", description: "" });
+  // answers/keywords: 학내외경험 인터뷰 챗봇에서 받아온 답변과 mock 추출 키워드
+  addExtracurricular(type, answers, keywords) {
+    this.profile.activities.academic_extracurricular.push({ id: uuid(), type, answers, keywords });
+    this.save();
+  },
+
+  updateExtracurricularType(id, type) {
+    const item = this.profile.activities.academic_extracurricular.find((e) => e.id === id);
+    if (!item) return;
+    item.type = type;
     this.save();
   },
 
@@ -173,8 +181,9 @@ const AppState = {
     this.save();
   },
 
-  addAward() {
-    this.profile.activities.awards.push({ id: uuid(), description: "" });
+  // answers/keywords: 수상·공모전 인터뷰 챗봇에서 받아온 답변과 mock 추출 키워드
+  addAward(answers, keywords) {
+    this.profile.activities.awards.push({ id: uuid(), answers, keywords });
     this.save();
   },
 

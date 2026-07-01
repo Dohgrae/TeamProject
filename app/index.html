@@ -118,7 +118,7 @@
     <!-- ===== 3. 학내외경험 ===== -->
     <section class="screen" id="screen-extracurricular">
       <h1>학내외경험</h1>
-      <p class="sub">항목을 추가하고 자유롭게 설명해주세요.</p>
+      <p class="sub">항목을 추가하면 챗봇이 몇 가지 질문을 물어봐요.</p>
 
       <div class="guide-box">
         <p class="guide-title">구체적으로 서술할수록 매칭 확률이 높아져요!</p>
@@ -144,7 +144,7 @@
     <!-- ===== 4. 수상/공모전 ===== -->
     <section class="screen" id="screen-awards">
       <h1>수상/공모전 경험</h1>
-      <p class="sub">항목을 추가하고 자유롭게 설명해주세요. 없다면 그냥 다음 단계로 넘어가도 돼요.</p>
+      <p class="sub">항목을 추가하면 챗봇이 몇 가지 질문을 물어봐요. 없다면 그냥 다음 단계로 넘어가도 돼요.</p>
 
       <div class="guide-box">
         <p class="guide-title">구체적으로 서술할수록 매칭 확률이 높아져요!</p>
@@ -304,12 +304,35 @@
     </div>
   </div>
 
-  <!-- ===== 직장경험 인터뷰 모달 ===== -->
+  <!-- ===== 학내외경험: 유형 먼저 고르는 모달 ===== -->
+  <div class="modal-overlay" id="extracurricular-type-modal" hidden>
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h2>어떤 경험인가요?</h2>
+        </div>
+        <button type="button" class="btn-text" id="btn-extracurricular-type-cancel">취소</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label>경험 유형</label>
+          <div class="chip-group" id="extracurricular-type-chips"></div>
+        </div>
+      </div>
+      <div class="modal-form">
+        <button type="button" class="btn btn-primary" id="btn-extracurricular-type-next" style="width: 100%">
+          다음: 경험 인터뷰 시작하기 →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 직장경험/학내외경험/수상공모전이 공통으로 쓰는 인터뷰 모달 ===== -->
   <div class="modal-overlay" id="interview-modal" hidden>
     <div class="modal-box">
       <div class="modal-header">
         <div>
-          <h2>직장 경험 기록하기</h2>
+          <h2 id="interview-modal-title">직장 경험 기록하기</h2>
           <p class="modal-progress" id="interview-progress"></p>
         </div>
         <button type="button" class="btn-text" id="btn-interview-cancel">취소</button>
