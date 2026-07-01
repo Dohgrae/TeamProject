@@ -19,7 +19,8 @@ function emptyProfile() {
       education: { level: "", major_category: "", major_detail: "" },
       contact: { phone: "", email: "" },
     },
-    filters: { region: [], job_category: [], company_size: [], employment_type: [] },
+    // job_subcategory: { M4: "백엔드", ... } 형태로 job_category 코드별 선택된 세부직무를 담는다.
+    filters: { region: [], job_category: [], job_subcategory: {}, company_size: [], employment_type: [] },
     qualifications: {
       languages: [],
       certificates: [],

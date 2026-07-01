@@ -134,6 +134,7 @@ function renderBasicInfo() {
     AppState.toggleInArray(p.filters.job_category, v);
     renderBasicInfo();
   });
+  renderJobSubcategories();
   bindChipGroup("filter-company-size-chips", COMPANY_SIZE_OPTIONS, () => p.filters.company_size, (v) => {
     AppState.toggleInArray(p.filters.company_size, v);
     renderBasicInfo();
@@ -145,6 +146,42 @@ function renderBasicInfo() {
 
   // 항목별 슬라이드 네비게이션(main.js)이 있으면 현재 항목 기준으로 다음 버튼 상태를 갱신한다.
   if (typeof updateFieldStepNav === "function") updateFieldStepNav();
+}
+
+// 직무를 하나 이상 고르면, 고른 직무마다 세부직무 선택 칩(전체 포함)을 아래에 띄운다.
+function renderJobSubcategories() {
+  const p = AppState.profile;
+  const container = document.getElementById("job-subcategory-container");
+
+  // 선택 해제된 직무의 세부직무 값은 정리
+  Object.keys(p.filters.job_subcategory).forEach((code) => {
+    if (!p.filters.job_category.includes(code)) delete p.filters.job_subcategory[code];
+  });
+
+  if (p.filters.job_category.length === 0) {
+    container.innerHTML = "";
+    return;
+  }
+
+  container.innerHTML = p.filters.job_category
+    .map(
+      (code) =>
+        `<div class="job-subcategory-group">
+          <p class="tech-category-label">${JOB_CATEGORY_OPTIONS.find((o) => o.value === code)?.label ?? code} 세부직무</p>
+          <div class="chip-group" id="job-subcategory-${code}"></div>
+        </div>`
+    )
+    .join("");
+
+  p.filters.job_category.forEach((code) => {
+    const options = (JOB_SUBCATEGORY_OPTIONS[code] || []).map((o) => ({ value: o.value, label: o.value }));
+    const selected = p.filters.job_subcategory[code] || "전체";
+    bindChipGroup(`job-subcategory-${code}`, options, () => [selected], (v) => {
+      p.filters.job_subcategory[code] = v;
+      AppState.save();
+      renderJobSubcategories();
+    });
+  });
 }
 
 // ============================================================

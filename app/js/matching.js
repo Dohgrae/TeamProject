@@ -38,6 +38,14 @@ function filterJobs(profile, jobs) {
     if (filters.job_category.length > 0 && !filters.job_category.includes(job.filter_job_major)) {
       fail.push("직무");
     }
+    // 세부직무(전체가 아닌 값)를 골랐으면, job_title에 해당 세부직무 키워드가 있는 공고만 남긴다.
+    const subcategory = filters.job_subcategory?.[job.filter_job_major];
+    if (subcategory && subcategory !== "전체") {
+      const sub = (JOB_SUBCATEGORY_OPTIONS[job.filter_job_major] || []).find((o) => o.value === subcategory);
+      if (sub && sub.keywords.length > 0 && !sub.keywords.some((k) => job.job_title.includes(k))) {
+        fail.push("세부직무");
+      }
+    }
     if (filters.employment_type.length > 0) {
       if (!filters.employment_type.some((t) => job.employment_type.includes(t))) fail.push("근무형태");
     }

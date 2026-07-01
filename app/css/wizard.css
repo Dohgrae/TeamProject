@@ -1,6 +1,13 @@
 /* 뽑아듀오 — 입력 위저드 화면 스타일 */
 
-/* ── 기본 인적사항: 항목 하나씩 슬라이드로 보여주는 뷰포트 ── */
+/* ── 기본 인적사항: 항목을 카드 한 장씩 슬라이드로 보여주는 화면 ── */
+/* 화면 자체는 카드가 떠 있는 배경 역할만 하고, 진짜 "카드"는 .field-step이 맡는다. */
+#screen-basic-info.screen.active {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
 .field-step-counter {
   font-size: 13px;
   color: #9ca3af;
@@ -8,12 +15,19 @@
 }
 
 .field-step-viewport {
+  position: relative;
   overflow: hidden;
-  min-height: 92px;
+  min-height: 220px;
+  padding: 10px 4px 24px;
 }
 
 .field-step {
   display: none;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+  will-change: transform, opacity, filter;
 }
 
 .field-step label {
@@ -113,8 +127,13 @@ textarea {
   color: #ffffff;
 }
 
-.tech-category {
+.tech-category,
+.job-subcategory-group {
   margin-bottom: 12px;
+}
+
+.job-subcategory-group {
+  margin-top: 16px;
 }
 
 .tech-category-label {

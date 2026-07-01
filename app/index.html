@@ -26,33 +26,31 @@
       <div class="progress-bar-wrap"><div class="progress-bar" id="field-step-progress-bar"></div></div>
 
       <div class="field-step-viewport" id="field-step-viewport">
+        <!-- 1. 이름/출생년월일/성별/전화번호/이메일 -->
         <div class="field-step" data-required="true">
           <label for="input-name">이름 *</label>
           <input type="text" id="input-name" placeholder="이름을 입력해주세요" />
-        </div>
-
-        <div class="field-step" data-required="true">
-          <label for="input-birth">출생년월일 *</label>
+          <label for="input-birth" style="margin-top: 16px">출생년월일 *</label>
           <input type="date" id="input-birth" />
-        </div>
-
-        <div class="field-step">
-          <label>성별</label>
+          <label style="margin-top: 16px">성별</label>
           <div class="chip-group" id="gender-chips"></div>
+          <label for="input-phone" style="margin-top: 16px">전화번호</label>
+          <input type="text" id="input-phone" placeholder="010-0000-0000" />
+          <label for="input-email" style="margin-top: 16px">이메일</label>
+          <input type="text" id="input-email" placeholder="example@email.com" />
         </div>
 
+        <!-- 2. 학력/전공 -->
         <div class="field-step" data-required="true">
           <label>학력 단계 *</label>
           <div class="chip-group" id="education-level-chips"></div>
-        </div>
-
-        <div class="field-step">
-          <label>전공 대분류</label>
+          <label style="margin-top: 16px">전공 대분류</label>
           <div class="chip-group" id="major-category-chips"></div>
           <label for="input-major-detail" style="margin-top: 16px">학과</label>
           <input type="text" id="input-major-detail" placeholder="예: 컴퓨터공학과" />
         </div>
 
+        <!-- 3. 자격증/어학 -->
         <div class="field-step">
           <label for="input-cert">보유 자격증</label>
           <div class="input-with-button">
@@ -60,10 +58,7 @@
             <button type="button" id="btn-add-cert">추가</button>
           </div>
           <div class="chip-list" id="cert-list"></div>
-        </div>
-
-        <div class="field-step">
-          <label>어학 능력</label>
+          <label style="margin-top: 16px">어학 능력</label>
           <div class="input-with-button">
             <select id="select-lang-test"></select>
             <input type="text" id="input-lang-score" placeholder="점수/등급" style="max-width: 120px" />
@@ -72,36 +67,27 @@
           <div class="chip-list" id="lang-list"></div>
         </div>
 
+        <!-- 4. 기술스택 -->
         <div class="field-step">
           <label>기술스택</label>
           <div id="tech-stack-container"></div>
         </div>
 
-        <div class="field-step">
-          <label for="input-phone">전화번호</label>
-          <input type="text" id="input-phone" placeholder="010-0000-0000" />
-          <label for="input-email" style="margin-top: 16px">이메일</label>
-          <input type="text" id="input-email" placeholder="example@email.com" />
-        </div>
-
-        <div class="field-step">
-          <label>희망 지역</label>
-          <p class="sub">여기부터는 채용공고 1차 필터링에 쓰이는 선호 조건이에요. 선택 안 하면 전체를 대상으로 매칭해요.</p>
-          <div class="chip-group" id="filter-region-chips"></div>
-        </div>
-
+        <!-- 5. 직무 + 세부직무 -->
         <div class="field-step">
           <label>직무</label>
+          <p class="sub">채용공고 1차 필터링에 쓰이는 선호 조건이에요. 선택 안 하면 전체를 대상으로 매칭해요.</p>
           <div class="chip-group" id="filter-job-category-chips"></div>
+          <div id="job-subcategory-container"></div>
         </div>
 
+        <!-- 6. 희망지역/기업규모/희망고용형태 -->
         <div class="field-step">
-          <label>기업규모</label>
+          <label>희망 지역</label>
+          <div class="chip-group" id="filter-region-chips"></div>
+          <label style="margin-top: 16px">기업규모</label>
           <div class="chip-group" id="filter-company-size-chips"></div>
-        </div>
-
-        <div class="field-step">
-          <label>희망 고용형태</label>
+          <label style="margin-top: 16px">희망 고용형태</label>
           <div class="chip-group" id="filter-employment-type-chips"></div>
         </div>
       </div>

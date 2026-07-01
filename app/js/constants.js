@@ -24,6 +24,59 @@ const JOB_CATEGORY_OPTIONS = [
   { value: "M7", label: "연구·생산" },
 ];
 
+// 직무(M1~M7) 선택 시 나타나는 세부직무. jobs.json에는 세부직무 코드가 따로 없어서,
+// "전체"가 아닌 값을 고르면 job_title에 keywords 중 하나가 포함되는 공고만 남기는
+// 소프트 필터로 동작한다 (1차 필터링을 보완하는 추가 조건).
+const JOB_SUBCATEGORY_OPTIONS = {
+  M1: [
+    { value: "전체", keywords: [] },
+    { value: "서비스기획", keywords: ["서비스기획", "기획자"] },
+    { value: "PM/PO", keywords: ["PM", "PO", "프로덕트 매니저", "프로덕트매니저"] },
+    { value: "사업기획", keywords: ["사업기획", "경영기획"] },
+  ],
+  M2: [
+    { value: "전체", keywords: [] },
+    { value: "국내영업", keywords: ["국내영업", "영업"] },
+    { value: "해외영업", keywords: ["해외영업", "글로벌영업"] },
+    { value: "BD/파트너십", keywords: ["BD", "파트너십", "사업개발"] },
+  ],
+  M3: [
+    { value: "전체", keywords: [] },
+    { value: "콘텐츠마케팅", keywords: ["콘텐츠", "콘텐츠마케팅"] },
+    { value: "퍼포먼스마케팅", keywords: ["퍼포먼스", "그로스"] },
+    { value: "브랜드마케팅", keywords: ["브랜드"] },
+  ],
+  M4: [
+    { value: "전체", keywords: [] },
+    { value: "백엔드", keywords: ["백엔드", "서버 개발", "Backend"] },
+    { value: "프론트엔드", keywords: ["프론트엔드", "웹퍼블리셔", "Frontend"] },
+    { value: "풀스택", keywords: ["풀스택", "Full-Stack", "Full Stack"] },
+    { value: "AI/ML", keywords: ["AI", "머신러닝", "딥러닝", "인공지능"] },
+    { value: "데이터", keywords: ["데이터 엔지니어", "데이터분석", "빅데이터"] },
+    { value: "모바일", keywords: ["모바일", "안드로이드", "iOS", "앱 개발"] },
+    { value: "DevOps/인프라", keywords: ["DevOps", "인프라", "클라우드", "SRE"] },
+    { value: "QA", keywords: ["QA", "품질", "테스트"] },
+  ],
+  M5: [
+    { value: "전체", keywords: [] },
+    { value: "UX/UI디자인", keywords: ["UX", "UI"] },
+    { value: "그래픽디자인", keywords: ["그래픽디자인", "그래픽"] },
+    { value: "프로덕트디자인", keywords: ["프로덕트디자인", "제품디자인"] },
+  ],
+  M6: [
+    { value: "전체", keywords: [] },
+    { value: "회계", keywords: ["회계"] },
+    { value: "재무", keywords: ["재무"] },
+    { value: "세무", keywords: ["세무"] },
+  ],
+  M7: [
+    { value: "전체", keywords: [] },
+    { value: "R&D", keywords: ["R&D", "연구개발", "연구원"] },
+    { value: "생산관리", keywords: ["생산관리", "생산"] },
+    { value: "품질관리", keywords: ["품질관리", "품질"] },
+  ],
+};
+
 const COMPANY_SIZE_OPTIONS = [
   { value: "A", label: "대기업" },
   { value: "B", label: "중견기업" },

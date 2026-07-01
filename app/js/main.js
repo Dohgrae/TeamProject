@@ -23,14 +23,15 @@ function getFieldStepEls() {
   return Array.from(document.querySelectorAll("#field-step-viewport .field-step"));
 }
 
-// 필수 항목(이름/출생년월일/학력단계)만 유효성 검사, 나머지는 항목 없이도 넘어갈 수 있다.
+// 필수 항목(이름·출생년월일 / 학력단계)만 유효성 검사, 나머지는 항목 없이도 넘어갈 수 있다.
 function isFieldStepValid(index) {
   const p = AppState.profile;
   const steps = getFieldStepEls();
   const el = steps[index];
   if (!el || el.dataset.required !== "true") return true;
-  if (el.querySelector("#input-name")) return p.basic_info.name.trim() !== "";
-  if (el.querySelector("#input-birth")) return p.basic_info.birth_date !== "";
+  if (el.querySelector("#input-name")) {
+    return p.basic_info.name.trim() !== "" && p.basic_info.birth_date !== "";
+  }
   if (el.querySelector("#education-level-chips")) return p.basic_info.education.level !== "";
   return true;
 }
@@ -44,13 +45,21 @@ function updateFieldStepNav() {
   document.getElementById("btn-basic-info-next").disabled = !isFieldStepValid(fieldStepIndex);
 }
 
+// 카드가 사라지고/나타날 때 경계가 부드럽게 흐려지도록 하는 블러 세기
+const FIELD_STEP_BLUR_PX = 10;
+
+function resetFieldStepStyle(el) {
+  el.style.transition = "";
+  el.style.transform = "";
+  el.style.opacity = "";
+  el.style.filter = "";
+}
+
 // 첫 진입(또는 다시 이 화면으로 돌아왔을 때) 첫 항목부터 보여주도록 초기화.
 function setupFieldSteps() {
   const steps = getFieldStepEls();
   steps.forEach((el, i) => {
-    el.style.transition = "";
-    el.style.transform = "";
-    el.style.opacity = "";
+    resetFieldStepStyle(el);
     el.style.display = i === 0 ? "block" : "none";
   });
   fieldStepIndex = 0;
@@ -58,6 +67,7 @@ function setupFieldSteps() {
 }
 
 // direction: 1 = 다음 항목(위로 슬라이드), -1 = 이전 항목(아래로 슬라이드)
+// 카드가 이동하면서 opacity/transform과 함께 filter: blur도 같이 바뀌어, 카드 간 경계가 흐릿하게 겹쳐 보인다.
 function goToFieldStep(newIndex, direction) {
   const steps = getFieldStepEls();
   if (newIndex < 0 || newIndex >= steps.length) return;
@@ -66,27 +76,30 @@ function goToFieldStep(newIndex, direction) {
   const nextEl = steps[newIndex];
   const outY = direction === 1 ? -28 : 28;
   const inY = direction === 1 ? 28 : -28;
+  const transitionCss = `transform ${FIELD_STEP_TRANSITION_MS}ms ease, opacity ${FIELD_STEP_TRANSITION_MS}ms ease, filter ${FIELD_STEP_TRANSITION_MS}ms ease`;
 
-  curEl.style.transition = `transform ${FIELD_STEP_TRANSITION_MS}ms ease, opacity ${FIELD_STEP_TRANSITION_MS}ms ease`;
+  curEl.style.transition = transitionCss;
   curEl.style.transform = `translateY(${outY}px)`;
   curEl.style.opacity = "0";
+  curEl.style.filter = `blur(${FIELD_STEP_BLUR_PX}px)`;
 
   setTimeout(() => {
     curEl.style.display = "none";
-    curEl.style.transition = "";
-    curEl.style.transform = "";
-    curEl.style.opacity = "";
+    resetFieldStepStyle(curEl);
 
     fieldStepIndex = newIndex;
     nextEl.style.display = "block";
     nextEl.style.transition = "none";
     nextEl.style.transform = `translateY(${inY}px)`;
     nextEl.style.opacity = "0";
+    nextEl.style.filter = `blur(${FIELD_STEP_BLUR_PX}px)`;
     void nextEl.offsetHeight; // 강제 리플로우로 위 스타일을 먼저 적용시킨 뒤 트랜지션 시작
-    nextEl.style.transition = `transform ${FIELD_STEP_TRANSITION_MS}ms ease, opacity ${FIELD_STEP_TRANSITION_MS}ms ease`;
+    nextEl.style.transition = transitionCss;
     nextEl.style.transform = "translateY(0)";
     nextEl.style.opacity = "1";
+    nextEl.style.filter = "blur(0)";
     updateFieldStepNav();
+    setTimeout(() => resetFieldStepStyle(nextEl), FIELD_STEP_TRANSITION_MS);
   }, FIELD_STEP_TRANSITION_MS);
 }
 
