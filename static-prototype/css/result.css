@@ -771,12 +771,25 @@ body:has(#screen-result.screen.active) {
   z-index: 2;
   width: 110px;
   height: auto;
-  animation: mascotFloat 2.4s ease-in-out infinite;
+  animation: mascotFloat 5.5s ease-in-out infinite;
 }
 
+/* 새 그림을 그릴 수는 없어서, 하나의 긴 애니메이션 안에 둥실 뜨기·좌우로 갸우뚱·
+   통통 튀는 작은 홉·살짝 커지는 스케일 펄스를 섞어 "다양한 동작"처럼 보이게 만들었다. */
 @keyframes mascotFloat {
-  0%, 100% { transform: translateY(0) rotate(-2deg); }
-  50%      { transform: translateY(-10px) rotate(2deg); }
+  0%   { transform: translateY(0)    translateX(0)   rotate(0deg)  scale(1); }
+  8%   { transform: translateY(-16px) translateX(-4px) rotate(-6deg) scale(1.03); }
+  16%  { transform: translateY(-4px) translateX(-8px) rotate(-9deg) scale(1); }
+  25%  { transform: translateY(-20px) translateX(0)   rotate(0deg)  scale(1.04); }
+  34%  { transform: translateY(-6px) translateX(8px)  rotate(9deg)  scale(1); }
+  42%  { transform: translateY(-16px) translateX(4px) rotate(6deg)  scale(1.03); }
+  50%  { transform: translateY(0)    translateX(0)   rotate(0deg)  scale(1); }
+  58%  { transform: translateY(-3px) translateX(0)    rotate(0deg)  scale(1.05); }
+  63%  { transform: translateY(-12px) translateX(0)   rotate(0deg)  scale(0.98); }
+  68%  { transform: translateY(-2px) translateX(0)    rotate(0deg)  scale(1.03); }
+  80%  { transform: translateY(-14px) translateX(-6px) rotate(-5deg) scale(1); }
+  90%  { transform: translateY(-4px) translateX(4px)  rotate(4deg)  scale(1.02); }
+  100% { transform: translateY(0)    translateX(0)   rotate(0deg)  scale(1); }
 }
 
 .match-loading-title {
@@ -841,6 +854,7 @@ body:has(#screen-result.screen.active) {
 #screen-result.is-loading .main > h1,
 #screen-result.is-loading .main > .sub,
 #screen-result.is-loading .button-area,
+#screen-result.is-loading .card-carousel-controls,
 #screen-result.is-loading > .nav-row {
   display: none;
 }
