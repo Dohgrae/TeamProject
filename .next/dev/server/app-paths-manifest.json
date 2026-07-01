@@ -1,5 +1,0 @@
-{
-  "/api/work-interview-keywords/route": "app/api/work-interview-keywords/route.js",
-  "/steps/extracurricular/page": "app/steps/extracurricular/page.js",
-  "/steps/work/page": "app/steps/work/page.js"
-}
