@@ -1,0 +1,3589 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>뽑아듀오</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #0f0f13;
+        --surface: #1a1a22;
+        --surface2: #24242f;
+        --accent: #7c6ff7;
+        --accent2: #a78bfa;
+        --text: #f0eeff;
+        --muted: #8b8aa8;
+        --pass: #4ade80;
+        --fail: #f87171;
+        --border: #2e2e3e;
+        --radius: 16px;
+      }
+
+      body {
+        font-family: "Pretendard", "Apple SD Gothic Neo", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      /* ── 헤더 ── */
+      header {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .logo {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+      .logo span {
+        color: var(--accent2);
+      }
+      .badge {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 20px;
+      }
+
+      /* ── 화면 전환 ── */
+      .screen {
+        display: none;
+      }
+      .screen.active {
+        display: block;
+      }
+
+      /* ── 필터 화면 ── */
+      #filter-screen {
+        max-width: 540px;
+        margin: 0 auto;
+        padding: 32px 20px;
+      }
+
+      .filter-title {
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.3;
+        margin-bottom: 6px;
+      }
+      .filter-sub {
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 32px;
+      }
+
+      .section-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--accent2);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        margin-top: 28px;
+      }
+      .section-label:first-of-type {
+        margin-top: 0;
+      }
+
+      .chip-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .chip {
+        padding: 8px 14px;
+        border-radius: 40px;
+        border: 1.5px solid var(--border);
+        background: var(--surface);
+        color: var(--muted);
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.15s;
+        user-select: none;
+      }
+      .chip:hover {
+        border-color: var(--accent);
+        color: var(--text);
+      }
+      .chip.selected {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+        font-weight: 600;
+      }
+
+      .select-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      select {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        padding: 10px 12px;
+        font-size: 13px;
+        width: 100%;
+        cursor: pointer;
+      }
+      select:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+
+      .run-btn {
+        width: 100%;
+        margin-top: 36px;
+        padding: 16px;
+        background: var(--accent);
+        border: none;
+        border-radius: var(--radius);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        letter-spacing: -0.3px;
+        transition: opacity 0.15s;
+      }
+      .run-btn:hover {
+        opacity: 0.88;
+      }
+
+      /* ── 결과 화면 ── */
+      #result-screen {
+        max-width: 540px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .result-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      .result-count {
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .result-count span {
+        color: var(--accent2);
+      }
+      .back-btn {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 7px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .back-btn:hover {
+        color: var(--text);
+      }
+
+      /* ── 카드 ── */
+      .card-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          transform 0.1s;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+      .card:hover {
+        border-color: var(--accent);
+        transform: translateY(-1px);
+      }
+
+      .card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .card-company {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+      .card-title {
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1.4;
+      }
+      .card-match {
+        flex-shrink: 0;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--pass);
+        background: rgba(74, 222, 128, 0.1);
+        border: 1px solid rgba(74, 222, 128, 0.2);
+        padding: 4px 9px;
+        border-radius: 20px;
+      }
+
+      .card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 12px;
+      }
+      .tag {
+        font-size: 11px;
+        padding: 4px 9px;
+        border-radius: 6px;
+        background: var(--surface2);
+        color: var(--muted);
+        border: 1px solid var(--border);
+      }
+      .tag.region {
+        color: #60a5fa;
+        border-color: rgba(96, 165, 250, 0.2);
+        background: rgba(96, 165, 250, 0.07);
+      }
+      .tag.work {
+        color: #34d399;
+        border-color: rgba(52, 211, 153, 0.2);
+        background: rgba(52, 211, 153, 0.07);
+      }
+      .tag.career {
+        color: #f59e0b;
+        border-color: rgba(245, 158, 11, 0.2);
+        background: rgba(245, 158, 11, 0.07);
+      }
+
+      .card-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 12px;
+        font-size: 12px;
+        color: var(--accent2);
+        opacity: 0;
+        transition: opacity 0.15s;
+      }
+      .card:hover .card-link {
+        opacity: 1;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--muted);
+      }
+      .empty-state .emoji {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+      .empty-state p {
+        font-size: 15px;
+      }
+
+      .major-warning {
+        background: rgba(251, 191, 36, 0.07);
+        border: 1px solid rgba(251, 191, 36, 0.2);
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 12px;
+        color: #fbbf24;
+        margin-bottom: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">뽑아<span>듀오</span></div>
+      <div class="badge">BETA · 더미 데이터 99개</div>
+    </header>
+
+    <!-- 필터 화면 -->
+    <div id="filter-screen" class="screen active">
+      <div class="filter-title">나한테 맞는<br />공고를 찾아줄게요</div>
+      <div class="filter-sub">
+        조건 선택 후 매칭 시작 → 통과 공고만 카드로 보여드려요
+      </div>
+
+      <div class="section-label">기업 규모 (복수 선택)</div>
+      <div class="chip-group" id="chips-size">
+        <div class="chip" data-val="A">대기업</div>
+        <div class="chip" data-val="B">중견기업</div>
+        <div class="chip selected" data-val="C">중소기업</div>
+        <div class="chip" data-val="D">스타트업</div>
+        <div class="chip" data-val="E">공공/교육</div>
+      </div>
+
+      <div class="section-label">직무 (단일 선택)</div>
+      <div class="chip-group" id="chips-job">
+        <div class="chip" data-val="M1">기획·PM</div>
+        <div class="chip" data-val="M2">영업·BD</div>
+        <div class="chip" data-val="M3">마케팅</div>
+        <div class="chip selected" data-val="M4">개발·AI</div>
+        <div class="chip" data-val="M5">디자인</div>
+        <div class="chip" data-val="M6">재무·회계</div>
+        <div class="chip" data-val="M7">연구·생산</div>
+      </div>
+
+      <div class="section-label">지역 (복수 선택)</div>
+      <div class="chip-group" id="chips-region">
+        <div class="chip selected" data-val="1">서울</div>
+        <div class="chip" data-val="2">경기·인천</div>
+        <div class="chip" data-val="3">부산·경남</div>
+        <div class="chip" data-val="4">대구·경북</div>
+        <div class="chip" data-val="5">대전·충청</div>
+        <div class="chip" data-val="6">광주·전라</div>
+        <div class="chip" data-val="7">강원</div>
+        <div class="chip" data-val="8">제주</div>
+        <div class="chip selected" data-val="9">재택·전국</div>
+      </div>
+
+      <div class="section-label">근무 형태 (복수 선택)</div>
+      <div class="chip-group" id="chips-work">
+        <div class="chip selected" data-val="정규직">정규직</div>
+        <div class="chip" data-val="계약직">계약직</div>
+        <div class="chip" data-val="인턴">인턴</div>
+        <div class="chip" data-val="프리랜서">프리랜서</div>
+      </div>
+
+      <div class="section-label">내 프로필</div>
+      <div class="select-row">
+        <select id="sel-edu">
+          <option value="">학력 무관</option>
+          <option value="H1">고졸</option>
+          <option value="H2">초대졸</option>
+          <option value="H3" selected>대졸(4년)</option>
+          <option value="H4">석사</option>
+          <option value="H5">박사</option>
+        </select>
+        <select id="sel-career-type">
+          <option value="">경력 무관</option>
+          <option value="신입" selected>신입</option>
+          <option value="경력">경력직</option>
+        </select>
+      </div>
+      <div style="margin-top: 10px">
+        <select id="sel-career-years">
+          <option value="0" selected>경력 없음 (신입)</option>
+          <option value="1">1년</option>
+          <option value="2">2년</option>
+          <option value="3">3년</option>
+          <option value="4">4년</option>
+          <option value="5">5년</option>
+          <option value="7">7년</option>
+          <option value="10">10년 이상</option>
+        </select>
+      </div>
+
+      <button class="run-btn" onclick="runFilter()">매칭 시작 →</button>
+    </div>
+
+    <!-- 결과 화면 -->
+    <div id="result-screen" class="screen">
+      <div class="result-header">
+        <div class="result-count">통과 <span id="pass-count">0</span>개</div>
+        <button class="back-btn" onclick="goBack()">← 조건 변경</button>
+      </div>
+      <div id="warning-box"></div>
+      <div class="card-list" id="card-list"></div>
+    </div>
+
+    <script>
+      // ── 공고 데이터 ──────────────────────────────────
+      const JOBS = [
+        {
+          회사명: "(주)바론시스템",
+          공고제목: "[바론시스템] 공공기관 경영/연구관리 시스템 개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54321289&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=b1fd8766-504c-4bc4-8017-ebbb643ce40a&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "대전 유성구",
+          근무지역_코드: "5",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "•Nexacro 플랫폼 개발 가능자\n \n •JAVA 개발 가능자\n \n •Oracle DB 활용 가능자\n \n •신원조회 및 해외여행 결격사유가 없는자",
+          경력유형: "신입",
+          경력유형_코드: "신입",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "공공기관 경영/연구관리 시스템 개발자",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "•공공기관 경영/연구관리 시스템 개발 및 유지보수\n \n •JAVA 기반 업무 기능 개발\n \n •Oracle DB 설계 및 SQL 개발\n \n •Nexacro 화면 개발\n \n •사용자 요구사항 반영 및 시스템 개선\n \n •운영지원 및 장애 대응\n \n • ERP사업부 부서 소속, 사원 직급으로 함께할 예정이에요.",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "•공공기관 프로젝트 수행 경험자\n \n •전자정부 프레임워크 경험자\n \n •경영/연구관리시스템(R&D) 구축 경험자\n \n •DB 성능개선 및 튜닝 경험자",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)인터오리진아이엔씨",
+          공고제목: "광고홍보/PPL/Ai컨텐츠/Ai 개발",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54321188&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=b1fd8766-504c-4bc4-8017-ebbb643ce40a&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강남구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "AI 알고리즘 및 소프트웨어 개발 역량을 보유하신 분 (단순 AI 툴 / 영상 활용자가 아닌 오리지널 AI 개발자)\n \n AI 서비스 개발 및 배포, 클라우드 인프라(AWS, GCP 등) 운영 경험자\n \n 개발 포트폴리오 제출 필수 (AI 개발 관련 작업물 우대)",
+          경력유형: "신입",
+          경력유형_코드: "신입",
+          경력연차_최소: "무관",
+          경력연차_숫자: "0",
+          직무명: "Ai 개발 담당",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "비즈니스 목적에 맞는 AI 모델 연구 및 최적화\n \n 사내 AI 플랫폼 및 자동화 툴 기능 개발 및 고도화\n \n 생성형 AI API를 활용한 인하우스 웹/앱 서비스 제작 및 연동\n \n AI 제작 가이드 시스템 반영 및 프로세스 자동화 구축\n \n AI 모델 학습 및 서빙을 위한 데이터 파이프라인 관리",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "대형 언어 모델(LLM) API 및 AI 에이전트 활용 프로젝트 경험자 우대",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)교육문화",
+          공고제목: "(주)교육문화 AI 활용 프론트엔드 개발자 인턴 채용 공고",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54321175&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=b1fd8766-504c-4bc4-8017-ebbb643ce40a&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 서초구",
+          근무지역_코드: "1",
+          근무형태: "정규직, 계약직, 인턴",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• HTML5, CSS3, JavaScript 기본 이해\n \n • React 개발 경험(개인 프로젝트 포함)\n \n • TypeScript 또는 JavaScript 개발 경험\n \n • REST API를 활용한 개발 경험\n \n • Git 사용 경험\n \n • 새로운 기술을 배우고 도전하는 것을 좋아하는 분\n \n • 원활한 의사소통 및 협업이 가능한 분\n \n • AI 코딩 도구를 활용한 개발 경험",
+          경력유형: "신입",
+          경력유형_코드: "신입",
+          경력연차_최소: "무관",
+          경력연차_숫자: "0",
+          직무명: "AI 활용 프론트엔드 개발자",
+          직무_카테고리_코드: "M1",
+          주요업무_원문:
+            "• React(TypeScript) 기반 웹 서비스 개발\n \n • UI/UX 화면 구현 및 기능 개발\n \n • REST API 연동\n \n • 태블릿 및 키오스크용 웹 애플리케이션 개발\n \n • PWA 기반 서비스 개발\n \n • Git을 활용한 협업",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 개인 프로젝트 또는 사이드 프로젝트 경험\n \n • 반응형 웹, 태블릿/키오스크 환경 개발 경험\n \n • Figma 등 디자인 툴을 참고해 화면을 구현해본 경험\n \n • 교육 서비스, 체험 콘텐츠, 웹 플랫폼 개발 경험\n \n • 백엔드 구조나 API 문서를 이해하고 협업해본 경험",
+          "지원 마감일": "2026.07.18",
+        },
+        {
+          회사명: "(주)블룸에이아이",
+          공고제목: "콜브릿지(상담콜) 백엔드 개발자 경력직 채용 (2-7년)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54321072&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=b1fd8766-504c-4bc4-8017-ebbb643ce40a&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 중구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "* 1. 백엔드 개발 실무 경력 2년 이상 7년 이하\n \n * 2. Code Agent 사용 경험 필수\n \n * 3. Java 기반 백엔드 실무 개발 경험 필수\n \n * 4. RESTful API 설계 및 개발 경험 (단순 CRUD가 아닌 확장성과 유지보수를 고려한 API 설계 경험)\n \n * 5. MySQL 8.0 이상 등 RDBMS 설계 및 최적화 경험 (DB 설계, 트랜잭션 및 Lock 이해, 쿼리 튜닝 경험)\n \n * 6. Linux 기반 서비스 운영 경험 (Nginx 등 웹 서버 이해, Docker 기반 컨테이너 환경 운영 경험)\n \n * 7. Git 기반 협업 경험 (Jira, Confluence, Notion 등 협업 도구 사용 경험)\n \n * 8. Jenkins 등 CI/CD 환경 사용 경험",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "2~7년",
+          경력연차_숫자: "2",
+          직무명: "백엔드 개발자",
+          직무_카테고리_코드: "M2",
+          주요업무_원문: "* Callbridge (AI Agent 콜봇 서비스) 백엔드 개발",
+          인재상_원문:
+            "이런 사람을 원해요.\n \n * AI Agent를 개발 동료처럼 활용하는 사람\n \n * 새로운 기술을 실험하고 팀에 공유하는 사람\n \n * 서비스 장애가 발생하면 로그부터 떠보는 사람\n \n * 코드 품질과 구조에 대한 고민을 하는 사람\n \n * 단순 기능 구현보다 문제 정의에 관심이 있는 사람\n \n * “이걸 자동화할 수 없을까?”를 먼저 생각하는 사람",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "* 1. Laravel, Spring Boot 등 프레임워크 사용 경험\n \n * 2. Elasticsearch 기반 검색/로그 시스템 운영 경험\n \n * 3. RabbitMQ, Kafka 등 메시지 큐 사용 경험\n \n * 4. WebSocket, gRPC 등 실시간 처리 경험\n \n * 5. Kubernetes 기반 서비스 운영 경험\n \n * 6. Microservice, Monorepo, 레거시 리팩토링 경험\n \n * 7. ISMS 보안 요구사항을 고려한 개발 경험\n \n * 8. STT, 챗봇 API 등 AI 연동 경험\n \n * 9. CI/CD 파이프라인 설계 경험\n \n * 10. 대용량 트래픽 처리 구조 설계 경험\n \n * 11. 풀스택(백엔드·프론트엔드) 개발자 우대",
+          "지원 마감일": "2026.08.29",
+        },
+        {
+          회사명: "(주)헥스에이아이랩스",
+          공고제목: "AI 알고리즘 개발자 채용 공고",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54320878&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=b1fd8766-504c-4bc4-8017-ebbb643ce40a&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역:
+            "경기 화성시 동탄첨단산업1로 27 금강펜테리움 IX타워 A동 1901호",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상(예정자 가능)",
+          학력_코드: "H3",
+          전공요건:
+            "무관 (우대사항에 AI, 통계, 반도체 관련학과, 수학 전공자 명시)",
+          자격요건:
+            "• 경력 무관 (신입 지원 가능)\n \n • 대학교졸업(4년)이상, 졸업 예정자 지원가능",
+          경력유형: "신입",
+          경력유형_코드: "신입",
+          경력연차_최소: "무관",
+          경력연차_숫자: "0",
+          직무명: "AI 알고리즘 개발자",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "• 반도체 불량률 예측 모델 개발 및 최적화/시각화\n \n • 공정 데이터 분석 및 이상 탐지 알고리즘 연구\n \n • 대규모 데이터 처리 파이프라인 설계 및 최적화",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "공통 (신입/경력)\n \n - 기본 요건 : SQL, ETL, Python, C++, AI native coding, Agile Coding\n \n - 우대 요건: MongoDB, GitHub, Docker, Applied Statistics, AI/ML Automation, CI/CD, Prefect, 시계열 모델링\n \n - 머신러닝/딥러닝 프레임워크 활용 경험 (PyTorch, TensorFlow 등)\n \n - 데이터 전처리 및 통계적 분석 능력\n \n \n 경력자 우대\n \n - AI, 통계 석박사 우대 및 반도체 관련학과 졸업자\n \n - 통계, 수학 전공자 및 AI 모델 실무 적용 및 상용화 경험\n \n - 반도체/제조/산업 데이터 프로젝트 경험\n \n - 대규모 데이터 처리, MLOps 및 클라우드 활용 능력\n \n - 프로젝트 리딩 경험\n \n \n 신입 우대\n \n - Kaggle, Github 등 프로젝트/연구 경험\n \n - 논문 구현, 개인 AI 프로젝트 경험\n \n - 시계열 데이터, 이상 탐지 연구 경험",
+          "지원 마감일": "2026.08.29",
+        },
+        {
+          회사명: "주식회사 프리그로우",
+          공고제목: "[경력]로보틱스·UWB R&D 엔지니어 채용(0명)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54320837&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=b1fd8766-504c-4bc4-8017-ebbb643ce40a&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "부산 동구 중앙대로 288 홍인빌딩 7층",
+          근무지역_코드: "4",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "- Python 능통 (로봇/제어/데이터 처리 또는 SDK 개발 경험)\n \n - ROS(ROS1/ROS2) 사용 경험\n \n - 좌표계·경로계획·상태제어 등 제어 기본기\n \n - 실제 하드웨어(로봇·드론·AGV)를 움직여본 경험\n \n - 깔끔한 코드·문서 작성 능력 (남이 따라 쓸 예제를 만들 수 있는 수준)",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3~10년",
+          경력연차_숫자: "3",
+          직무명: "로보틱스·UWB R&D 엔지니어",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "- UWB 개발자 키트(Q1)용 Python SDK·예제 코드·튜토리얼 작성 및 GitHub 공개\n \n - 측위 데이터 기반 드론 가이던스·경로 제어 개발\n \n - ROS 기반 AGV/모바일 로봇 자율주행 제어 연구·개발\n \n - 기성 드론·로봇을 측위·플랫폼에 연동해 제품화\n \n - 측위·센서·카메라 데이터 연동 (사내 백엔드와 협업)\n \n - 정부 R&D 과제 수행",
+          인재상_원문:
+            "- 논문·데모로 끝내지 않고 실제로 움직이는 걸 만드는 데 재미를 느끼는 사람\n \n - 내가 만든 예제·SDK를 남이 잘 쓰는 데서 보람을 느끼는 사람\n \n - 검증된 오픈소스를 영리하게 활용하고, 우리만의 가치는 그 위에 쌓는 실용주의자\n \n - 초기 R&D를 주도적으로 끌고 갈 수 있는 사람\n \n - 시키기 전에 먼저 움직이는 사람",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문: "",
+          "지원 마감일": "채용시 마감",
+        },
+        {
+          회사명: "엔셀 주식회사",
+          공고제목: "AI 사업부 인공지능 개발자 (신입)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54320347&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=b1fd8766-504c-4bc4-8017-ebbb643ce40a&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강남구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관 (예정자 가능)",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "대졸이상\n 전반적인 AI 기술에 대한 이해가 있으신 분\n Vision/TimeSeries/NLP 딥러닝 모델에 대한 이해 및 학습경험\n 딥러닝 프레임워크(Pytorch, Tensorflow 등) 사용\n 데이터를 분석하거나 모델링을 통해 결과를 도출해낸 경험이 있으신 분",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "무관",
+          경력연차_숫자: "0",
+          직무명: "인공지능 개발자",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "인공지능 알고리즘 개발 및 연구\n 인공지능 서비스 솔루션 개발\n Vision Time Series NLP 데이터 처리 및 분석\n 언어: Python",
+          인재상_원문:
+            "사람과 기술을 연결하고 협업하는 세상을 만들어 나가는 기업",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문: "PMP 자격증 소지자 우대",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)에이아이세스",
+          공고제목: "[AICESS] 웹개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54319694&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=b1fd8766-504c-4bc4-8017-ebbb643ce40a&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역:
+            "경기 성남시 수정구 창업로 54 판교제2테크노밸리기업성장센터",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "대졸(2,3년제) 이상",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "• Java 및 Spring, Framework, Spring boot 기반 웹 개발 경험\n \n • Mybatis JSP, X-Javascript, jQuery, ASP, PHP 등 관련 기술 스텍 경험\n \n • MSSQL 또는 PostgreSQL, Oracle 운영 경험",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "5~5년",
+          경력연차_숫자: "5",
+          직무명: "웹 개발자",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "• 제조업 FA 시스템 개발 및 운영\n \n • 사내 IT 시스템 개발 및 운영\n \n • API 개발 및 외부 시스템 인터페이스 연동 개발\n \n • 사용자 요구사항 분석 및 시스템 설계",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 제조업 기반 IT 시스템( ERP, MES, QMS, SCM 등) 운영 경험\n \n • 복수의 프로젝트 관리 및 협업 경험\n \n • Linux, Window, WAS 서버 관리 경험\n \n • 코드 품질 개선 및 리팩토링 경험\n \n • Git, SVN 등의 형상 관리 도구 활용 경험\n \n • 원활한 커뮤니케이션 능력과 문제 해결 역량",
+          "지원 마감일": "2026.07.31",
+        },
+        {
+          회사명: "(주)클러쉬",
+          공고제목: "(주) 클러쉬 Full Stack 경력 개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54319630&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=8270a6f2-9656-4ba2-8a19-35211448c3be&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역:
+            "서울 강남구 테헤란로20길 9 동궁빌딩 (또는 수도권 고객 Project Site)",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "SI 프로젝트 또는 IT운영 프로젝트 10년 이상 경험 (Full Stack), 백엔드 및 프론트엔드 필수 기술요건 만족",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "10년 이상",
+          경력연차_숫자: "10",
+          직무명: "Full Stack 경력 개발자",
+          직무_카테고리_코드: "M3",
+          주요업무_원문:
+            "- 대고객 SI 프로젝트 수행 및 기술지원 업무\n \n - PL(프로젝트 리더)급 역할 수행\n \n - AI OCR 솔루션 개발 및 구축\n \n - LLM/RAG 기반 AI 서비스 기능 개발 및 고도화\n \n - AI 기반 엔터프라이즈 문서처리 플랫폼 유지보수 및 기술지원\n \n - 신규 AI 플랫폼 구축 및 개발",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "[백엔드 우대]\n \n - MSA, Kubernetes, Docker 기반 컨테이너 운영 및 CI/CD 환경 경험\n \n - 폐쇄망/온프레미스 환경 빌드·배포 경험\n \n - Gradle 멀티모듈 프로젝트 설계·운영 경험 등 (상세내용 본문 참조)\n \n [프론트엔드 우대]\n \n - Styling & Design System 구축 경험\n \n - AI 서비스 UI 개발 경험\n \n - 데이터 시각화 컴포넌트 개발 경험 등\n \n [기타 우대]\n \n - 프론트엔드와 백엔드 간 인터페이스 조율 경험\n \n - ChatGPT, Claude 등 LLM 서비스에 대한 이해 또는 관련 학위 등",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)아인잡",
+          공고제목: "프론트엔드 개발자 (경력)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54319630&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=8270a6f2-9656-4ba2-8a19-35211448c3be&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강남구 강남대로 310, 1701호",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "1.프런트엔드 실무 경력 3~4년\n \n 2.React 기반 개발 경험\n \n 3.Next.js(12~13+) 기반 SSR/CSR 개발 경험 등 자격요건 10가지 만족",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3~10년",
+          경력연차_숫자: "3",
+          직무명: "프론트엔드 개발자",
+          직무_카테고리_코드: "M1",
+          주요업무_원문:
+            "1. HR 서비스 웹 프론트 개발\n \n 2. UI/UX 품질 향상 및 구조 설계\n \n 3. API 연동 및 상태 관리\n \n 4. 프론트 개발 환경 및 공통 모듈 구축\n \n 5. 운영 및 협업\n \n 6. WebView 기반 Hybrid App 화면 개발",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• Next.js 13 (app router) 경험\n \n • React Query, Zustand, SWR 등 최신 데이터 패칭 라이브러리 사용 경험\n \n • Storybook 기반 컴포넌트 문서화\n \n • Jest / Testing-library 기반 테스트 경험\n \n • HR/CRM/오퍼레이션 관리자 UI 개발 경험\n \n • AI Agent 활용 UI 개발 경험 (우대)\n \n • 앱 배포 프로세스 경험",
+          "지원 마감일": "2026.07.26",
+        },
+        {
+          회사명: "(주)세미파이브",
+          공고제목: "SoC Generator Design(Scala/Chisel) Engineer",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54319412&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=8270a6f2-9656-4ba2-8a19-35211448c3be&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 성남시 분당구, 성남시, 수원시",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "ㆍScala/Chisel기술에 대한 열정과 관심이 있으신 분\n \n ㆍ디지털 회로 및 SoC 설계에 대한 지식이 있으신 분\n \n ㆍVersion Control system (Git, Perforce, etc.) 사용 능력이 있으신 분\n \n ㆍ객체 지향 및 함수형 프로그래밍에 대한 이해가 있으신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "1~10년",
+          경력연차_숫자: "1",
+          직무명: "SoC Generator Design(Scala/Chisel) Engineer",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "ㆍScala/Chisel을 사용한 고성능 반도체 및 반도체 플랫폼 설계 및 개발\n \n ㆍSoC 설계 프로세스의 자동화 및 최적화\n \n ㆍScala/Chisel, FIRRTL, CIRCT(Circuit IR Compilers and Tools)등 최신 기술 동향에 대한 연구 및 적용\n \n ㆍ팀과 협력하여 프로젝트 목표 달성",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "영어로 업무 수행이 가능하신 분",
+          우대사항_원문:
+            "ㆍAMBA interface (APB/AHB/AXI/CHI) 에 대한 인해가 있으신 분\n \n ㆍComputer Architecture (CPU, Memory hierarchy)에 대한 지식이 있으신 분\n \n ㆍLinux 환경, Shell script, Python, JAVA, C에서의 소프트웨어 개발 경험 및 능력이 있으신 분\n \n ㆍ영어로 업무 수행이 가능하신 분\n \n ㆍLinux 서버 및 네트워크 응용에 대한 이해가 있으신 분",
+          "지원 마감일": "2026.07.29",
+        },
+        {
+          회사명: "(주)일신비츠온",
+          공고제목:
+            "[경력] 전산관리본부 ICT 개발팀 개발자 경력직 채용(JAVA, JSP)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54319221&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=8270a6f2-9656-4ba2-8a19-35211448c3be&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중견기업",
+          기업규모_코드: "B",
+          근무지역: "경기도 구리시 갈매중앙로 190",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "초대졸 이상 (졸업예정자 가능)",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "ㆍ학력 : 초대졸이상 (졸업예정자 가능)\n \n ㆍ경력 : 10년 이상\n \n ㆍ나이/성별 무관",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "10년 이상",
+          경력연차_숫자: "10",
+          직무명: "개발자 (전산팀)",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "ㆍJava, Jsp, Spring 4.3, Ms-Sql 2019\n \n ㆍ사내 전산프로그램 유지보수",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "ㆍWMS, 물류/유통 ERP 개발/유지보수 경험\n \n ㆍAWS EC2, RDS, S3 등 주요 서비스 운영 및 관리 경험\n \n ㆍAI 기반 코드 품질 분석 및 자동화 도구 활용 경험\n \n ㆍAI 기반 검색/추천 시스템 개발 경험\n \n ㆍ머신러닝/딥러닝 모델을 활용한 데이터 처리 및 분석 경험",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)유니코써치",
+          공고제목: "[라이프스타일 테크 플랫폼] 백엔드 개발자 (커머스 경력자)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54318410&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=8270a6f2-9656-4ba2-8a19-35211448c3be&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강남구 테헤란로87길 36 도심공항타워",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• 5년 이상의 개발 경력이 있으신 분\n \n • Spring boot Framework 기반 API 서버 개발 경험이 있으신 분\n \n • 다양한 Problem-Solving 경험과 스킬을 갖추신 분\n \n • 같이 일하는 동료에게 기술적 가이드를 제시하고 기술 인사이트를 제시할 수 있는 분\n \n • 자기 주도적으로 이슈를 선정하고 개발을 진행할 수 있으신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "5~7년",
+          경력연차_숫자: "5",
+          직무명: "백엔드 개발자",
+          직무_카테고리_코드: "M2",
+          주요업무_원문:
+            "• 핵심 서비스를 개발, 유지보수.\n \n • 프로그래밍 언어 상관없이 솔루션의 핵심 프로그래밍 문제를 해결하고 구현.\n \n • Loose Coupling을 통해 확장성 있으면서 유연한 서비스 아키텍쳐를 설계 및 구현.\n \n • 요구사항에 대한 기술 Research를 수행하고 적합한 기술을 제안.\n \n • 새로운 기술 도입 향상을 위한 의견을 공유하고 사내 컨퍼런스를 통해 교육을 진행.\n \n • React, TypeScript, styled-components를 기반으로 재사용 가능한 UI 컴포넌트와 모듈화된 로직을 구현.",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 기술 중심이 아닌 유저&비즈니스 중심적인 태도를 가지고 계신 분\n \n • 코드 재사용 및 확장성에 대한 이해가 깊으신 분\n \n • 채팅 서비스 구조 설계 경험이 많으신 분\n \n • 클라우드 컴퓨팅 서비스 경험이 많으신 분 (AWS 등)",
+          "지원 마감일": "채용시 마감",
+        },
+        {
+          회사명: "(주)엔엠소프트",
+          공고제목: "[울산]소프트웨어 개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54318380&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=8270a6f2-9656-4ba2-8a19-35211448c3be&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "울산 남구 대공원로 241",
+          근무지역_코드: "7",
+          근무형태: "정규직, 계약직",
+          학력요건: "대졸(4년제) 이상(예정자 가능)",
+          학력_코드: "H3",
+          전공요건: "전기/전자공학, 컴퓨터/시스템공학, 산업공학",
+          자격요건:
+            "• 신입 / 경력 2년 이상 ~ 20년 이하\n \n • 대학교졸업(4년)이상, 졸업 예정자 지원가능\n \n • 보유역량: 인근거주자",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "2~20년",
+          경력연차_숫자: "2",
+          직무명: "소프트웨어 개발자",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "• 자사 솔루션 개발 및 유지보수\n \n • C#, ASP.Net, Blazor\n \n • 스마트팩토리\n \n • MS-SQL, My-SQL\n \n • 개발이 즐거운 책임감 있는 인재를 모집합니다.\n \n • 주임/과장/부장 직급으로 함께할 예정이에요.",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 전공: 전기/전자공학, 컴퓨터/시스템공학, 산업공학\n \n • 보유역량: 운전가능자, 해당직무 근무경험",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "몬드리안에이아이(주)",
+          공고제목: "Product Manager (AI & Cloud)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54314622&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=8270a6f2-9656-4ba2-8a19-35211448c3be&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "인천 연수구 (재택근무 가능)",
+          근무지역_코드: "9",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "- PM / PO / 서비스 기획 등 제품 기획 및 프로젝트 관리 역할을 3년 이상 수행해 보신 분\n \n - 요구사항 정리 수준을 넘어, 무엇을 왜 만들지에 대한 판단과 우선순위를 직접 결정해 본 경험이 있는 분\n \n - 사용자 서비스와 관리자(Admin/Back-Office) 화면을 함께 설계 · 운영해 본 경험이 있는 분\n \n - 정성적 VoC와 정량적 데이터를 함께 활용해 문제를 정의하고 개선해 본 경험이 있는 분\n \n - 개발자 · 디자이너 · 비즈니스 조직과 협업하며, 명확하게 소통하실 수 있는 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "Product Manager (AI & Cloud)",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "1. 클라우드, 에이전트 프로덕트의 기획/운영 및 프로젝트 관리 (50%)\n \n - 정의된 제품 방향 안에서 담당 영역의 사용자 문제를 구체화하고, 우선순위와 실행 계획을 수립합니다.\n \n - 추상적인 요구사항을 기능 단위로 구조화하여, 개발 · 디자인 조직이 바로 실행할 수 있도록 문제 정의 > 해결안 > 범위로 정리합니다.\n \n - 신규 기능 및 개선 과제에 대해 PRD를 작성하고, 화면 · 정책 · 데이터 흐름 · 결제/정산 구조를 직접 설계합니다.\n \n - 담당 기능의 정책과 흐름이 플랫폼 전반과 일관되도록 챙기며, 의사결정의 배경 · 대안 · 트레이드오프를 정리해 제안합니다.\n \n \n 2. 제품 운영 및 사용자 경험 개선 주도 (30%)\n \n - VOC, 사용 데이터, 운영 이슈를 기반으로 개선 과제를 발굴하고 우선순위를 조정합니다.\n \n - 고객 문의를 단순 대응에 그치지 않고 제품 인사이트로 전환해 구조적인 개선으로 연결합니다.\n \n - 릴리즈 계획, 배포 일정, 장애 이슈를 관리하며 안정적인 제품 운영과 품질을 챙깁니다.\n \n - 제품 가이드·매뉴얼(국/영문)을 온보딩 경험의 일부로 설계합니다.\n \n \n 3. 비즈니스 성과와 제품의 연결 (20%)\n \n - 제품 관점에서 매출·전환·활성화 등 핵심 지표를 정의하고 추적합니다.\n \n - 마케팅·세일즈·전시회(AI Expo 등)와 연계하여, 제품 메시지·데모·고객 피드백을 제품 개선으로 환류합니다.",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- B2B SaaS, AI Agent 플랫폼 제품에서 서비스 기획자 또는 PM 직무를 수행한 경험\n \n - 결제·정산·과금 등 비즈니스 크리티컬한 도메인의 정책을 개선해본 경험\n \n - 제품 지표를 정의하고, 대시보드/리포트 기반으로 개선을 제안해 본 경험\n \n - AI, 인프라, 클라우드 대상 제품에 대한 이해 또는 기술 기반 제품에 대한 학습 의지가 높은 분",
+          "지원 마감일": "채용시 마감",
+        },
+        {
+          회사명:
+            "(주)키스템프그룹 (채용대행, 실제 AI헬스케어 기업명은 비공개)",
+          공고제목: "[정규직] AI헬스케어기업 서비스기획자 / 사업관리 다수 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54314576&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=8270a6f2-9656-4ba2-8a19-35211448c3be&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 서대문구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "초대졸 이상",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "- 보험사 상품기획 또는 헬스케어 플랫폼 제휴 업무 경험자\n \n - 헬스케어 데이터 또는 보험 상품(Underwriting, 보장분석)의 구조에 대한 이해도",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "Predict Health 사업본부 - 사업관리",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "[플랫폼 적용 전략 및 확장]\n \n - 자사 헬스케어/데이터 플랫폼을 보험업 및 헬스케어 산업 전반에 적용하기 위한 진입 전략 수립\n \n - 보유 기술(AI, 데이터 분석 등)을 활용하여 헬스케어 기업의 니즈를 해결할 수 있는 신규 사업 모델 설계\n \n [버티컬 서비스 발굴]\n \n - 자사 헬스케어/데이터 플랫폼을 헬스케어 산업 전반에 적용하기 위한 진입 전략 수립\n \n - 시장 트렌드 및 경쟁사 분석을 기반으로 차별화된 서비스 기획\n \n [신규 제휴 및 사업 타당성 검토]\n \n - 신규 버티컬 서비스 런칭을 위한 핵심 파트너사(보험사, GA, 의료기관 등) 발굴 및 제휴 제안\n \n - 신규 사업의 수익성 분석 및 기술적/법적 실현 가능성 검토",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- 대기업 헬스케어 사업부, IT 플랫폼 기업, 또는 헬스케어 전문 스타트업에서의 성공적인 서비스 런칭 경험\n \n - AI(LLM), Big Data 기술에 대한 이해도가 높은 분",
+          "지원 마감일": "2026.07.06",
+        },
+        {
+          회사명: "디케이엠텍(주)",
+          공고제목: "디케이엠텍(주)에서 함께 성장할 SW 개발자를 찾고 있어요",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54259002",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "대전 유성구",
+          근무지역_코드: "5",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "전자 공학 / 컴퓨터 공학 등 소프트웨어 관련 학과 우대",
+          자격요건:
+            "• 경력 무관 (신입 지원 가능) • 학력무관 • SW개발 숙련자 • 주요 프로그래밍 언어: C/C++, C#, 파이썬 등 • 개발 환경: 리눅스, 임베디드리눅스, 윈도우즈 • 학력 제한 없음 (능력 우선)",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "SW 개발자",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "• 소프트웨어 개발 및 유지 보수 업무 수행 • 데이터 분석 및 시스템 개선 • 고객 요구 사항 분석 및 반영 • 신규 프로그램 설계 및 개발 업무",
+          인재상_원문: "",
+          우대_자격증: "운전 면허",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 수학, 공학 문제 해결 능력 • AI기반 영상 처리 능력 • 전자 공학 / 컴퓨터 공학 등 소프트웨어 관련 학과 • 운전 면허 보유",
+          "지원 마감일": "2026.07.26",
+        },
+        {
+          회사명: "(주)하닉스",
+          공고제목: "(주)하닉스 설비 소프트웨어 개발자(C#/WPF) 채용합니다.",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54258912",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 금천구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• 경력 5년 이상 • 학력무관 • WPF, C#(.NET) 기반 개발 경험이 풍부하신 분 • MS SQL 활용 및 SQL 작성·분석 역량을 보유하신 분 • 요구사항 분석부터 설계, 개발, 운영까지 주도적으로 수행할 수 있는 분 • 생산 현장의 업무 흐름을 이해하고 시스템으로 구조화할 수 있는 분 • 장비 업체 및 현업 담당자와 원활한 기술 협의를 수행할 수 있는 분 • 운영 중인 시스템의 문제를 파악하고 개선 방향을 제안할 수 있는 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "5년 이상",
+          경력연차_숫자: "5",
+          직무명: "설비 소프트웨어 개발자(C#/WPF)",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "• 생산설비 및 검사장비 운용 프로그램 개발 및 유지보수 • WPF / C#(.NET) 기반 응용프로그램 개발 • MS SQL 기반 데이터 처리, 쿼리 작성 및 성능 개선 • 신규 설비 도입 시 장비 업체와의 기술 협의 및 인터페이스 검토 • 장비 데이터 수집 및 연계 기능 개발 • 장비 통신 및 제어 기능 개발 • 현업 요구사항 분석 및 기능 기획 • 운영 이슈 분석 및 장애 대응 • 기존 시스템 구조 개선 및 안정화 • 사용자 편의성 및 운영 효율 향상을 위한 기능 고도화",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- • 제조업 또는 생산설비 관련 소프트웨어 개발 경험 - • 검사장비, 자동화 설비, 생산설비 운용 프로그램 개발 경험 - • TCP/IP, Serial 통신 등 장비 인터페이스 개발 경험 - • 레거시 시스템 분석 및 리팩토링 경험 - • 외부 업체와 기술 협의 및 프로젝트 수행 경험 - • 유관부서와의 원활한 커뮤니케이션 역량 - • Claude Code, ChatGPT, GitHub Copilot 등 AI 기반 개발 도구 활용 경험",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "(주)브이앤지",
+          공고제목: "[판교] IT부분 시스템 및 서비스 기획자 모집",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54258752",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 성남시 수정구",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• IT 부문 시스템 및 서비스 기획 경력 (2년 ~ 5년) \\n• PT 포함 문서 작성 역량 갖춘 분 \\n• 시스템 및 서비스 개발, 디자인, IT, 비즈니스 전반에 대한 이해와 오너십을 갖춘 분 \\n• IT 기술과 데이터를 기반으로 고객의 니즈를 확인하고 서비스를 개선 시킬 수 있는 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "2년 이상",
+          경력연차_숫자: "2",
+          직무명: "시스템 및 서비스 기획자",
+          직무_카테고리_코드: "M5",
+          주요업무_원문:
+            "• 시스템 / 서비스 / 제품 기획 및 문서작업 \\n• GIS / AI / 디지털트윈 관련 제품 및 서비스 기획 \\n• 정부 / 지자체 / 공공기관 업무시스템 기획 \\n• 정부지원 공모사업과 연구사업 사업계획서 작성 \\n• 제품 및 서비스 기획서 기반 내부 직원과 외부 고객 커뮤니케이션 \\n• 시스템 / 서비스 / 제품 관련 제안서 작성",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준:
+            "• IT 관련 전공 우대 (필수 사항 아님) \\n• 본인이 기획한 시스템과 서비스를 내부 직원과 외부 고객에게 잘 설득할 수 있는 능력을 갖춘 분 \\n• PT 포함 문서 작성 능력이 우수한 분 \\n• 영어 능력 우수한 분",
+          우대사항_원문: "2026-07-23 00:00:00",
+          "지원 마감일": "",
+        },
+        {
+          회사명: "(주)마디",
+          공고제목: "[(주)MADI] 생성모델 기반 의료 LLM 개발자 모집",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54258717",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강남구",
+          근무지역_코드: "1",
+          근무형태: "정규직, 계약직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건:
+            "컴퓨터공학, AI/ML, 데이터사이언스, 의생명정보학 등 관련 분야 전공자 또는 동등한 실무 경험",
+          자격요건:
+            "• 컴퓨터공학, AI/ML, 데이터사이언스, 의생명정보학 등 관련 분야 전공자 또는 동등한 실무 경험\n • Python 기반 LLM 서비스 또는 데이터 파이프라인 개발 경험\n • LLM API, RAG, Agent Framework, Vector DB 중 하나 이상 활용 경험\n • SQL 기반 데이터 처리 및 CDW/DB 연동 개발 역량\n • Git 기반 협업 및 코드 리뷰 경험",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "AI 개발자 (의료 LLM 개발자)",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "• CDW 데이터 기반 의료 LLM Agent 설계 및 개발\n • EHR/임상 문서/검사/처방 데이터 연동 파이프라인 구축\n • RAG 기반 임상 데이터 질의응답 워크플로우 개발\n • 의료 LLM Agent 성능 평가, 오류 분석 및 프롬프트/검색/추론 로직 개선\n • 의료진 및 연구자 요구사항을 반영한 AI 기능 프로토타이핑 및 문서화",
+          인재상_원문:
+            "• 의료 AI가 실제 임상 현장에 미치는 임팩트에 관심이 있는 분\n • 복잡한 의료 데이터를 LLM이 활용 가능한 형태로 구조화하는 데 흥미가 있는 분\n • 빠르게 실험하고, 실패 원인을 분석하며, 제품 수준으로 개선하는 것을 즐기는 분\n • 연구와 개발의 경계에서 문제를 정의하고 끝까지 구현하는 분",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 의료 LLM, 의료 NLP, 임상 데이터 분석 관련 연구 또는 개발 경험\n • CDW, EMR/EHR, FHIR, OMOP 등 의료 데이터 구조 이해 및 활용 경험\n • 임상 문서, 진료기록, 검사/처방 데이터 기반 모델링 경험\n • RAG, Agent 관련 개발 경험\n • 의료 AI 관련 논문, 오픈소스, 프로덕트 개발 또는 PoC 경험",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "(주)플렉스데이",
+          공고제목: "JAVA 백엔드 개발자",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54258532",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "부산 부산진구 (재택근무 가능)",
+          근무지역_코드: "9",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• 백엔드 개발 2년 미만 또는 신입 (학력무관)\n • Java / Spring Boot, JPA 실무 경험\n • RDBMS 설계 및 쿼리 튜닝 경험\n • REST API 설계·운영 경험\n • AWS 등 클라우드 운영 경험\n • Git 기반 협업·코드 리뷰 문화에 익숙한 분",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "JAVA 백엔드 개발자",
+          직무_카테고리_코드: "M2",
+          주요업무_원문:
+            "• Spring Boot 기반 백엔드 서비스 개발·운영\n • 신규 기능 설계·개발 및 기존 시스템 고도화\n • 결제·정산 등 정합성이 중요한 비즈니스 로직 개발\n • 외부 채널 및 다양한 디바이스 연동 API 개발\n • 클라우드 인프라 · CI/CD 파이프라인 개선",
+          인재상_원문:
+            "• 결제·정산처럼 돈이 오가는 로직을 책임감 있게 다룰 줄 아는 분\n • 새로운 기술에 대한 두려움이 없는 분\n • 업무에 대한 Ownership을 가지고 주도적으로 업무 수행이 가능한 분",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• ★ Claude Code 등 AI 코딩 에이전트 활용 경험이 풍부하신 분\n • ★ 오픈소스 컨트리뷰터 경험\n • ★ 알고리즘 실력 (Baekjoon, Codeforces, LeetCode 등)\n • ★ 메시지 큐(RabbitMQ, Kafka 등) 비동기 아키텍처 경험\n • ★ 결제 · 커머스 · O2O 도메인 경험\n \n [기술 스택]\n BACKEND: Java, Spring Boot, Spring Data JPA, QueryDSL\n DATABASE: MySQL, MariaDB\n INFRA: AWS, Docker, GitHub Actions\n TOOLS: Git, Slack, Jira, Notion",
+          "지원 마감일": "2026.08.22",
+        },
+        {
+          회사명: "(주)아웃라이어",
+          공고제목: "[OUTLIER] AI 엔지니어 모집(신입/경력)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54258475",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 금천구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "컴퓨터 공학 또는 관련 학과 전공자 (신입 기준)",
+          자격요건:
+            "• 신입: 4년제 컴퓨터 공학 또는 관련 학과 전공자\\n• 나이 / 성별 무관",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "AI 활용 엔지니어",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "• 사내 AI 에이전트를 활용한 코드 설계/자동화/문서화 및 운영 업무 효율화\\n• 사내 운영 시스템, 문서, 로그 데이터를 활용한 AI 기반 업무 도구 기획 및 개발\\n• 운영 중인 서비스(솔루션)의 유지보수, 장애 대응 및 성능 개선\\n• 레거시 시스템 개선 및 리팩토링을 통한 안정성 및 확장성 강화",
+          인재상_원문: "",
+          우대_자격증: "정보처리기사",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 개발표준 문서(UML 등)에 익숙하신 분\\n• LangChain, LangGraph 등 Agent Framework 또는 RAG 기반 서비스 개발 경험이 있으신 분\\n• Claude Code, Codex, Cursor, GitHub Copilot 등 AI 코딩 에이전트 활용 경험이 있으신 분\\n• 프롬프트 엔지니어링 및 하네스 엔지니어링 경험이 있으신 분\\n• AI 기반 서비스 및 AI Agent 기획·설계·개발 경험이 있으신 분\\n• 머신러닝/딥러닝 모델 개발, 학습 및 서비스 적용 경험이 있으신 분\\n• AWS(Amazon Web Service) 기반 인프라에 대한 관심 및 경험이 있으신 분\\n• MSA(Micro Service Architecture)에 대한 관심 및 경험이 있으신 분\\n• 원활한 협업을 위한 커뮤니케이션 능력을 가지신 분\\n• 백엔드뿐 아니라 클라이언트, 인프라, AI 도구 등 다양한 영역에 도전하는 것을 즐기시는 분\\n• 신기술 트렌드에 관심이 많고 자기개발을 꾸준히 하시는 분\\n• 컴퓨터/시스템공학 계열 전공자\\n• 정보처리기사 자격증 취득자\\n• 인근 거주자\\n\\n[팀 사용 기술 및 개발 환경]\\n• Claude Code / Codex\\n• SpringBoot / MyBatis / Java\\n• Node.js\\n• React.js\\n• Flutter / Dart\\n• C# / WinForms / WPF\\n• MySQL / Oracle / PostgreSQL\\n• Docker / Kubernetes\\n• MSA(Micro Service Architecture)\\n• HTTP / gRPC / WebSocket\\n• Prometheus / Grafana\\n• AWS(ECS / EC2 / EFS / MSK / RDS / CodePipeline)\\n• Zookeeper\\n• Kafka\\n• Redis\\n• ELK Stack\\n• Machine Learning / Deep Learning\\n• Spark / Hadoop HDFS / Apache HIVE\\n• Nginx\\n• Github\\n• Windows / Mac",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "(주)에이치솔루션즈",
+          공고제목: "백엔드 개발자 채용(AI·IoT 서비스 연동 경험 우대)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54258238",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "대전 서구",
+          근무지역_코드: "5",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• 경력 3년 이상\\n• 학력무관\\n- 웹 서비스 개발 경력 3년 이상이신 분\\n- Python 기반 프레임워크(FastAPI, Django) 또는 Node.js/NestJS를 활용한 실무 경험이 있으신 분\\n- PostgreSQL, MySQL 등 RDB 설계 및 운영 경험이 있으신 분\\n- REST API 설계 및 개발 경험이 있으신 분\\n- Git 기반의 협업 및 코드 관리 경험이 있으신 분\\n- AWS, GCP, Azure, Supabase 등 클라우드 환경에서의 개발 또는 운영 경험이 있으신 분\\n- 서비스 운영, 유지보수 및 장애 대응 경험이 있으신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "백엔드 개발자",
+          직무_카테고리_코드: "M2",
+          주요업무_원문:
+            "• AI·IoT 연동 백엔드 API를 개발\\n• 서비스 데이터 흐름을 설계하고 운영\\n• 외부 시스템 연동과 인증을 구현\\n• 배포 자동화와 모니터링을 구축\\n• 장애 원인을 분석",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- AI 서비스 또는 AI API 연동 경험이 있으신 분\\n- IoT 기기, 장비 데이터 수집 및 외부 시스템 연동 경험이 있으신 분\\n- 모바일 앱 서비스의 백엔드 개발 경험이 있으신 분\\n- 스타트업 또는 소규모 조직에서 다양한 역할을 주도적으로 수행해 보신 분\\n- 프론트엔드 개발 경험이 있거나, 백엔드와 프론트엔드 간 연동 구조에 대한 이해가 있으신 분",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "(주)슈프리마",
+          공고제목: "[슈프리마] 웹서버 개발자 모집",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54258105",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 성남시 분당구",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "- 웹서버, 네트워크, 데이터베이스에 대한 기본 이해 및 실무 활용 역량을 보유하신 분\\n- Java/Spring 기반의 백엔드 개발 경험이 있으신 분\\n- C++ 개발 경험이 있거나, 기존 시스템 및 레거시 환경에 대한 이해가 있으신 분\\n- 레거시 시스템의 문제를 구조적으로 분석하고, 끈기 있게 원인을 파악하여 개선해본 경험이 있으신 분\\n- 새로운 기술과 개발 트렌드에 대한 학습 의지가 높고, 이를 업무 개선이나 성과로 연결할 수 있는 분\\n- 타 부서 및 내부 구성원과 원활하게 소통하며 협업할 수 있는 분\\n- 학력 : 학사 이상\\n- 경력 : 4년 이상",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "4년 이상",
+          경력연차_숫자: "4",
+          직무명: "웹서버 개발자",
+          직무_카테고리_코드: "M2",
+          주요업무_원문: "- 출입통제 SW 개발",
+          인재상_원문:
+            "우리 부서는 코드 리뷰, 설계 리뷰를 진행합니다. 리뷰의 목적은 서로의 부족한 점을 조언하고, 리뷰를 통해 업무를 파악 및 좋은 코드를 배우는 것입니다. 이 모든 과정에는 '존중'이라는 가치를 통해 서로가 부담 없이 의사 표현을 할 수 있는 문화를 지향하고 있습니다.\\n소통 과정은 민주적이고 자유로우며 역할 중심의 소통을 지향합니다.",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- 출입통제 SW 도메인에 대한 이해가 있거나, 관련 제품 개발에 관심과 열의를 보유하신 분\\n- AI 기반 개발 도구를 활용하여 개발 생산성을 높여본 경험이 있으신 분\\n- 네트워크, 보안, 대용량 트래픽 처리에 대한 이해 또는 관련 개발 경험이 있으신 분\\n- JavaScript 및 React, Vue 등 Front-end 프레임워크 기반 개발 경험이 있으신 분\\n- 풀스택 개발을 선호하시는 분",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "(주)에이아이세스",
+          공고제목: "[AICESS] 장비보안관제 시스템 개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54258033",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 성남시 수정구",
+          근무지역_코드: "2",
+          근무형태: "계약직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "• 경력 : 3년이상~ ※ 해당 직무(산업 자동화 SW개발, 설비 제어 및 연동) 3년 이상 경력\\n• Java 및 HTML / X-javascript를 활용한 웹/서버 개발 경험\\n• Kafka를 이용한 실시간 데이터 파이프라인 구축 및 메시징 처리 경험",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "장비보안관제 시스템 개발자",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "• 설비 제어 및 유지보수\\n- 자동화 설비 제어 프로그램 개발 및 관리\\n- 제조 및 물류 자동화 설비의 안정적인 운영을 위한 제어 시나리오 설계 및 프로그램 개발\\n- 기존 제어 시스템의 고도화, 트러블슈팅 및 지속적인 유지보수\\n• 데이터 기반 솔루션 개발\\n- 설비 데이터 수집 및 분석 SW 개발\\n- 생산 설비로부터 발생하는 실시간 데이터 수집 및 모니터링 시스템 구축\\n- 상위 시스템(MES/ERP 등) 연동\\n- 현장 설비 데이터와 MES, ERP, 비즈니스 로직 간의 인터페이스 설계 및 데이터 동기화\\n• 기술 문서화 및 현장 지원\\n- 시스템 운영 기술 문서 작성\\n- 개발 표준 정의서, 시스템 아키텍처 다이어그램, 운영 가이드 및 매뉴얼 작성\\n- 현장 기술 지원\\n- 시스템 도입 및 시운전 단계에서의 현장 기술 지원, 유관 부서 대응",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준:
+            "• PLC(LS, Mitsubishi 등) 및 산업용 프로토콜(OPC UA, Modbus 등)에 대한 이해 및 연동 경험자\\n• 대용량 시계열 데이터베이스 핸들링 및 대규모 데이터 분산 처리 시스템 운영 경험자\\n• 제조업 스마트팩토리 구축 프로젝트(원격 모니터링, RMS, EES 등) 리드 경험자\\n※ 기술스택 관련 태그: #C#, #Java, #OracleDB, #SQL, #RDBMS, #SVN, #PostgreSQL, #인터페이스, #Spring, #JSP, #Javascript, #API, #Python, #DBA, #MySQL, #SQLite, #WPF, #SpringBoot, #Linux, #Windows, #jQuery, #PHP",
+          우대사항_원문:
+            "• PLC(LS, Mitsubishi 등) 및 산업용 프로토콜(OPC UA, Modbus 등)에 대한 이해 및 연동 경험자\\n• 대용량 시계열 데이터베이스 핸들링 및 대규모 데이터 분산 처리 시스템 운영 경험자\\n• 제조업 스마트팩토리 구축 프로젝트(원격 모니터링, RMS, EES 등) 리드 경험자\\n※ 기술스택 관련 태그: #C#, #Java, #OracleDB, #SQL, #RDBMS, #SVN, #PostgreSQL, #인터페이스, #Spring, #JSP, #Javascript, #API, #Python, #DBA, #MySQL, #SQLite, #WPF, #SpringBoot, #Linux, #Windows, #jQuery, #PHP",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "(주)쓰리아이",
+          공고제목: "iOS 개발자 모집",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54257713",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강남구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "[공통] - 개발 자체를 즐기고, 직접 만든 결과물에서 보람을 느끼는 분 - 변화하는 환경에 유연하게 대응하며, 그에 맞는 아키텍처를 고민하는 분 - 무언가를 만들어내는 일 자체에 진심인 분 [역량] - 컴퓨터 과학, 공학 또는 관련 분야 학사 학위 이상 - iOS 앱 개발 경력 4년 이상 - Swift, UIKit 기반 개발에 능숙하며, SwiftUI에 대한 깊은 이해 보유 - Swift Concurrency를 활용한 비동기 처리 경험 - MVVM, Clean Architecture 등 아키텍처를 직접 설계하거나 리팩토링한 경험 - Claude Code 등 AI 도구를 활용하여 개발 생산성을 향상시키고 새로운 워크플로우를 만드실 분 - AI Code Agent가 구현을 주도하고, 개발자가 뼈대를 담당하는 워크플로우를 만들어갈 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "4년 이상",
+          경력연차_숫자: "4",
+          직무명: "iOS 개발자",
+          직무_카테고리_코드: "M1",
+          주요업무_원문:
+            "- 카메라 기반 미디어 데이터 처리 및 머신러닝 모델의 앱 적용 - 외부 하드웨어 디바이스 연동 및 통신 처리 - 서비스 안정성과 기능 확장을 고려한 구조 설계 및 개발",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- AVFoundation을 활용한 카메라 작업 및 동영상 처리 경험 - Vision Framework를 통해 YOLO11, YOLO26 등 모델을 앱에 적용한 경험 - React Native를 활용한 앱 운영 및 서비스 경험 - OpenCV, Metal 등 Computer Graphics 처리 경험 - Objective-C, C++ 등 네이티브 언어를 활용한 하드웨어 연동 등 로우레벨 개발 경험",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "(주)넥스트그라운드",
+          공고제목: "프론트엔드 개발자 (전환형 인턴)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54257642&recommend_ids=eJxVzrENw0AMQ9Fp3IuSKPHqDJL9t7APRiynfPgAQSbEoL4Cjv4wHaGIh3AmfWqpfap325tKYw19ce1lu6fyYr9qovBjVJkBU5dr8aGmTDnMau%2F%2FGzaVdd3ePAHJli%2B%2B&view_type=search&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&gz=1&t_ref_content=generic&t_ref=search&relayNonce=56dc1f1365ba8948962c&paid_fl=n&search_uuid=b8de0222-f5cf-465b-9c59-c35ef9ed088b&immediately_apply_layer_open=n#seq=0",
+          기업규모: "",
+          기업규모_코드: "E",
+          근무지역: "서울 강남구",
+          근무지역_코드: "1",
+          근무형태: "정규직, 인턴",
+          학력요건:
+            "학력무관(예정자 가능, 대학 졸업자 이상 / 2026년 08월 졸업 예정자 포함)",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "- Next.js, TypeScript 기반의 웹 개발 경험이 있으신 분\\n- 주도적으로 문제를 분석하여 해결할 수 있으신 분\\n- AI를 적극적으로 활용하여 생산성을 높인 경험이 있으신 분\\n- 유저의 경험을 함께 고민하며, 타 직군과의 적극적인 커뮤니케이션이 가능하신 분\\n- 빠르게 개발하고 배포하는 문화를 경험하고 싶으신 분\\n- 대학 졸업자 이상 (2026년 08월 졸업 예정자 포함)",
+          경력유형: "신입",
+          경력유형_코드: "신입",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "프론트엔드 개발자",
+          직무_카테고리_코드: "M1",
+          주요업무_원문:
+            "- 집품 플랫폼의 유저들을 위한 프론트엔드 개발을 담당합니다.\\n- 신규 서비스의 설계부터 출시까지 함께 참여합니다.\\n- AI를 활용하여 팀의 속도와 품질을 높이기 위한 규칙을 만들기 위해 고민합니다.\\n- 집품 서비스 전반의 성능을 최적화하고 안정성을 높이기 위해 고민합니다.\\n- 웹 성능 지표, 렌더링 등 이슈를 분석하고 개선합니다.\\n- 높은 생산성 유지 및 비효율적인 구조 개선을 위한 리팩터링을 진행합니다.",
+          인재상_원문:
+            "새로운 것에 대한 두려움 없으신 분, 문제를 파악하고 개선할 의지가 있으신 분과 함께 성장하고 싶습니다.",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- Next.js, TypeScript 기반의 웹 개발 경험이 있으신 분\\n- 주도적으로 문제를 분석하여 해결할 수 있으신 분\\n- AI를 적극적으로 활용하여 생산성을 높인 경험이 있으신 분\\n- 유저의 경험을 함께 고민하며, 타 직군과의 적극적인 커뮤니케이션이 가능하신 분\\n- 빠르게 개발하고 배포하는 문화를 경험하고 싶으신 분\\n- 대학 졸업자 이상 (2026년 08월 졸업 예정자 포함)\\n\\n[기술 스택]\\n- Typescript, Next.js, React, Flutter\\n- React Query, Recoil, SWR\\n- TailwindCSS, eslint, prettier, biome\\n- GitHub Actions, Sentry\\n- Github, Slack, Notion, Figma",
+          "지원 마감일": "2026.07.10",
+        },
+        {
+          회사명: "(주)엔플럭스",
+          공고제목: "AI/딥러닝 개발자 채용 공고",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54257465",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 성남시 분당구",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "학사 이상 (석사 이상 또는 관련 연구 경험자 우대)",
+          학력_코드: "H4",
+          전공요건: "",
+          자격요건:
+            "• Python을 활용한 개발이 가능하신 분\\n• 머신러닝 및 딥러닝에 대한 기본 지식 및 경험 보유하신 분\\n• PyTorch, TensorFlow, Keras 등 딥러닝 프레임워크 사용이 가능하신 분\\n• Linux, Windows 환경에서 개발이 가능하신 분\\n• Git을 활용한 협업 경험이 있으신 분\\n• 새로운 기술을 학습하고 실제 프로젝트에 적용할 수 있으신 분\\n• 영상 처리 및 신호처리 관련 지식 보유하신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "2년 이상",
+          경력연차_숫자: "2",
+          직무명: "AI/딥러닝 개발자",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "• 생성형 AI 기반 서비스 및 기능 개발\\n• LLM/VLM 기반 질의응답 및 AI Agent 기능 개발\\n• 영상, 시계열 및 센서 데이터 기반 AI Model 개발\\n• 객체 탐지, 추적, 분류 및 이상 상황 분석 모델 개발\\n• 데이터 수집, 전처리, 학습, 평가, 배포 등 AI 모델 생명주기 전반 수행\\n• AI 모델 API 및 실제 서비스 연동\\n• 시계열 데이터 기반 AI 모델 개발 및 운영\\n• 연구개발 과제 수행 및 기술 문서 작성\\n• 팀 중간관리 및 프로젝트 일정·산출물 관리\\n• 팀원 및 유관 부서와의 협업",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "정보처리기사 등 관련 자격증",
+          우대사항_원문:
+            "• LLM, VLM, RAG 또는 AI Agent 개발 경험이 있으신 분\\n• 컴퓨터 비전, 객체 탐지 및 추적 모델 개발 경험이 있으신 분\\n• 시계열, 음성 또는 센서 데이터 분석 경험이 있으신 분\\n• C, C++, C# 중 하나 이상의 언어 사용이 가능하신 분\\n• FastAPI, Docker 및 REST API 개발 경험이 있으신 분\\n• Jetson 등 Edge AI 환경에서 모델을 배포한 경험이 있으신 분\\n• 연구과제 또는 AI+X 프로젝트 수행 경험이 있으신 분\\n• AI 데이터 구축 및 데이터 파이프라인에 대한 이해가 있으신 분\\n• 기술 문서 및 연구 보고서 작성에 능숙하신 분\\n• 관련 학과 학위를 보유하신 분 (석사 이상 우대)\\n• 정보처리기사 등 관련 자격증을 보유하신 분\\n• 끊임없는 호기심과 도전정신을 보유하신 분",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "하나에이아이(주)",
+          공고제목: "[하나AI] 웹 개발자 채용 공고(백엔드) 신입/경력(우대)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54257412&recommend_ids=eJxNj8sNQkEMA6vhHjvO70wh9N8FQg9t9jhyPFZCGETg07BXvUNOhewgAR8%2FCBX6h%2FgfE3Gh1TC2y4npy2yMWRUty06XFBKL8PZj9kwzXGl2cXcxGu4LlOoxfwGuDC%2BO&view_type=search&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&gz=1&t_ref_content=generic&t_ref=search&relayNonce=59db5c5ca2d54ce67197&paid_fl=n&search_uuid=b8de0222-f5cf-465b-9c59-c35ef9ed088b&immediately_apply_layer_open=n#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "충남 천안시",
+          근무지역_코드: "9",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "-Node.js, Python, Java/Spring 중 1개 이상 Backend 개발 경험\\n-REST API 개발 및 DB 설계 경험\\n-PostgreSQL, MySQL, MariaDB 등 RDBMS 사용 경험\\n-외부 시스템 연동 및 데이터 처리 경험\\n-서버 운영, 로그 관리, 장애 대응에 대한 기본 이해",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "웹 개발자(백엔드)",
+          직무_카테고리_코드: "M2",
+          주요업무_원문:
+            "-AI WCS 서버 기능 개발\\n-작업지시 생성, AMR/AGF 배차, 장비상태 관리 기능 개발\\n-RFID·비전 자동검수 결과 수집 및 처리 API 개발\\n-MES/WMS/ERP 연동 API 개발\\n-Operation DB, Traceability DB 연계 기능 개발\\n-사용자 권한, 로그, 알림, 운영관리 기능 개발\\n-SaaS 관제 플랫폼 Backend 및 데이터 처리 기능 개발\\n• 무인솔루션 사업본부 부서 소속, 과장/대리/차장 직급으로 함께할 예정이에요.",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "-MES, WMS, ERP, SCM 등 업무 시스템 연동 경험\\n-IoT Gateway, RFID, 장비 데이터 연동 경험\\n-WebSocket, MQTT, OPC-UA 등 통신 프로토콜 경험\\n-Cloud 환경 개발 및 배포 경험\\n-제조·물류·스마트팩토리 프로젝트 경험",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "하나에이아이(주)",
+          공고제목: "[하나AI] 웹 개발자 채용 공고(프론트엔드) 신입/경력(우대)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54257387",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "충남 천안시 서북구",
+          근무지역_코드: "9",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "-React, Vue, Next.js 중 1개 이상 개발 경험\\n-HTML, CSS, JavaScript/TypeScript 개발 가능자\\n-REST API 연동 및 데이터 기반 화면 개발 경험\\n-대시보드, 관리자 페이지, 관제 화면 개발 경험",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "웹 개발자(프론트엔드)",
+          직무_카테고리_코드: "M1",
+          주요업무_원문:
+            "-SaaS 기반 통합 관제 대시보드 개발\\n-AMR/AGF 작업현황, 장비 상태, 위치, 알람 화면 개발\\n-자재 입하, 검수, 재고, 출하 이력 조회 화면 개발\\n-KPI, 생산·물류 데이터 시각화 화면 개발\\n-관리자 화면, 사용자 권한, 운영 설정 UI 개발\\n-Backend API 연동 및 실시간 데이터 표시 기능 개발\\n• 무인솔루션 사업본부 부서 소속, 과장/대리/차장 직급으로 함께할 예정이에요.",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "-실시간 모니터링 화면 개발 경험\\n-Chart.js, ECharts, D3.js 등 데이터 시각화 경험\\n-산업용 관제, IoT, 물류, 제조 시스템 UI 개발 경험\\n-Figma 기반 화면 구현 경험\\n-WebSocket, SSE 등 실시간 통신 경험\\n[기술 스택] React, Vue, Next.js, HTML, CSS, JavaScript, TypeScript",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "하나에이아이(주)",
+          공고제목: "[하나AI] AI 개발자 채용 신입/경력(우대)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54257315&recommend_ids=eJxNj8ENAjAMA6fhHzs2ad4Mwv5bUEBq%2Bjz5dFEsRKryvYBHvSwwnhWDjSQPsir4leOHsdrWwW3Ck8qops%2B6UzYuWTswuM%2FK1xp0HyRy5ZQJZOptVVnPKlOr%2Fwgeqiy%2BJ&view_type=search&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&gz=1&t_ref_content=generic&t_ref=search&relayNonce=8467bb63945e627d4446&paid_fl=n&search_uuid=b8de0222-f5cf-465b-9c59-c35ef9ed088b&immediately_apply_layer_open=n#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "충남 천안시",
+          근무지역_코드: "9",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "• 신입 / 경력 (연수 무관) • 대학교졸업(4년)이상 -Python 기반 AI 모델 개발 경험 -Vision AI, Object Detection, OCR, Classification 등 개발 경험 -PyTorch, TensorFlow, OpenCV 중 1개 이상 활용 가능자 -데이터 전처리, 학습, 검증, 성능평가 경험 -실제 현장 데이터 기반 문제 해결에 관심이 있는 자",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "AI 개발자",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "-자재, 팔레트, 라벨, 작업자, 장애물 인식 AI 모델 개발 -RFID, OCR, 비전카메라 기반 자동검수 알고리즘 개발 -On-Device AI 적용을 위한 모델 경량화 및 추론 최적화 -현장 영상·센서 데이터 기반 이상상황 및 안전 이벤트 탐지 -수요물동량, ETA, 납기지연 등 제조·물류 운영 예측 모델 개발 -AI 모델 학습 데이터셋 구축, 성능 검증, 모델 버전관리 • 무인솔루션 사업본부 부서 소속, 과장/대리/차장 직급으로 함께할 예정이에요.",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "-YOLO, Detectron, OCR, VLM, Multimodal AI 개발 경험 -ONNX, OpenVINO, TensorRT 등 모델 변환·최적화 경험 -Edge AI, On-Device AI, NPU/GPU 추론 환경 경험 -제조, 물류, 로봇, 스마트팩토리 관련 프로젝트 경험 -RFID, 카메라, 센서 데이터 연동 경험",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "(주)토마토시스템",
+          공고제목: "[(주)토마토시스템] 솔루션 개발자 채용(경력)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54257243",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강남구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(2,3년제) 이상",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "- 학력 : 초대졸(2, 3년제) 이상 - 경력 : 관련 경력 3년 이상 - 고객사 또는 유관 부서와의 원활한 커뮤니케이션 능력을 갖춘 분 - 꼼꼼하게 이슈를 트래킹하고 문서화 할 수 있는 분 - 웹 개발에 대한 전반적인 이해도가 있는 분 - 기존 레거시 코드를 분석하고 문제 원인을 파악하여 해결할 수 있는 논리적 사고력을 갖춘 분 [필요기술] - Backend : 백엔드 프레임워크 사용 경험(예: Java, Spring Boot 등) - Frontend : HTML, CSS, JavaScript 기본 지식 및 UI 프레임워크 경험 - Database : RDBMS(MySQL , Postgre SQL 등) 기반의 SQL 쿼리 작성",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "백엔드 및 프론트엔드 개발",
+          직무_카테고리_코드: "M1",
+          주요업무_원문: "- 백엔드 및 프론트엔드 개발",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "기사자격증",
+          우대사항_원문:
+            "- 대학, 공공, 금융기관의 개발 및 기술지원 경험 우대 - 기사자격증 보유자 - UI개발툴 사용 경험자",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "(주)사이버테크프랜드",
+          공고제목: "프론트엔드 개발자 경력 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54257175",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 하남시",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건: "",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "프론트엔드 개발자",
+          직무_카테고리_코드: "M1",
+          주요업무_원문: "",
+          인재상_원문: "",
+          우대_자격증:
+            "정보처리기사, 컴퓨터활용능력, 리눅스마스터2급, ITQ 마스터",
+          우대_어학기준: "",
+          우대사항_원문:
+            "#데이터시각화 #DBMS #TypeScript #React #Git #Javascript #RestAPI",
+          "지원 마감일": "2026.07.24",
+        },
+        {
+          회사명: "알서포트(주)",
+          공고제목: "[코스닥 상장사] 소프트웨어 기술지원 엔지니어 경력 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54256999",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강동구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "기술지원, 미들웨어, 백엔드/서버개발 관련 숙련도 및 문제인식/분석력",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "소프트웨어 기술지원 엔지니어",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "알서포트 제품군 소프트웨어 기술지원 엔지니어 업무 (고객사 기술 대응 및 시스템 운영 지원)",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준:
+            "정보처리기사, 네트워크관리사, 리눅스마스터, 워드프로세서",
+          우대사항_원문:
+            "*경쟁자 우대 스킬/역량 기반 참고: 미들웨어 및 백엔드/서버 개발 경험자 우대",
+          "지원 마감일": "2026.07.06",
+        },
+        {
+          회사명: "피피에스(주)",
+          공고제목: "Open API gateway 개발자 경력직 채용 (3년이상)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54256954",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 광진구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "• 경력 3년 이상\\n• 대학교졸업(4년)이상\\nㆍ경력 : 3년↑( 공공기관 및 군 사업 프로젝트 경험자 우대 )\\nㆍJava (Spring, Camel, Mule 등)\\nㆍESB, Open API gateway 미들웨어 개발 경험자\\nㆍAI LLM, RAG 인터페이스 경험자",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "Open API gateway 개발자",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "ㆍ공공기관 및 공기업 연계사업에서 시스템 간 데이터 통합 및 연계 플랫폼(ESB) , Open API 기반 시스템 연계 설계·구축\\n- 공공기관 시스템 연계 아키텍처 설계 및 인터페이스 개발\\n- EAI/ESB 기반 표준 연계 정책 수립 및 데이터 변환 로직 구현\\n- ESB·EAI와 연계된 API Gateway 환경 설계·개발\\n- Open API (RESTful) 서비스 설계, 인증/인가(OAuth2.0, JWT 등) 구현\\n- 메시지 라우팅, 트랜잭션 관리, 어댑터/변환 모듈 개발(Java 기반)\\n- 연계 서비스 운영·모니터링 및 장애 대응 프로세스 개선\\n- 신규 시스템 연계 기술 검토 및 기술문서(명세서, 표준가이드 등) 작성",
+          인재상_원문: "",
+          우대_자격증: "정보처리기사, AWS·Kubernetes 등 관련 자격증",
+          우대_어학기준: "",
+          우대사항_원문:
+            "ㆍ정부·공공기관 정보시스템 및 클라우드 통합 연계사업 경험자\\nㆍ대용량 트랜잭션 처리 및 고가용성(HA) 구조 설계 경험자\\nㆍ오픈소스 ESB(Apache Camel, Mule ESB 등) 커스터마이징 경험\\nㆍAPI Gateway, OpenAPI, Swagger 등 서비스 연계 표준화 경험\\nㆍ모니터링/로그 분석 도구(ELK, Prometheus, Grafana 등) 활용 가능자\\nㆍREST API 설계, Swagger(OpenAPI 3.x), OAuth2.0 / JWT / HTTPS / SSL 인증\\nㆍ정보처리기사, AWS·Kubernetes 등 관련 자격증 소지자",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "(주)하나투어",
+          공고제목: "하나투어 AI/ML 엔지니어 경력직 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54256910",
+          기업규모: "중견기업",
+          기업규모_코드: "B",
+          근무지역: "서울 종로구",
+          근무지역_코드: "1",
+          근무형태: "정규직, 계약직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "- 유관경력 3년 이상\\n- ML 모델 개발 경험 필수\\n- ML 모델 학습, 평가, 피처 엔지니어링에 대한 이해\\n- Python 숙련자\\n- 추천 시스템 개발/운용 역량\\n- 추천 시스템, 랭킹 모델, 임베딩 기반 검색·추천에 대한 기본 이해\\n- 백엔드 개발 및 모델 API 서빙 경험\\n- AWS 환경 개발 경험",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "AI/ML 엔지니어 (백엔드 개발자)",
+          직무_카테고리_코드: "M2",
+          주요업무_원문:
+            "- 여행 데이터와 사용자 행동 데이터를 활용한 개인화 추천 모델 개발 및 개선\\n- 추천 시스템, 랭킹 모델, 임베딩 기반 추천 구조 설계 및 실험\\n- 오프라인 평가 및 온라인 실험을 통해 추천 품질을 검증하고 서비스 지표 개선으로 연결\\n- 데이터 파이프라인 설계와 모델 서빙",
+          인재상_원문:
+            "- 문제를 단순히 해결하는 것에 그치지 않고, 확장성과 유지보수성을 고려한 근근본적 해결책을 고민하는 분\\n- 새로운 기술을 빠르게 습득하고 서비스에 적절히 적용할 수 있는 학습 능력과 실행력을 갖춘 분\\n- 동료들과 원활한 커뮤니케이션을 통해 함께 성장하는 것을 즐기는 분",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- 개인화 추천 시스템 또는 검색·랭킹 모델 개발 경험\\n- 사용자 행동 로그 기반 피처 설계, 모델 학습, 성능 개선 경험\\n- A/B 테스트, 오프라인 평가 지표 설계, 추천 품질 개선 경험\\n- LLM API 연동 및 AI Agent 개발 경험\\n- Elasticsearch 기반 검색, 인덱싱, 랭킹 개선 또는 벡터 검색 활용 경험\\n- 바이브 코딩 및 에이전틱 엔지니어링 이해 및 활용 경험\\n- AI 트렌드에 대한 관심과 학습 의지\\n※ 기술스택 및 관련 태그: Python, AWS, Elasticsearch, MySQL, Git, RestAPI, Java, rpc",
+          "지원 마감일": "2026.07.06",
+        },
+        {
+          회사명: "(주)커몬소셜",
+          공고제목: "AI 기반 혁신 지향 모바일(Flutter) 개발자 (경력 2~3년차)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54256768",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 영등포구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건: "• 경력 2년 이상 ~ 5년 이하\\n• 학력무관",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "2년 이상",
+          경력연차_숫자: "2",
+          직무명: "모바일(Flutter) 개발자",
+          직무_카테고리_코드: "M1",
+          주요업무_원문:
+            "- 모바일 애플리케이션 플랫폼 개발 (Main): Flutter 기반 크로스 플랫폼 앱의 고도화 및 신규 기능 고속 구현\\n- 백엔드 기능 지원 및 협업 (Sub): 서비스 완성도 향상을 위한 백엔드 API 및 서비스 레이어 개발에 유기적 참여·지원\\n- AI 최적화 워크플로우 내재화: 최신 AI Pair 프로그래밍 도구를 활용한 코드 생산성 극대화, 리팩토링·디버깅 공수 단축\\n- 글로벌 협업 및 이슈 관리: 국내외 협업 팀과의 유기적 커뮤니케이션 및 실시간 이슈 트래킹 기반 안정적 딜리버리\\n- 코드 품질 및 서비스 안정성 확보: 결함 없는 인도(Zero-defect delivery)를 목표로 한 고품질 코드 작성 및 아키텍처 개선",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- Java / Spring Boot 기반 백엔드 개발 역량을 서브 스택으로 보유했거나 관련 협업 경험이 있으신 분\\n- 대규모 데이터 처리, 플랫폼 아키텍처 최적화 및 DB(PostgreSQL 등) 활용 능력을 갖추신 분\\n- 다양한 원격 협업 시스템(Git 기반 소스 관리, 이슈 트래커) 및 코드 리뷰 문화에 익숙하신 분",
+          "지원 마감일": "채용시 마감",
+        },
+        {
+          회사명: "(주)그라파",
+          공고제목:
+            "[Al 개발자] AI 기반 데이터플랫폼 솔루션 개발자 모집 (경력)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54256209",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경남 창원시",
+          근무지역_코드: "9",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상(예정자 가능)",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "• 경력 5년 이상\\n• 대학교졸업(4년)이상, 졸업 예정자 지원가능",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "5년 이상",
+          경력연차_숫자: "5",
+          직무명: "AI 개발자, 백엔드 개발, 프론트 개발, DB 설계",
+          직무_카테고리_코드: "M2",
+          주요업무_원문:
+            "• AI 모델 연동 및 서비스 개발\\n• 데이터플랫폼 백엔드 설계 및 개발\\n• 프론트엔드 UI/UX 개발\\n• 데이터베이스 설계 및 최적화\\n• REST API 및 시스템 연계 개발\\n• 대용량 데이터 처리 및 운영\\n• 서비스 성능 개선 및 안정화\\n• AI 기반 신규 서비스 기획 및 개발",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문: "",
+          "지원 마감일": "채용시 마감",
+        },
+        {
+          회사명: "(주)델레오코리아",
+          공고제목: "[델레오코리아] JAVA 개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54256035&recommend_ids=eJxNz8ENwDAIA8Bp%2BgeDg3l3kO6%2FRVNVSvI8WciGGTCwH7lddTO9s%2BGLUBrHpP%2BpGNQmmMRiwCtqEVkWuWgapoM5CnXcmkq7t8pgRwpn7F7vPmbMhXPJ7hWk7yN%2FAcC%2FL70%3D&view_type=search&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&gz=1&t_ref_content=generic&t_ref=search&relayNonce=f55403aebb7558f3b0f6&paid_fl=n&search_uuid=b5111272-6286-4628-8d8c-337a30ea6872&immediately_apply_layer_open=n#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강남구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(2,3년제) 이상",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건: "경력 8년 ↑",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "8년 이상",
+          경력연차_숫자: "8",
+          직무명: "JAVA 개발자",
+          직무_카테고리_코드: "M2",
+          주요업무_원문: "",
+          인재상_원문: "",
+          우대_자격증: "정보처리기사",
+          우대_어학기준: "",
+          우대사항_원문:
+            "#Java, #RestAPI, #SpringBoot, #Redis, #DevOps, #AWS, #Git, #Docker, #풀스택",
+          "지원 마감일": "채용시 마감",
+        },
+        {
+          회사명: "엠아이큐브솔루션(주)",
+          공고제목: "[엠아이큐브솔루션] 스마트팩토리 자동화 개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54255932",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 서초구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건: "경력 3년 ↑",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "스마트팩토리 자동화 개발자",
+          직무_카테고리_코드: "M7",
+          주요업무_원문: "스마트팩토리 자동화 개발자 채용",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문: "3년 이상의 자동화 개발 경력",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "슈어소프트테크(주)",
+          공고제목: "[SDx개발실] SW개발 경력 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54255897",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 성남시 수정구, 대전 유성구",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "대졸(2,3년제) 이상",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "임베디드SW 개발경력 5년 이상 / AI (Cursor, Claude 등) 활용 가능자 / 자동차 분야 SW 개발에 관심이 있는 지원자",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "5년 이상",
+          경력연차_숫자: "5",
+          직무명: "SW개발",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "- C 언어 기반 임베디드 SW 및 제어기 SW 개발 - AUTOSAR 기반 ASW 개발 - AUTOSAR 기반 BSW 설정 및 CDD 개발",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- 자동차 제어기 SW 개발 경험자 우대 - 임베디드 리눅스 기반의 SW 개발 경험자 우대 - Matlab Simulink, Stateflow 경험자 우대 - AI 활용 관련 Harness Engineering 경험자 우대 / #QA/테스터 #S/W #C언어 #임베디드 #ISTQB #제어기 #ASW #BSW #CDD #AI(인공지능) #cursor #Claude #자동차분야 #AUTOSAR",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "(주)사미텍",
+          공고제목: "(주)사미텍 AI Agent 개발자 채용공고(경력/신입)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54255797&recommend_ids=eJxtjrERxEAIA6v5HAkEXOxC3H8Xfw5sHDhcZmeFAlSIZwO%2FOhTWaR2DkcV6kFVGe9BJyEdW7trIfV1eslFrag13omWbAyIu99JJRPrsIIUfGikXcqaDBOW8wd0sfeMYf%2FLgzaw%3D%3D&view_type=search&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&gz=1&t_ref_content=generic&t_ref=search&relayNonce=5779aa14a4cf0f238d53&paid_fl=n&search_uuid=75a1c19d-d3eb-4ba9-bc1d-de3ddf0649c1&immediately_apply_layer_open=n#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "대전 유성구",
+          근무지역_코드: "5",
+          근무형태: "정규직, 계약직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "- 학력무관\\n- Python 또는 Java 개발 경력 3년 이상\\n- REST API 개발 경험\\n- SQL 활용 가능자\\n- Git 기반 협업 경험\\n- Linux 환경 사용 가능자\\n- AI 활용 가능자",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "AI/SI 개발자 (AI Agent 개발자)",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "- 생성형 AI 기반 서비스 개발\\n- 공공기관 업무시스템 개발 및 유지보수\\n- 백엔드 API 개발\\n- 데이터베이스 설계 및 연계 개발\\n- 대내·외 시스템 인터페이스 구축\\n- 데이터 수집 및 연계 모듈 개발\\n- 화면 및 업무 기능 개발\\n- 요구사항 분석 및 기능 구현\\n- 시스템 테스트 및 오류 개선\\n- 운영 지원 및 유지보수",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- Python, Java(Spring), React 숙련자\\n- 관련 전공 우대\\n- LangChain 경험\\n- LlamaIndex 경험\\n- RAG 구축 경험\\n- Vector DB 활용 경험\\n- 공공기관 시스템 구축 경험\\n- AI 및 정보화사업 수행 경험\\n- 원활한 소통 능력\\n- 문제 해결 능력",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "(주)지디에스케이",
+          공고제목: "[지디에스케이] Java/Spring 웹 개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54255722&recommend_ids=eJxVzcsRQlEIA9Bq3JNA%2BKwtxP678D1nvOjykExQOI2aV8Me9VQQ8PF%2FxrLKaBfxoZOQH2JiiFMGFeI39Uwz4JQ57NHPFMrr0DqtYxlZ3BQh5E6Z8vq1y31fbr4Bq8MvkQ%3D%3D&view_type=search&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&gz=1&t_ref_content=generic&t_ref=search&relayNonce=790ec054182bff34ff63&paid_fl=n&search_uuid=75a1c19d-d3eb-4ba9-bc1d-de3ddf0649c1&immediately_apply_layer_open=n#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 성동구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "- Java 및 Spring Framework 개발 경력 1년 이상 3년 이하 (단, 경력 미달이더라도 프로젝트 경험 및 기술 역량이 검증된 경우 지원 가능) - HTML, CSS, JavaScript를 활용한 웹 표준 화면 마크업 및 스타일링 가능자 - Maven을 이용한 프로젝트 빌드 및 의존성 관리 경험자 - 기본적인 SQL 작성 및 RDBMS(MySQL, Oracle 등) 활용 가능자",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "1년 이상",
+          경력연차_숫자: "1",
+          직무명: "Java/Spring 웹 개발자",
+          직무_카테고리_코드: "M2",
+          주요업무_원문:
+            "- BI portal 솔루션 개발 및 유지보수 - Java / Spring Framework 기반의 웹 애플리케이션 백엔드 개발 및 운영 - HTML, CSS, JavaScript를 활용한 웹 프론트엔드 화면 UI 구현 및 수정 - Maven 기반 프로젝트의 빌드 환경 관리 및 라이브러리 업데이트 - 서비스 운영에 필요한 RESTful API 개발 및 데이터베이스(RDBMS) 쿼리 작성",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            '- Apache-Tomcat 연동 및 Nginx 리버스 프록시 설정 경험자 - 리눅스(Linux) 환경에서 기본적인 명령어 사용 및 서버 로그 확인 가능자 - Maven 기반 레거시 프로젝트를 Spring Boot나 다른 환경으로 마이그레이션해 본 경험이 있는자 - BootStrap 등 CSS 프레임워크나 jQuery 등 자바스크립트 라이브러리 활용 능숙자 - MyBatis 또는 JPA를 활용한 데이터 액세스 개발 경험자 - C언어 개발 경험자 또는 개발 능력자 - BI 툴(tableau, powerbi) 유경험자 - Git을 활용한 소스 코드 관리 및 협업 경험자 "문제를 끝까지 해결하려는 끈기와 원활한 소통 능력을 가지신 분" * 기술 스택: Java, Spring Framework, HTML, CSS, JavaScript, Maven, MySQL, Oracle, Apache-Tomcat, Nginx, Linux, Spring Boot, BootStrap, jQuery, MyBatis, JPA, C언어, Tableau, PowerBI, Git',
+          "지원 마감일": "2026.07.07",
+        },
+        {
+          회사명: "(주)블루개러지",
+          공고제목: "프론트엔드 개발자(2~4년)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326541&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=1ed063f4-68be-4895-b625-e0bcd820cd19&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강동구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "• React 및 TypeScript(또는 Modern JavaScript)에 대한 이해를 갖추신 분\n • 코드의 재사용성과 유지보수성을 고려하여 개발해보신 경험이 있는 분\n • 복잡한 요구사항을 구조화하고, 이를 코드로 구현할 수 있는 분\n • 문제를 주도적으로 해결하고, 협업 과정에서 원활한 커뮤니케이션이 가능한 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "2년 이상",
+          경력연차_숫자: "2",
+          직무명: "프론트엔드 개발자",
+          직무_카테고리_코드: "M1",
+          주요업무_원문:
+            "• React Native 기반의 크로스 플랫폼 환경에서 서비스 기능을 개발하고 운영합니다.\n \n \n • 서비스의 원활한 렌더링, 응답성, 성능을 보장하기 위해 병목 현상을 파악하고 해결합니다.\n \n \n • 비즈니스 전략에 따른 새로운 기능을 구현하고, 유저의 피드백을 통해 서비스를 지속적으로 개선합니다.\n \n \n • PM, Designer, Backend Engineer와 협업하여 기능을 설계하고 완성도 높은 사용자 경험을 제공합니다.\n \n \n • 코드 리뷰와 기술 논의를 통해 코드 품질과 개발 생산성을 함께 개선합니다.\n \n \n \n [기여 도메인]\n \n \n • 커뮤니티: 아티스트와 팬의 원활한 소통을 이어주는 역할에 기여하고, 팬들에게 기억에 남는 경험을 제공해요.\n \n \n • 커머스: 팬 활동에 필수적인 굿즈를 글로벌로 판매하며, 다국어 지원, 국가별 가격 설정, 해외 배송 등 복잡성이 높은 커머스 기능을 구현해요.\n \n \n • 라이브: 아티스트가 직접 송출하는 라이브/채팅 기능 개발에 참여해요.\n \n \n • 오프라인: 팬들에게 핵심적인 오프라인 활동의 장벽을 낮추고, 기존 시스템의 비효율성을 개선해요.",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "React Native 기반 모바일 앱 개발 또는 서비스 운영 경험\n \n \n • GraphQL, Expo 등 관련 기술 사용 경험\n \n \n • 글로벌 서비스를 위한 i18n(다국어 처리) 경험\n \n \n • 커머스 또는 결제 관련 서비스 개발 경험\n \n \n • VOD, Live Streaming 등 영상 관련 기능 개발 경험\n \n \n • 디자인 시스템 구축 또는 운영 경험\n \n \n • 외국인의 경우 한국어로 의사소통이 가능한 자 (한국어 능력 시험(TOPIK) 4급 이상 우대)",
+          "지원 마감일": "2026.07.29",
+        },
+        {
+          회사명: "(주)사이냅소프트",
+          공고제목: "2026년 SW 개발자 경력 모집",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326416&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=1ed063f4-68be-4895-b625-e0bcd820cd19&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강서구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "ㆍLinux, Windows, C/C++, HTML, x-javascript 기반 SW 개발 경험\n \n \n ㆍPyTorch, TensorFlow, Huggingface, LLM 활용 AI SW 개발 경험\n \n \n ㆍ클라우드 환경의 REST API, MCP, A2A 기반 AI 웹 서비스 및 솔루션 개발 경험\n \n \n ㆍClaude Code, Codex 등 AI 코딩 어시스턴트 및 Agentic 도구 활용에 능숙한 분\n \n \n ㆍ사이냅소프트에서 명품 소프트웨어를 함께 만들고자 하시는 분\n \n \n ㆍ동료와 함께 배우고 함께 성장하기를 마다하지 않는 분\n \n \n ㆍ소프트웨어를 통해 세상에 이로운 가치를 만들어 가고 싶으신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "4년 이상",
+          경력연차_숫자: "4",
+          직무명: "SW개발",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "ㆍ프로젝트 관리 및 아키텍처 설계\n \n \n ㆍ디지털 문서 처리 솔루션 및 서비스 개발\n \n \n ㆍLLM, RAG, Agent 기반 문서AI 솔루션 및 서비스 개발",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "ㆍ팀 매니지먼트, 프로젝트 PM 경험\n \n \n ㆍLLM 튜닝, RAG, LLMOps, AI 데이터 파이프라인 구축 경험\n \n \n ㆍ오피스 파일 포맷 분석 및 변환 소프트웨어 개발 경험\n \n \n ㆍAWS등의 클라우드 인프라 환경에서 동작하는 서비스 개발 및 운영 경험",
+          "지원 마감일": "2026.07.09",
+        },
+        {
+          회사명: "에이지엘(주)",
+          공고제목: "[ 예비 유니콘 ] API 개발자",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326381&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=ab158376-693e-4a29-ae0d-47b1928ec162&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 광진구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "ㆍ관련 경력(API) : 5년 ~ 12년 (백엔드/API 개발 경험)\n \n \n ㆍ.NET Core 7.0 이상(.NET 8.0 우대) 환경에서의 서비스 개발 경험\n \n \n ㆍEntity Framework Core 기반 ORM 개발 경험\n \n \n ㆍRESTful API 설계 및 개발 능력\n \n \n ㆍMS-SQL, PostgreSQL 또는 유사 RDBMS 사용 경험\n \n \n ㆍOOP 에 대한 이해",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "5년 이상",
+          경력연차_숫자: "5",
+          직무명: "API 개발자",
+          직무_카테고리_코드: "M2",
+          주요업무_원문:
+            "ㆍ골프장 티타임(재고) 및 예약 연동 API 개발 및 유지보수\n \n \n ㆍ내부 GDS(Global Distribution System) 및 제휴 플랫폼과의 API 연동\n \n \n ㆍ.NET Core 기반 백엔드 서비스 설계 및 고도화\n \n \n ㆍ데이터베이스 모델링 및 ORM(EF Core) 기반 비즈니스 로직 구현\n \n \n ㆍ시스템 성능 개선 및 오류 모니터링, 로그 분석",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "ㆍ대규모 트래픽 처리 및 성능 최적화 경험\n \n \n ㆍGDS, 예약/재고 시스템 또는 외부 API 연동 프로젝트 경험\n \n \n ㆍAWS, Azure 등 클라우드 환경에서의 서비스 운영 경험\n \n \n ㆍGit, Jira, Jenkins 등 협업 툴 활용 능숙자\n \n \n ㆍAI 기반 개발 도구를 활용한 코드 작성, 리팩토링, 테스트 코드 생성 등 바이브 코딩 경험\n \n \n ㆍ적극적인 커뮤니케이션과 문제 해결 능력을 갖춘 분",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)아이엠폼",
+          공고제목: "[경력 3년 이상] 백엔드 개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326373&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=1ed063f4-68be-4895-b625-e0bcd820cd19&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강남구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(2,3년제) 이상",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "• 백엔드 개발 경력 3년 이상\n \n \n • Node.js, Python, Java등 하나 이상의 백엔드 언어 사용 경험\n \n \n • REST API 설계 및 개발 경험 (Spring Boot)\n \n \n • MySQL, PostgreSQL, MongoDB 등 데이터베이스 사용 경험\n \n \n • AWS, Docker, Linux 서버 환경에 대한 기본 이해\n \n \n • 비동기 작업 처리, 큐 시스템, 배치 처리 등에 대한 이해 또는 경험\n \n \n • Git 기반 협업 경험",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "백엔드 개발자",
+          직무_카테고리_코드: "M2",
+          주요업무_원문:
+            "• 자사 솔루션 DAIMS 서비스 및 관리자 백엔드 API 설계 및 개발\n \n \n • AI Agent 기반 워크플로우 실행 및 관리 기능 개발\n \n \n • 다양한 AI 모델 및 외부 API 연동을 위한 서버 로직 개발\n \n \n • 작업 큐, 비동기 처리, 배치 작업 등 장시간 실행되는 AI 작업 처리 구조 설계\n \n \n • 데이터베이스 설계, 성능 최적화 및 검색 기능 고도화\n \n \n • AWS, Docker, Linux 기반 서버 인프라 운영 및 배포 환경 관리\n \n \n • 프론트엔드 및 기획/디자인 팀과 협업하여 서비스 기능 고도화",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• AI Agent, LLM, 이미지 생성 모델 또는 AI SaaS 서비스 개발 경험\n \n \n • LangChain, LangGraph, OpenAI API, Gemini API 등 AI Agent/LLM 관련 기술 사용 경험\n \n \n • GPU 서버, 모델 서빙, ComfyUI, Stable Diffusion, Flux 등 이미지 생성 파이프라인 운영 경험\n \n \n • AWS, Docker Compose, Nginx, CloudFront, S3 등 인프라 운영 경험\n \n \n • 작업 큐, 스케줄러, 모니터링, 로그 관리 등 운영 자동화 경험\n \n \n • 결제, 구독, 사용자 권한 관리 기능 개발 경험\n \n \n • 초기 단계 서비스에서 빠르게 문제를 정의하고 구조를 개선해본 경험",
+          "지원 마감일": "2026.08.29",
+        },
+        {
+          회사명: "컴즈(주)",
+          공고제목: "AI 기반 QA 자동화 플랫폼 기획/디자이너 채용의 건",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326365&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=1ed063f4-68be-4895-b625-e0bcd820cd19&t_ref=search&t_ref_content=generic#seq=00",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 구로구",
+          근무지역_코드: "1",
+          근무형태: "프리랜서",
+          학력요건: "대졸(2,3년제) 이상",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "ㆍ웹 서비스 기획 및 UI·UX 디자인 실무 경력 2년 이상\n \n \n ㆍ기획과 디자인을 겸직으로 수행 가능한 분\n \n \n ㆍ개발팀과의 협업 프로세스 이해 및 원활한 커뮤니케이션 역량\n \n \n ㆍ기능 명세, 화면 설계 등 문서화 능력 보유",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "2년 이상",
+          경력연차_숫자: "2",
+          직무명: "서비스 기획 / UX·UI 디자인",
+          직무_카테고리_코드: "M5",
+          주요업무_원문:
+            "[- 서비스 기획]\n \n \n ㆍAI 기반 테스트 자동화 플랫폼 웹 서비스 기획 및 기능 정책 수립\n \n \n ㆍ신규 기능 요구사항 분석, 화면 설계(스토리보드 ·와이어프레임) 작성\n \n \n ㆍ사용자 시나리오 및 서비스 플로우 정의, 기능 명세서(PRD) 작성\n \n \n \n [- UX·UI 디자인]\n \n \n ㆍ플랫폼 UI 디자인 및 디자인 시스템 구축 ·운영(컴포넌트, 가이드라인)\n \n \n ㆍ와이어프레임 → 프로토타입 → 최종 디자인 산출물 제작\n \n \n ㆍ개발자 핸드오프용 디자인 스펙 산출물 작성(Figma 기반)",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "ㆍQA, AI/ML 관련 서비스 기획 · 디자인 경험\n \n \n ㆍFigma 활용 능숙(와이어프레임 ·프로토타이핑 ·디자인 산출물 제작)\n \n \n ㆍJira, Confluence 등 협업 툴 활용 경험\n \n \n ㆍ기초 수준의 HTML/CSS 이해(개발 협업 관점)\n \n \n ㆍUX 리서치(사용자 인터뷰 · 사용성 테스트 등) 수행 경험\n \n \n ㆍ해당직무 근무경험\n \n \n ㆍ취업보호대상자(국가 유공자 및 장애인 등) 우대",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)시큐리온",
+          공고제목: "Back-end(백엔드) 개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326316&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=1ed063f4-68be-4895-b625-e0bcd820cd19&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 송파구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(2,3년제) 이상",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "ㆍDjango를 이용한 5년 이상의 웹 서비스 개발 및 운영 경험\n \n \n ㆍDjango REST framework에 대한 높은 이해도\n \n \n ㆍ클라우드 환경 및 Dockerizing 경험\n \n \n ㆍORM 기반 개발 역량 보유\n \n \n ㆍREST API에 대한 깊은 이해\n \n \n ㆍ빌드, 테스트, 배포까지 CI/CD 파이프라인 자동화 구축 경험\n \n \n ㆍ성장하는 회사와 함께 개발 문화를 만들어갈 의지\n \n \n ㆍ긍정적이고 적극적인 커뮤니케이션 스킬\n \n \n ㆍ고객 관점에서 서비스 개선을 고민하는 태도",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "5년 이상",
+          경력연차_숫자: "5",
+          직무명: "Back-end 개발자",
+          직무_카테고리_코드: "M2",
+          주요업무_원문:
+            "ㆍPython/Django 기반 백엔드 개발 및 유지보수\n \n \n ㆍ운영업무용 Admin 패널 및 자동화 프로그램 개발",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "ㆍDjango를 이용한 다양한 프로젝트 경험\n \n \n ㆍAWS, Azure 등 클라우드 인프라 사용 경험 및 이해\n \n \n ㆍTDD(Test-Driven Development) 방법론에 기반한 개발 경험\n \n \n ㆍ서비스 개발 및 지속적인 개선 경험\n \n \n ㆍ안드로이드 앱 개발 경험 또는 모바일 악성코드 분석 경험\n \n \n ㆍNoSQL 사용 경험\n \n \n ㆍGit 사용 경험",
+          "지원 마감일": "2026.07.31",
+        },
+        {
+          회사명: "(주)마케팅블랭크",
+          공고제목: "[부산 서면 마케팅블랭크] UI/UX 디자이너 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326302&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=1ed063f4-68be-4895-b625-e0bcd820cd19&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "부산진구",
+          근무지역_코드: "4",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건: "",
+          경력유형: "무관",
+          경력유형_코드: "무관",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "UI/UX 디자이너",
+          직무_카테고리_코드: "M6",
+          주요업무_원문:
+            "ㆍ서비스 UI/UX 기획 및 설계\n \n \n - AI 기반 서비스 및 커머스 플랫폼의 사용자 시나리오 정의, User Flow, 와이어프레임 및 화면 기획서 작성\n \n \n ㆍUI/UX 인터랙션 및 GUI 디자인\n \n \n - 웹/모바일 반응형 레이아웃 설계, Figma를 활용한 UI 디자인\n \n \n ㆍ디자인 시스템 구축 및 관리\n \n \n - 효율적인 협업 및 일관된 브랜드 경험을 위한 Figma 컴포넌트 및 디자인 시스템 가이드라인 수립·운영\n \n \n ㆍ인하우스 디자인 지원\n \n \n - 회사소개서, 프로모션 배너, 이벤트 이미지, 명함 등 기업 브랜딩 및 마케팅 디자인 지원",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "ㆍ커뮤니케이션 능력이 보유하신 분\n \n \n - UI 상태, 예외 화면, 비즈니스 정책을 개발자 및 이해관계자에게 논리적이고 명확하게 전달할 수 있는 분\n \n \n ㆍAI 프로젝트 경험이 있으신 분\n \n \n - LLM/RAG 구조 및 생성형 AI 기반 서비스 기획 또는 인터페이스 디자인 경험이 있으신 분\n \n \n ㆍ툴 활용 능력이 뛰어난 분\n \n \n - Photoshop, Illustrator 활용 능숙자",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)신보",
+          공고제목: "[명학]방산 하드웨어 연구원채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326254&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=1ed063f4-68be-4895-b625-e0bcd820cd19&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 안양시 만안구",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "ㆍ하드웨어 개발 관련 경력 3년 이상\n \n ㆍ임베디드 시스템(MSU,DSP,AP) 기반 디지털/아날로그 회로설계 경험\n \n ㆍ고속 인터페이스 및 영상 스트리밍 제어 HW 아키텍쳐 이해도 \n \n ㆍ국내 및 해외 출장 (필드 테스트 및 고객사 대응) 가능자",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "하드웨어(HW) 개발자",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "• 하드웨어(HW) 개발자\n \n \n - 회로 설계 및 분석 (MCU, FPGA, RF 및 Intel Platform 기반 PC 등)\n \n \n - 고속 신호 인터페이스 설계 (PCIe, USB 3.x, HDMI, MIPI, Ethernet, LVDS 등)\n \n \n - 시스템 검증: 회로 해석, PCB Artwork 분석, 펌웨어 연동 및 필드 테스트 대응",
+          인재상_원문: "",
+          우대_자격증: "운전면허증",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 하드웨어(HW) 개발자\n \n \n - 방위산업 유관 분야 프로젝트 수행 경력자\n \n \n - 펌웨어 수준 소프트웨어 연동 개발 경험 (C/C++, 디버깅)",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)투피트",
+          공고제목: "AI(CV/LLM) 및 풀스택 개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326213&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=1ed063f4-68be-4895-b625-e0bcd820cd19&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 관악구",
+          근무지역_코드: "1",
+          근무형태: "정규직, 계약직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• 경력 (연수 무관)\n • 학력무관\n • 컴퓨터 공학, AI/ML 관련 분야의 학사 학위 이상을 소지 혹은 동등한 지식을 보유하신 분\n • 관련 기술 스택에 능숙하신 분\n  - CV - Python 우대\n  - LLM\n  - 풀스택 - React, NestJS, PostgreSQL, AWS, Lambda 등 선호\n • 문제 해결 능력, 논리적 사고, 팀 협업 능력을 갖추신 분\n • 스타트업 환경에서 유연하게 적응할 수 있는 도전 정신과 자율성을 보유하신 분\n * GitHub 링크나 포트폴리오 제출 필수",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "AI/ML 개발자 및 풀스택 개발자",
+          직무_카테고리_코드: "M3",
+          주요업무_원문:
+            "[모집 분야]\n - AI/ML 개발자 (CV 모델 엔지니어 또는 LLM 파인튜너) 및 풀스택 개발자\n  (총 1~3명 모집, 분야별 구분 없이 지원 가능)\n \n [주요 업무]\n 1. CV 모델 엔지니어\n  - AI 기반 컴퓨터 비전 모델을 개발하고 최적화하여 소프트웨어에 적용\n 2. LLM 파인튜너\n  - 대형 언어 모델(LLM)을 커스터마이징하고 최적화\n 3. 풀스택 개발자\n  - 웹 애플리케이션의 프론트엔드 및 백엔드를 개발",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 스타트업 또는 빠른 프로젝트/대규모 프로젝트 환경에서의 개발 경험이 있으신 분을 우대\n • AI/ML 프로젝트(CV/LLM) 또는 풀스택 개발 경험이 2년 이상 있으신 분을 우대\n • 클라우드(AWS, Azure 등) 또는 온프레미스 환경에서의 배포 경험이 있으신 분을 우대\n • 스타트업 프로젝트에 즉시 투입 가능한 경력자 우대\n \n [기술 스택 정보]\n - CV - Python 우대\n - 풀스택 - React, NestJS, PostgreSQL, AWS, Lambda 등 선호",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)휴먼컨설팅그룹",
+          공고제목: "HCG 휴먼컨설팅그룹 2026년 하반기 경력 공채 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326141&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=607a788c-249f-4c69-987e-622cf7da236d&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 성남시 분당구 (양재센터 / 판교센터)",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• 연령, 성별, 학력 무관\n • HR시스템 개발 및 인사업무 경험\n • 시스템 PM, PL 또는 설계/분석 경력 3년 이상\n • Java, JavaScript, Oracle 활용 경험\n • 개발자와 원활한 소통이 가능한 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "e-HR Project 분석/설계 (PM/PL)",
+          직무_카테고리_코드: "M5",
+          주요업무_원문:
+            "• 프로젝트에 대한 전반적인 진행관리\n • 고객사 직원 및 요구사항에 대한 업무분석/정의\n • 개발요건 정의 및 설계\n • e-HR 시스템에 대한 세팅 및 교육\n • 프로젝트 산출물에 대한 작성 및 관리",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• HR 프로젝트 수행 경험 또는 HR 관련 지식을 보유하신 분\n • 프로젝트 관리에 대한 이론적인 지식체계(PMBOK)를 가지신 분\n • IT 프로젝트 실무(개발) 경험이 있으신 분\n • 하이브리드 등 AI를 활용한 업무수행 능력을 보유하신 분",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)쇼엠",
+          공고제목: "[대구] 풀스택 개발자 경력직 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326063&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=607a788c-249f-4c69-987e-622cf7da236d&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "대구 중구",
+          근무지역_코드: "6",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• 웹 개발 경력 2년 이상 ~ 5년 이하\n • PHP 기반 풀스택 개발 경험이 있으신 분\n • MySQL/MariaDB 등 RDBMS 설계 및 운영 경험이 있으신 분\n • RESTful API 설계 및 개발 경험이 있으신 분\n • Git 등 형상관리 도구 사용 경험이 있으신 분\n • Linux 서버 환경 이해도를 갖추고, AI (Gemini, Claude 등) 활용 개발 경험이 있으신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "2년 이상",
+          경력연차_숫자: "2",
+          직무명: "풀스택 개발자",
+          직무_카테고리_코드: "M3",
+          주요업무_원문:
+            "• 웹 서비스 전반(프론트엔드 + 백엔드) 개발\n • PHP 기반 사내 업무시스템 개발\n • AI(Gemini 등)를 활용한 서비스 기능 개발\n • 기존 서비스 시스템 추가 개발 및 유지보수",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• AWS 등 클라우드 인프라 운영 경험 보유자\n • 대용량 트래픽 처리 및 성능 튜닝 경험 보유자\n • 크롤링/자동화/데이터 처리 경험 보유자",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "매드업",
+          공고제목: "[제품본부] AI Engineer - 3년 이상(전문연구요원 가능)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326044&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=607a788c-249f-4c69-987e-622cf7da236d&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강남구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "Python 기반 Backend Engineer로서 3년 이상의 실무 경험이 있으신 분\n Pytorch, Tensorflow 등의 ML Framework로 공개된 모델 활용 경험이 있으신 분\n LLM service(OpenAI, Anthropic, Gemini 등) 및 다른 pre-trained model을 이용한 프로젝트 경험이 있으신 분\n 주도적으로 다양한 모델/프레임워크 신청부터 시작하여 End-to-End AI 서비스 개발 경험해보고 싶으신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "AI Engineer",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "• LLM 및 Multi-modal model을 활용한 생성형 AI 및 추천 서비스를 개발합니다.\n • 최신 연구성과와 상용 foundation model을 기반으로 실제 서비스 기능으로 전환하여 제품화합니다.\n • 모델 선택·튜닝부터 서빙·운영, 성능 모니터링까지 E2E(End-to-End) 제품 개발 사이클 전반을 주도합니다.\n • Microservice 기반의 서비스 아키텍처와 파이프라인을 설계하고 구현합니다.\n • 데이터 레이블 관리 및 모델 평가 시스템 구축합니다.",
+          인재상_원문:
+            "🚀 속도감 있게 실행하고 멈추지 않고 개선하는 Runner\n 한번의 시도로 끝내지 않습니다. 빠르게 실행하고 끊임없이 다음을 준비합니다.\n 💡 AI를 '툴'이 아닌 '동료'로 여기는 Partner\n AI를 비롯한 다양한 도구를 적극적으로 활용해 같은 시간 내 더 큰 임팩트 있는 문제 해결에 집중합니다.\n ✏️ 변화를 기다리지 않고, 변화를 만들어가는 Game-Changer\n 시키는 일을 하는 것보다 스스로 문제를 정의하고 끝까지 책임지는 방식으로 일합니다.",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "Pytorch 및 Tensorflow 등의 ML Framework 실무 경험이 있으신 분\n ML을 활용한 서비스를 운영하고 배포한 경험이 있으신 분\n 디지털마케팅/온라인쇼핑에 대한 도메인 지식을 보유하신 분\n 프롬프트 최적화, RAG, LangChain, Chain-of-Thought 사용 경험이 있으신 분\n Docker, Kubernetes 등 환경에 익숙하신 분",
+          "지원 마감일": "2026.08.02",
+        },
+        {
+          회사명: "매드업",
+          공고제목: "[제품본부] 시니어 AI Engineer - 5년 이상",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326005&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=607a788c-249f-4c69-987e-622cf7da236d&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강남구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "AI/ML 관련 분야 석사 이상 학위 취득 후, 5년 이상의 상용 서비스 개발 경험을 보유하신 분\n 비즈니스/제품 요구사항을 이해하고, 이를 AI/ML 기술로 해결하기 위한 구체적인 엔지니어링 문제를 정의하고, 필요한 데이터 레이블 체계를 설계하고, 정량적 성과 측정 지표를 수립하여 프로젝트를 성공적으로 완수한 경험이 있으신 분\n 하나 이상의 AI 전문 분야(Computer Vision, NLP 등)에 대한 깊이 있는 이해와 최상 모델 개발 경험을 보유하신 분\n 복잡한 기술적 내용을 비기술 직군 동료들에게도 명확하고 효과적으로 전달할 수 있는 뛰어난 커뮤니케이션 능력을 지니신 분\n Pytorch/Tensorflow 등 딥러닝 프레임워크를 활용하여 모델을 직접 학습하며, 상용 수준으로 배포 및 최적화 해 본 경험이 있으신 분\n 동료 엔지니어를 기술적으로 리딩하거나 주도적으로 멘토링하며 프로젝트를 성공적으로 이끌어 본 경험이 있으신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "5년 이상",
+          경력연차_숫자: "5",
+          직무명: "AI Engineer",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "✅ 비즈니스 문제 해결을 위한 AI 과제 정의 및 솔루션 설계\n \n 제로/버즈니스팀과 긴밀히 협업하여 '광고 효율 극대화'와 같은 비즈니스 목표와 주어진 요구 사항을 기반으로, 이를 해결하기 위한 구체적인 AI 과제를 도출하고, 측정 가능하며 실행 가능한 엔지니어링 문제로 명확하게 정의합니다.\n (예: '광고 소재별 전환율(CVR) 예측', '전환율 기여 캠페인 탐지', '광고 소재 이미지 자동 생성' 등)\n 정의된 솔루션이 실제로 필요한 데이터 요건을 도출하고, 모델 학습 및 평가에 가장 효과적인 레이블 체계를 정의하며, 성능 지표(F1-score, hit@k, NDCG 등) 측정을 위한 측정하기 위한 검증 전략을 수립합니다.\n ✅ End-to-End AI 시스템 개발, 최적화 및 운영\n \n 정의된 비지니스 문제 해결을 위해, Computer Vision, 상용 LLM API를 활용한 LLM Agent, sLLM, Time-series Model 등 특정 도메인에 국한되지 않고 문제 해결에 가장 적합한 다양한 AI 기술을 견적적으로 신중하고 응용하여 적용합니다.\n 제품 개발 단계에서는 기존 연구 결과, 오픈소스 모델 등 상용 AI 서비스(LLM API 등)를 효과적으로 활용하여 정량적인 평가 기반으로 신속하게 탐색합니다. 나아가, 비즈니스 목표 달성 및 심는 극대화하 위해 필요 시 이미벼딩 schema를 직접 설계하거나, 기존 모델을 개선하고 미세조정(fine-tuning)하여 핵심 AI 모델을 개발하고 지속적으로 고도화 합니다. 상용 LLM 기반 Agent의 경우, 프롬프트 엔지니어링, RAG 시스템 구축, Function Calling 등을 통해 성능을 최적화하고 실제 서비스에 적용합니다.\n 개발된 AI 모델 및 솔루션이 운영되고 확장 가능하게 서비스될 수 있도록 MLOps 환경을 구축하고, CI/CD 파이프라인을 통해 배포 및 운영 자동화 프로세스를 주도적으로 개선합니다.",
+          인재상_원문:
+            "🚀 속도감 있게 실행하고 멈추지 않고 개선하는 Runner\n 한번의 시도로 끝내지 않습니다. 빠르게 실행하고 끊임없이 다음을 준비합니다.\n 💡 AI를 '툴'이 아닌 '동료'로 여기는 Partner\n AI를 비롯한 다양한 도구를 적극적으로 활용해 같은 시간 내 더 큰 임팩트 있는 문제 해결에 집중합니다.\n ✏️ 변화를 기다리지 않고, 변화를 만들어가는 Game-Changer\n 시키는 일을 하는 것보다 스스로 문제를 정의하고 끝까지 책임지는 방식으로 일합니다.",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "광고(Ad-Tech) 도메인에서의 AI/ML 엔지니어링 경험을 보유하신 분\n 상용 LLM API를 활용한 Agent 개발, Multimodal AI 등 새로운 AI 기술 및 도메인에 대한 빠른 습득 능력과 문제 해결에 유연하게 적용하는 능력을 갖추신 분\n 다양한 AI 기술을 상용 서비스의 성공적으로 적용하고, 이를 통해 구체적인 비즈니스 임팩트를 창출한 경험이 있으신 분\n Github을 통한 협업 문화에 익숙하며 Pull request 리뷰 기반의 협업을 통한 모델 및 제품 개발 경험이 있으신 분\n 주요 글로벌 학회(NeurIPS, ICML, ICLR, CVPR, ACL, EMNLP 등)에 논문 게재 또는 의미 있는 특허 등의 연구 성과를 보유하신 분\n 정교한 실험 설계(변인통제, 가설설정, ablation test, 통계적 유의성 검증 등)부터 실제 서비스 적용까지 관련 있게 수행하며 데이터 기반 의사결정을 이끌어본 경험이 있으신 분\n 최신 AI 기술 동향에 대한 깊은 이해와 새로운 지식을 적극적으로 학습하고 공유하는 자세를 가지신 분\n Docker, Kubernetes 등 컨테이너 환경에서 ML 모델을 상용 운영하고 운영해 본 경험이 있으신 분\n Git, Jenkins, Github Actions 등을 활용하여 CI/CD 파이프라인을 구축하고 운영해 본 경험이 있으신 분",
+          "지원 마감일": "2026.08.02",
+        },
+        {
+          회사명: "매드업",
+          공고제목: "[개발 본부] DevOps Engineer (1년이상~5년미만) 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54325903&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=607a788c-249f-4c69-987e-622cf7da236d&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강남구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "• AWS 클라우드 인프라 구성 및 운영 경험이 1년 이상 5년 미만이신분\n • Terraform 등 Infrastructure as Code 도구를 활용해 인프라 변경을 코드로 관리해 보신 분\n • 인프라 구성, 배포, 모니터링, 장애 대응, 비용/보안 개선 중 하나 이상의 영역을 주도적으로 개선해 보신 분\n • 책임감이 강하고 주도적으로 자기 업무를 수행하시는 분\n • 커뮤니케이션 능력이 탁월하고 의견을 설득력 있게 전달 가능하신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "1년 이상",
+          경력연차_숫자: "1",
+          직무명: "DevOps Engineer",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "• 클라우드 인프라(AWS, Kubernetes)를 코드로 설계하고 안정적으로 운영\n • GitOps와 CI/CD 기반의 배포 파이프라인 구축 및 자동화\n • 서비스 모니터링과 옵저버빌리티 체계 구축, 장애 대응 및 재발 방지\n • 클라우드 비용 최적화와 인프라 보안 및 접근 관리\n • 유관 조직과 협업한 시스템 통합 및 운영 자동화",
+          인재상_원문:
+            "🚀 속도감 있게 실행하고 멈추지 않고 개선하는 Runner\n 한번의 시도로 끝내지 않습니다. 빠르게 실행하고 끊임없이 다음을 준비합니다.\n 💡 AI를 '툴'이 아닌 '동료'로 여기는 Partner\n AI를 비롯한 다양한 도구를 적극적으로 활용해 같은 시간 내 더 큰 임팩트 있는 문제 해결에 집중합니다.\n ✏️ 변화를 기다리지 않고, 변화를 만들어가는 Game-Changer\n 시키는 일을 하는 것보다 스스로 문제를 정의하고 끝까지 책임지는 방식으로 일합니다.",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "EKS 등 Kubernetes 기반 컨테이너 오케스트레이션 서비스의 구성 및 내부 구조에 대한 이해가 깊으신 분\n GitOps(ArgoCD)와 Helm 기반 배포 운영 경험\n 모니터링 및 옵저버빌리티 스택(예: Datadog, Prometheus, Grafana 등) 구축 및 운영 경험\n 대규모 트래픽/데이터 파이프라인 인프라 운영 경험\n HashiCorp Vault, Boundary 등 보안/접근 제어 도구 운영 경험\n 초기 구성부터 고도화까지 인프라 라이프사이클 전반을 경험하신 분",
+          "지원 마감일": "2026.08.02",
+        },
+        {
+          회사명: "(주)나로세움",
+          공고제목: "AI·클라우드 에듀테크 소프트웨 개발자",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54325835&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=607a788c-249f-4c69-987e-622cf7da236d&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경북 구미시",
+          근무지역_코드: "9",
+          근무형태: "계약직, 프리랜서",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• 경력 2년 이상\n • 학력무관\n • 웹 서비스 풀스택(프론트+백엔드) 개발 및 배포 경력 \n . JavaScript·TypeScript 및 프레임워크(React 등) 능숙\n . 클라우드(AWS·GCP·NCP 등) 기반 서비스 구축·운영 경험\n . Three.js·WebGL 등 3D 웹 개발 경험 (또는 빠르게 학습 가능한 분)\n . 사양·문서를 스스로 읽고 구조로 옮길 수 있는 자기주도성",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "2년 이상",
+          경력연차_숫자: "2",
+          직무명: "풀스택 개발자 (WebGL · 3D)",
+          직무_카테고리_코드: "M3",
+          주요업무_원문:
+            "• 플랫폼의 프론트엔드·백엔드 개발 (초기 개발 리딩)\n • SaaS 전환 설계(멀티테넌시·MSA·클라우드 네이티브)를 실제 코드로 구현\n . WebGL·3D 기반 AR 학습 인터랙션 엔진 및 XR 진로 시뮬레이션 모듈 개발\n . AI(LLM API) 연동 및 학습 대시보드 구현\n . 클라우드 배포·운영(CI/CD) 및 아키텍처·기능 명세 문서화",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• WebXR(AR·VR) 개발 경험\n . 멀티테넌시·MSA 등 SaaS 아키텍처 이해\n . 에듀테크·콘텐츠 플랫폼 또는 AI(LLM) 연동 경험\n . 기술 명세 문서화 역량",
+          "지원 마감일": "2026.08.29",
+        },
+        {
+          회사명: "마크로버(주)",
+          공고제목: "[마크로버(주)] 경력 정규직 - Java 기반 웹 개발, PL 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54325694&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=607a788c-249f-4c69-987e-622cf7da236d&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "울산 남구",
+          근무지역_코드: "7",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "• 경력 5년 이상\n • 대학교졸업(4년) 이상\n • 해당직무 근무경험",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "5년 이상",
+          경력연차_숫자: "5",
+          직무명: "Java 기반 웹 개발, PL",
+          직무_카테고리_코드: "M2",
+          주요업무_원문:
+            "• 기술연구소 부서 소속, 선임연구원/수석연구원 직급\n • JAVA / Spring 기반 Web 서비스 및 업무 시스템 개발\n • AI 서비스 연동을 위한 API 설계 및 백엔드 기능 개발\n • LLM, 챗봇, 문서 분석, 자동화 등 AI 기반 기능의 Web 서비스 적용\n • AI 연동 결과를 활용한 업무 프로세스 자동화 및 서비스 고도화\n • 기존 시스템 기능 개선 및 운영 이슈 대응",
+          인재상_원문: "",
+          우대_자격증: "정보처리기사",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 자격증 : 정보처리기사\n • AI 및 최신 디지털 트렌드에 대한 높은 관심과 빠른 학습 능력을 보유하신 분\n • 클라우드 환경에서의 구축 및 운영 경험\n • B2B SaaS 또는 업무용 서비스 개발 경험\n • 원활한 커뮤니케이션과 협업이 가능하신 분",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)에이알이",
+          공고제목: "층간소음 저감기술 개발 및 사업화 인재 모집",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54332952&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=7bb87d4a-6961-45c3-a74d-fe931f2c67f4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "대전 중구",
+          근무지역_코드: "5",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상(예정자 가능)",
+          학력_코드: "H3",
+          전공요건: "전기/전자공학, 컴퓨터/시스템공학, 물리",
+          자격요건:
+            "대학교졸업(4년)이상, 졸업 예정자 지원가능 / 개발자의 경우 C언어 중급이상 기본 요구됨",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "",
+          경력연차_숫자: "0",
+          직무명: "층간소음 저감기술 개발 및 사업화 인재 모집",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "R&D (층간소음 저감을 위한 ANC 솔루션 개발 및 사업화 분야)",
+          인재상_원문:
+            "• ANC HW 및 SW/알고리즘 개발 • ANC 시스템 시험 및 데이터 분석, 관제용 APP 개발 • ANC 솔루션 생산기술 개발 • 기술 영업 및 마케팅",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 음향 신호처리, 진동/소음 제어 분야 경험자 우대. • HW 생산 및 유지보수 기술 경력자 우대. • 보유역량: 해당직무 근무경험",
+          "지원 마감일": "2026.07.31",
+        },
+        {
+          회사명: "(주)큐라움",
+          공고제목: "[큐라움] Web/App 서비스 디자인 기획(UI/UX)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54332811&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=7bb87d4a-6961-45c3-a74d-fe931f2c67f4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 용산구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "고교졸업 이상(예정자 가능)",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• Figma로 디자인 및 화면 설계가 가능하신 분 • 포토샵, 일러스트레이터 등 그래픽 툴 활용이 가능하신 분 • 서비스 기획에 대한 이해도가 높으신 분 • 웹/앱 UI 디자인에 대한 기본 감각이 있으신 분 • 사용자 경험 중심 사고가 가능하신 분",
+          경력유형: "신입",
+          경력유형_코드: "신입",
+          경력연차_최소: "",
+          경력연차_숫자: "0",
+          직무명: "Web/App 서비스 디자인 기획",
+          직무_카테고리_코드: "M5",
+          주요업무_원문: "Web/App 서비스 디자인 기획(UI/UX)",
+          인재상_원문:
+            "• 프로모션 및 이벤트 페이지 등 산출물 제작 • Figma 기반의 웹/앱 UX/UI 설계 및 디자인 시스템 구축/운영 • 자사 Web/App의 기능 기획, 개선 • 화면 설계 및 기능 명세서/기획서 작성 • 프로젝트 과정에서 개발자들과의 협업",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• HTML/CSS에 대한 기본 이해 • Figma 기본 활용 능력(디자인 시스템 이해 및 AI 규칙 변환 능력) • MCP 활용 경험 • 사용자 중심의 문제 해결 능력을 갖추신 분",
+          "지원 마감일": "2026.07.31",
+        },
+        {
+          회사명: "(주)옵스테크",
+          공고제목: "풀스택 개발자",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54332451&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=7bb87d4a-6961-45c3-a74d-fe931f2c67f4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 광명시",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건:
+            "4년제 대학 졸업자 (공고 상단에는 학력무관이나 상세 내용에 4년제 졸업 명시)",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "• 전자정부프레임워크 기반 개발 프로젝트 경험이 있으신 분 • 협업 도구 기반 개발 프로세스 경험이 있으신 분 • 고객의 요구사항을 분석하고 대응해 나가실 수 있는 분 • 컴퓨터 구조와 프로그래밍에 대한 탄탄한 이해도와 응용 능력을 갖추신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "",
+          경력연차_숫자: "0",
+          직무명: "풀스택 개발자",
+          직무_카테고리_코드: "M3",
+          주요업무_원문: "웹개발, AI개발",
+          인재상_원문:
+            "• AI 기반 서비스 기획 및 개발 • AI로 생성한 코드 결과물을 검증하고 개선 • 전자정부프레임워크 기반 솔루션 개발 • 데이터 처리 기술 연구 및 엔진 개발",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 컴퓨터, 소프트웨어 관련 전공 및 교육 이수자 • 데이터 처리 및 다양한 아키텍처에 대한 이해도 및 경험이 있으신 분 • 주도적으로 업무를 설계하고 계획하며, 업무를 해나가실 수 있는 분 • AI 도구를 사용해 '실무에서 운용 가능한' 수준의 서비스 개발 경험이 있으신 분",
+          "지원 마감일": "2026.07.31",
+        },
+        {
+          회사명: "(주)새한정보",
+          공고제목: "신한카드 AI쳇봇 개발 및 운영 - SM",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54332266&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=7bb87d4a-6961-45c3-a74d-fe931f2c67f4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 중구",
+          근무지역_코드: "1",
+          근무형태: "정규직, 프리랜서",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "경력 3년 이상 ~ 20년 이하, Javasc ript, React, typesc ript, 코사등 경력증빙 필수",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "신한카드 AI쳇봇 개발 및 운영 - SM",
+          직무_카테고리_코드: "M2",
+          주요업무_원문: "웹개발자",
+          인재상_원문:
+            "신한카드 AI쳇봇 개발 및 운영 - SM - 초급 개발자 (1명) - 중급 개발자 (1명) - Javasc ript, React, typesc ript - KT쳇봇빌더 경험자 우대 - 협업 및 커뮤니케이션 능력 우수자 - 근무기간 : 2026.08.01 ~ 2027.06 (11개월 이후 연단위 연장) - 근무장소 : 을지로3가 - 코사등 경력증빙 필수 - 정규직 및 프리랜서 가능 - 개인 프로필 및 희망급여 제시 요망",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "KT쳇봇빌더 경험자 우대, 협업 및 커뮤니케이션 능력 우수자",
+          "지원 마감일": "2026.07.03",
+        },
+        {
+          회사명: "(주)헤디",
+          공고제목: "[벤처/부설연구소] 임베디드 소프트웨어 개발 신입/경력 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54331754&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=7bb87d4a-6961-45c3-a74d-fe931f2c67f4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "부산 강서구",
+          근무지역_코드: "4",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상(예정자 가능)",
+          학력_코드: "H3",
+          전공요건: "컴퓨터 공학, 전자공학, 소프트웨어 공학 등 관련 전공",
+          자격요건:
+            "최종학력 경남소재 대학 졸업(예정자), C, C++ 등의 프로그래밍 언어에 대한 기본적인 이해도",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "임베디드 소프트웨어 개발 신입/경력 채용",
+          직무_카테고리_코드: "M7",
+          주요업무_원문: "임베디드 소프트웨어 개발",
+          인재상_원문:
+            "- 임베디드 소프트웨어의 설계 및 개발\\n- 임베디드 시스템의 테스트 및 디버깅\\n- 임베디드 엣지 AI 개발\\n- ROS 기반 SW 개발",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- 소프트웨어 개발 프로세스에 대한 지식과 경험\\n- Linux, RTOS 등 임베디드 운영체제에 대한 경험\\n- ROS에 대한 지식과 경험",
+          "지원 마감일": "2026.07.10",
+        },
+        {
+          회사명: "(주)트윔",
+          공고제목: "머신비전 응용 소프트웨어 개발",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54331578&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=7bb87d4a-6961-45c3-a74d-fe931f2c67f4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 화성시",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "대졸(2,3년제) 이상",
+          학력_코드: "H2",
+          전공요건: "전자공학, 컴퓨터공학",
+          자격요건: "MFC, C++, C# 가능자",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "1년 이상",
+          경력연차_숫자: "1",
+          직무명: "머신비전 응용 소프트웨어 개발",
+          직무_카테고리_코드: "M7",
+          주요업무_원문: "머신비전 영상처리 S/W 개발자",
+          인재상_원문:
+            "- 머신비전 영상처리 S/W 개발\\n- vision UI, DLL, Algorithm 제작 (C#, C++)\\n- 머신비전 프로젝트 셋업 및 대응",
+          우대_자격증: "",
+          우대_어학기준: "B1/B2 비자 소지자",
+          우대사항_원문:
+            "- 해당 직무 유경험자 (이차전지, 디스플레이, 머신비전 검사기)\\n- 해외 근무, 장기 출장 가능자(3개월~)\\n- B1/B2 비자 소지자",
+          "지원 마감일": "2026.07.31",
+        },
+        {
+          회사명: "(주)트윔",
+          공고제목: "AI 플랫폼 백엔드 개발자(전문연구요원 가능)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54331566&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=7bb87d4a-6961-45c3-a74d-fe931f2c67f4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 화성시",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "컴퓨터공학, 전기, 전자, 산업공학, 통계, 수학 등 관련 전공",
+          자격요건:
+            "- C++, C#, Python 등 언어 개발 경험 보유자\\n- 이미지 데이터 처리 및 컴퓨터 비전 관련 개발 경험\\n- TensorFlow, PyTorch 등 딥러닝 프레임워크 활용 경험 및 모델 학습/추론 구현 경험",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "1년 이상",
+          경력연차_숫자: "1",
+          직무명: "AI 플랫폼 백엔드 개발자",
+          직무_카테고리_코드: "M2",
+          주요업무_원문: "AI 플랫폼 백엔드 개발자",
+          인재상_원문:
+            "- AI 기반 서비스의 백엔드 아키텍처 설계 및 기능 개발\\n- 머신비전 검사 분야의 딥러닝 컴퓨터 비전 모델 연구 · 개발\\n- 이미지 데이터 기반 이상 탐지, 불량 분류, 세그멘테이션 등 AI 알고리즘 설계 및 구현\\n- 자사 AI 플랫폼(MOAI, T-AIS 등) 리팩토링, 고도화 및 기술 문서화",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- 딥러닝, 컴퓨터 비전 분야 석사이상 학위자\\n- 이종 언어 간 포팅 및 알고리즘 최적화 경험\\n- 대규모 이미지 데이터셋 구축 및 라벨링/검수 자동화 파이프라인 설계 경험\\n- MLOps, ONNX, Docker, CI/CD 등 AI 서비스화 경험",
+          "지원 마감일": "2026.07.31",
+        },
+        {
+          회사명: "(주)트윔",
+          공고제목: "AI로봇비전 개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54331553&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=7bb87d4a-6961-45c3-a74d-fe931f2c67f4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 화성시",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "- 동종 경력 2년 이상\\n- Python 언어 사용 가능자\\n- C++, C# 중 1개 이상의 언어에 능숙한 개발 경험 보유자\\n- 구현가능 능력(1개 이상) 보유자 (Socket 통신 / PyQT / AMR(AGV) 물류 스케줄링)",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "2년 이상",
+          경력연차_숫자: "2",
+          직무명: "AI로봇비전 개발자 채용",
+          직무_카테고리_코드: "M4",
+          주요업무_원문: "AI 로봇비전 개발자",
+          인재상_원문:
+            "- ROS2(Humble), Isaac Sim 등 로봇 관련 프로그래밍\\n- 디지털 트윈 환경 구축\\n- 시뮬레이션 학습\\n- 검증 및 실제 로봇 적용",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- 인근 거주자\\n- 운전 가능자\\n- 해외여행 결격 사유 없는 자\\n- AI 학습 능력 보유자 (디지털트윈 환경구축, 시뮬레이션 학습, 검증 및 실제 로봇 적용)\\n- ROS2(Humble) 프로그래밍 가능자",
+          "지원 마감일": "2026.07.31",
+        },
+        {
+          회사명: "코리아써치",
+          공고제목: "설계로 연결하고 기준으로 확장하는 플랫폼 디자이너",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54331381&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=7bb87d4a-6961-45c3-a74d-fe931f2c67f4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 서초구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(2,3년제) 이상",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "시스템 컴포넌트를 직접 설계한 경험이 있습니다 / 제품 적용까지 완주한 경력입니다 / Figma 안에서 구조를 정리할 수 있습니다 / 컴포넌트를 지속 운영할 감각이 있습니다 / HTML·CSS 원리를 이해하고 있습니다 / 개발자와 언어 맞춰 협업할 수 있습니다 / 색상 대비 기준을 놓치지 않습니다 / 키보드 이동성까지 고려해 설계합니다 / 화면 미감만 보지 않습니다 / 구조 문제를 정의하고 해결합니다 / 디자인과 개발의 사이를 읽습니다 / 협업 프로세스를 팀에 확산시킨 경험이 있습니다",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "4년 이상",
+          경력연차_숫자: "4",
+          직무명: "설계로 연결하고 기준으로 확장하는 플랫폼 디자이너",
+          직무_카테고리_코드: "M7",
+          주요업무_원문: "플랫폼 디자이너",
+          인재상_원문:
+            "토큰과 컴포넌트의 뼈대를 세웁니다 / 디자인 시스템의 확장 지도를 그립니다 / 단일 요소를 넘어 패턴을 묶어냅니다 / 반복 가능한 UI 질서를 만듭니다 / 가이드의 기준을 선명하게 다듬습니다 / 자동화와 AI로 운영 속도를 높입니다 / HTML·CSS 구조를 정확히 읽어냅니다 / 개발 협업으로 구현 완성도를 끌어올립니다 / 운영 방식의 흐름을 새로 설계합니다 / 정책이 조직 안에 자리 잡게 만듭니다",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "컴포넌트 너머 패턴 단계까지 다뤄봤습니다 / 구조 체계를 한층 깊게 만든 경험이 있습니다 / 가이드를 수작업에 묶어두지 않았습니다 / 자동화와 AI로 운영 효율을 높였습니다 / 작은 조직이라도 리딩해본 경험이 있습니다 / 시스템 운영의 중심을 맡아봤습니다 / 글로벌 서비스 흐름을 경험했습니다 / 여러 서비스를 잇는 시스템 설계 경험이 있습니다",
+          "지원 마감일": "2026.07.28",
+        },
+        {
+          회사명: "(주)엔티엘헬스케어",
+          공고제목: "(주)엔티엘헬스케어 AI 연구팀 LLM/RAG 개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54331140&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=df18a5ca-579e-4abe-8769-99c109cf0fe4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 성남시",
+          근무지역_코드: "2",
+          근무형태: "정규직, 계약직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "- 경력 1년 이상 (인턴·프로젝트 포함)\n - RAG 시스템 설계·구현 및 실서비스 배포 경험\n - Python/FastAPI 기반 백엔드 개발 경험\n - Docker, Jenkins 등 CI/CD 환경 운영 경험\n - LLM 서빙 및 GPU 서버 운영 경험",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "1년 이상",
+          경력연차_숫자: "1",
+          직무명: "엔티엘헬스케어 AI 연구팀 LLM/RAG 개발자 채용",
+          직무_카테고리_코드: "M4",
+          주요업무_원문: "LLM/RAG 개발자",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문: "",
+          "지원 마감일": "2026.07.31",
+        },
+        {
+          회사명: "(주)뱅크엑스",
+          공고제목: "프로덕트 매니저 (PM) 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54331134&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=df18a5ca-579e-4abe-8769-99c109cf0fe4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 영등포구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "* IT 또는 서비스 개발 프로젝트 PM 또는 관련 업무 경험 5년 이상 또는 이에 준하는 프로젝트 관리 경험이 있으신 분 * 프로젝트 일정 관리 및 협업 경험 * 개발자, 기획와의 커뮤니케이션 경험 * 업무를 구조적으로 정리하고 전달할 수 있는 분 * 여러 이해관계자와 협업하며 프로젝트를 끝까지 진행해본 경험이 있는 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "6년 이상",
+          경력연차_숫자: "6",
+          직무명: "프로덕트 매니저  채용",
+          직무_카테고리_코드: "M7",
+          주요업무_원문: "프로덕트 매니저 (PM)",
+          인재상_원문:
+            "* 서비스 개발 프로젝트 전반의 일정 및 진행 관리 * 기획자, 개발자, 디자이너 간 커뮤니케이션 및 협업 조율 * 프로젝트 요구사항 정리 및 우선순위 관리 * 진행 상황 공유 및 이슈 관리 * WBS 기반 일정 구조화 및 업무 단위(Task) 관리 * 협업 툴을 활용한 프로젝트 관리 * 기존 및 신규 프로젝트 병행 관리 * 필요 시 간단한 기능 정의 및 기획 보조",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "* 웹/앱 서비스 프로젝트 경험 * 스타트업 또는 초기 프로젝트 경험 * 서비스 기획 또는 UI/UX 기획 경험 * 기획자 또는 개발자로서의 실무 경험 * WBS, 일정 관리 문서 작성 경험 * 요구사항 정의서(RFD 등) 작성 경험 * Jira, Notion, Excel 등 협업 툴 사용 경험",
+          "지원 마감일": "2026.07.25",
+        },
+        {
+          회사명: "(주)인피니에이아이",
+          공고제목: "AI 개발자 채용 (OCR·문서분류·데이터셋 검증·이상탐지 모델)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54329882&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=df18a5ca-579e-4abe-8769-99c109cf0fe4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "인천 부평구",
+          근무지역_코드: "3",
+          근무형태: "정규직, 계약직, 인턴",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "- Python 기반 AI 모델 개발 경험이 있으신 분 \\n- PyTorch, TensorFlow, Scikit-learn 등 AI/ML 프레임워크 활용 경험이 있으신 분 \\n- 이미지, 문서, 영상, 정형/비정형 데이터 중 1개 이상을 활용한 AI 모델 개발 경험이 있으신 분 \\n- AI 학습 데이터셋 구축, 전처리, 학습, 평가, 성능 개선 과정을 이해하고 수행할 수 있으신 분 \\n- Accuracy, Precision, Recall, F1-score 등 모델 성능평가 지표를 이해하고 검증 결과를 정리할 수 있으신 분 \\n- 데이터 라벨링 기준 수립, 학습/검증/테스트 데이터셋 분리, 데이터 품질관리 경험 또는 이해가 있으신 분 \\n- AI 모델 개발 결과를 기술문서, 검증보고서, 모델정의서 등 산출물 형태로 정리할 수 있으신 분 \\n- 백엔드, 프론트엔드, 데이터 엔지니어, 기획자 등 협업 부서와 원활하게 커뮤니케이션할 수 있으신 분 \\n- 공공사업, R&D 과제, 실증사업 등 문서 기반 프로젝트 수행에 거부감이 없으신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "1년 이상",
+          경력연차_숫자: "1",
+          직무명: "AI 개발자 채용",
+          직무_카테고리_코드: "M4",
+          주요업무_원문: "AI 개발자 (중급/고급)",
+          인재상_원문:
+            "■ 공통 AI 개발 업무 \\n- 공공·복지·행정 분야 AI 모델 개발 및 검증 \\n- Python, PyTorch 기반 AI 모델 학습, 평가, 개선 \\n- 정형·비정형 데이터 기반 AI 분석모델 개발 \\n- 이미지, 문서, 영상, 시계열 데이터 기반 AI 모델 개발 \\n- 학습 데이터셋 구축, 라벨링 기준 수립, 검증 데이터셋 분리 및 품질관리 \\n- 모델 성능평가 지표 수립 및 검증 리포트 작성 \\n- Accuracy, Precision, Recall, F1-score 등 정량 성능평가 수행 \\n- AI 모델 개발 산출물 작성 지원 \\n- AI 모델 PoC, 성능검증, 테스트 및 고도화 지원 \\n- 발주처 요구사항 분석 및 제안서 기술파트 작성 지원 \\n■ 문서 AI / OCR 관련 업무 \\n- 스캔 문서, 이미지, PDF 등 비정형 데이터의 OCR 판독 결과 분석 및 후처리 \\n- 신청서, 첨부서류 등 문서 유형 분류 모델 개발 \\n- OCR 결과의 오류 유형 분석 및 보정 로직 개발 \\n- 문서 내 주요 필드 추출 및 구조화 데이터 변환 지원 \\n- OCR 추출값과 기존 정형 DB 간 정합성 비교·검증 로직 개발 \\n- 문서 이미지 품질 개선을 위한 전처리 알고리즘 적용 \\n- 문서 분류 및 OCR 검증을 위한 학습/검증 데이터셋 구축 \\n■ 비전 AI / 영상분석 관련 업무 \\n- 이미지 및 영상 기반 객체 탐지, 행동 분석, 이상행동 탐지 모델 개발 \\n- CCTV, 카메라, 센서 데이터 기반 위험상황 탐지 모델 개발 지원 \\n- 사람의 자세, 행동, 이동패턴 분석을 위한 Computer Vision 모델 개발 \\n- Pose Estimation, Skeleton 데이터, 행동 인식 모델 적용 및 검증 \\n- 영상 데이터 기반 이벤트 탐지 및 위험도 산출 알고리즘 개발 \\n- 영상 분석 결과의 정량 성능평가 및 오탐·미탐 개선 \\n- 비식별화된 영상 Feature 데이터 기반 AI 모델 학습 및 검증 \\n■ 이상탐지 / 위험도 분석 업무 \\n- 정상/비정상 패턴 기반 이상탐지 모델 개발 \\n- 사용자 행동, 이동경로, 체류패턴, 이용패턴 등 시계열 데이터 분석 \\n- 위험요소 도출, 위험도 점수화, 우선순위 산정 모델 개발 \\n- Rule 기반 Baseline 모델과 머신러닝 기반 예측모델 결합 \\n- 이상패턴 탐지를 위한 Feature Engineering 수행 \\n- 분석 결과에 대한 설명 가능성 확보 및 판단 근거 정리 \\n- AI 분석 결과를 대시보드, 알림, 리포트 등 서비스 기능과 연계 \\n■ 데이터셋 및 AI 검증 업무 \\n- AI 학습용 데이터셋 구축 기준 수립 \\n- 라벨링 가이드 작성 및 검수 기준 정의 \\n- 학습/검증/테스트 데이터셋 분리 관리 \\n- 데이터 품질 오류, 중복, 누락, 불균형 데이터 점검 \\n- 모델 성능 저하 원인 분석 및 개선 데이터셋 재구성 \\n- 데이터셋 구축 결과 및 AI 검증 결과 보고서 작성 \\n- 공공사업 및 R&D 과제 수행을 위한 데이터 관리체계 수립 지원 \\n■ 개발 및 협업 업무 \\n- AI 모델 API 연계 및 백엔드/프론트엔드 개발팀과 협업 \\n- Docker 기반 AI 실험환경 구성 및 운영 지원 \\n- GPU 서버 기반 모델 학습, 추론, 성능 테스트 수행 \\n- 모델 배포, 로그 분석, 성능 모니터링 및 개선 지원 \\n- 프로젝트 일정, 요구사항, 테스트 결과에 따른 개발 산출물 관리 \\n- 공공기관, 연구기관, 컨소시엄 참여기관과의 기술 협의 지원",
+          우대_자격증: "같이 성장하실 성실하고 적극적인 분",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- Document AI 관련 기술 \\n- YOLO / ResNet / EfficientNet / ViT \\n- XGBoost / LightGBM \\n- MLflow / Airflow \\n- Hadoop / Hive / Spark \\n- Kubernetes \\n- GIS / GeoJSON / PostGIS",
+          "지원 마감일": "2026.07.31",
+        },
+        {
+          회사명: "(주)한컴케어링크",
+          공고제목: "[한컴케어링크] 헬스케어 개발 인재 모집",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54329721&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=df18a5ca-579e-4abe-8769-99c109cf0fe4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 성남시",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "대학졸업(2,3년)이상, 졸업 예정자 지원가능",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "• 문제 해결을 위해 주도적으로 고민하고 실행할 수 있는 분\\n• 원활한 협업 및 커뮤니케이션 역량을 보유한 분\\n• 새로운 기술에 대한 학습 의지와 성장 욕구가 있는 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "헬스케어 개발 인재 모집",
+          직무_카테고리_코드: "M7",
+          주요업무_원문: "개발자",
+          인재상_원문:
+            "• 신규 앱·웹 서비스 개발\\n• 검진 관리 플랫폼(검진 예약, 결제 등) 운영 및 고도화\\n• 유전자 분석 서비스(웹) 운영 및 기능 개선\\n• 사내 관리자 시스템 운영 및 유지보수\\n• AI 기반 신규 서비스 및 기능 검토·개발",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 컴퓨터공학 등 관련 전공자\\n• React, Next.js, TypeScript, Node.js 개발 경험\\n• Java, JSP, Spring 개발 경험\\n• 하이브리드 앱 또는 모바일 서비스 개발 경험\\n• 헬스케어, 의료, 바이오 분야 서비스 개발 경험(앱·웹)\\n• 백엔드 개발 및 REST API 설계·개발 경험\\n• Git 등 형상관리 도구를 활용한 버전 관리 경험\\n• AI 서비스, LLM, 에이전트(Agent) 기반 서비스 구축 또는 활용 경험\\n• 새로운 기술을 빠르게 학습하고 서비스에 적용한 경험",
+          "지원 마감일": "2026.08.01",
+        },
+        {
+          회사명: "(주)코어스택",
+          공고제목: "26 풀스택 웹개발자 채용 - 경력 (1년차 이상)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54328722&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=df18a5ca-579e-4abe-8769-99c109cf0fe4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "세종",
+          근무지역_코드: "8",
+          근무형태: "정규직, 인턴",
+          학력요건: "대졸(2,3년제) 이상",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "· 기본적인 자기주도 개발 역량을 보유하신 분\\n· 소스코드를 분석하여 업무 흐름과 논리 구조를 이해할 수 있는 분\\n· AI 도구에 의존하지 않고 기본적인 코드 분석 및 문제 해결이 가능한 분\\n· 다중 테이블 관계를 이해하고 SQL 쿼리 작성이 가능한 분\\n· 조회, 집계, 통계성 데이터를 SQL로 처리해 본 경험이 있는 분\\n· 팀원 및 고객사와 원활하게 소통하고 협업할 수 있는 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "1년 이상",
+          경력연차_숫자: "1",
+          직무명: "26 풀스택 웹개발자 채용 - 경력",
+          직무_카테고리_코드: "M3",
+          주요업무_원문: "웹개발자",
+          인재상_원문:
+            "• 국가·공공기관 업무시스템 유지관리 및 기능개선 업무 수행\\n• 공공기관 업무시스템 유지관리 및 기능 개선\\n• 기존 소스 분석을 통한 오류 수정 및 기능 보완\\n• 사용자 요청사항 검토 및 개발 반영\\n• SQL 기반 데이터 조회, 통계 처리 및 검증\\n• 시스템 운영 이슈 원인 분석 및 조치 지원\\n• 고객사 및 내부 개발팀과의 협업",
+          우대_자격증: "",
+          우대_어학기준: "정보처리기사, 빅데이터 분석기사",
+          우대사항_원문:
+            "• WebSquare 개발 또는 유지보수 경험이 있으신 분\\n• AIReport 등 리포팅 툴 활용 경험이 있으신 분\\n• 전자정부프레임워크 또는 공공기관 시스템 개발 경험이 있으신 분\\n• 정보처리기사 등 시스템·소프트웨어 관련 자격증을 보유하신 분\\n• 빅데이터 분석기사 자격증 취득자\\n• IT 관련 수상경력자\\n• IT 개발 인력 양성 국비교육 이수자",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "코드비전(주)",
+          공고제목: "AI 서비스 백엔드 개발자 채용 (신입·주니어 가능)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54327786&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=df18a5ca-579e-4abe-8769-99c109cf0fe4&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 마포구",
+          근무지역_코드: "1",
+          근무형태: "계약직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "인공지능 및 컴퓨터 공학 관련 학과",
+          자격요건:
+            "• 인공지능 및 컴퓨터 공학 관련 학사 학위 소지자 \\n• Python 기반 백엔드 개발에 관심이 있거나 관련 프로젝트 경험이 있는 분 \\n• REST API, 데이터베이스, 서버 구조에 대한 기본 이해가 있는 분 \\n• AWS 클라우드 환경에서의 서비스 개발 및 운영 경험 \\n• Docker 컨테이너 기술에 대한 이해와 사용 경험 \\n• 원활한 커뮤니케이션 능력과 동료와 함께 성장하는 것을 즐기는 분 \\n• 주어진 업무를 책임감 있게 수행하고, 적극적으로 학습하는 분 \\n• 제조 현장의 문제를 기술로 해결하는 일에 관심이 있는 분 \\n• LLM, AI API 등 최신 AI 서비스 기술에 관심이 있는 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "AI 서비스 백엔드 개발자 채용",
+          직무_카테고리_코드: "M2",
+          주요업무_원문: "AI 서비스 백엔드 개발자",
+          인재상_원문:
+            "• AI 서비스 및 제조 데이터 플랫폼 백엔드 개발 \\n• REST API 설계 및 서버 기능 개발 \\n• 데이터베이스 설계, 연동 및 데이터 관리 기능 개발 \\n• LLM API, AI 모델 추론 결과와 백엔드 시스템 연동 \\n• 비전 AI, 제조 데이터, 검사 데이터 기반 서비스 기능 개발 \\n• 관리자 페이지, 대시보드, 내부 운영도구와의 API 연동 \\n• 사용자 권한, 인증, 로그, 파일 업로드 등 서비스 운영 기능 개발 \\n• 서비스 배포 및 운영 환경 개선 지원",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• FastAPI, Django, Flask, Spring Boot, Express 등 백엔드 프레임워크 사용 경험 \\n• OpenAI API, Claude, Gemini 등 LLM API 연동 경험 \\n• RAG, Vector DB, Embedding, LangChain, LlamaIndex 관련 경험 \\n• AI/머신러닝/딥러닝 관련 수업, 프로젝트, 공모전 경험 \\n• AI 모델 추론 서버와 백엔드 API 연동 경험 \\n• React, Next.js, Vue 등 프론트엔드 프레임워크 사용 경험 \\n• PostgreSQL, MySQL, MongoDB, Redis 등 데이터베이스 사용 경험 \\n• Docker, Linux, Nginx, 클라우드 서버 운영 경험 \\n• 제조 데이터, 이미지 데이터, 검사 데이터 처리 경험 \\n• 대시보드, 관리자 페이지, SaaS형 서비스 개발 경험 \\n• 포트폴리오, GitHub, 개인 프로젝트 보유자",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)연인트레이드",
+          공고제목: "주식회사 연인트레이드 쇼핑몰·플랫폼 웹개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54327057",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 금천구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건: "",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "주식회사 연인트레이드 쇼핑몰·플랫폼 웹개발자 채용",
+          직무_카테고리_코드: "M7",
+          주요업무_원문: "쇼핑몰·플랫폼 웹개발자",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문: "",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)키우소",
+          공고제목: "백엔드 개발자(경력직) 모집",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326955&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=ab158376-693e-4a29-ae0d-47b1928ec162&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "충남 천안시",
+          근무지역_코드: "9",
+          근무형태: "정규직",
+          학력요건: "대졸(2,3년제) 이상",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "백엔드 개발 경력 3년 이상 또는 그에 준하는 실력을 보유하신 분\n Java17에 능숙하신 분\n SpringBoot 3.x 기반의 프로젝트나 서비스를 개발해 보신 분\n JPA(Hibernate)에 능숙하신 분\n Swagger 사용 경험이 있으신 분\n Git, Github, GitLab 사용에 능숙하신 분\n Restful API 에 대한 이해가 있으신 분\n MySQL 및 Maria DB를 사용해 보신 분\n Linux 서버 운영 경험이 있으신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "백엔드 개발자 모집",
+          직무_카테고리_코드: "M2",
+          주요업무_원문: "백엔드 개발자",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "Java 외 다른 언어를 활용하실 수 있는 분\n CI/CD 구축 경험이 있으신 분\n Spring Cloud나 MSA를 경험해 보신 분\n Doctor Container 기반으로 서비스를 운영해보신 분\n RDB를 튜닝해보신 분\n 서비스 기획과 개발 및 운영 전반을 경험해보신 분",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "에이지엘(주)",
+          공고제목: "[ 예비 유니콘 ] API 개발자",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326381&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=ab158376-693e-4a29-ae0d-47b1928ec162&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 광진구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "ㆍ관련 경력(API) : 5년 ~ 12년 (백엔드/API 개발 경험) ㆍ.NET Core 7.0 이상(.NET 8.0 우대) 환경에서의 서비스 개발 경험 ㆍEntity Framework Core 기반 ORM 개발 경험 ㆍRESTful API 설계 및 개발 능력 ㆍMS-SQL, PostgreSQL 또는 유사 RDBMS 사용 경험 ㆍOOP 에 대한 이해",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "5년 이상",
+          경력연차_숫자: "5",
+          직무명: "API 개발자",
+          직무_카테고리_코드: "M2",
+          주요업무_원문: "API 개발자",
+          인재상_원문:
+            "ㆍ골프장 티타임(재고) 및 예약 연동 API 개발 및 유지보수 ㆍ내부 GDS(Global Distribution System) 및 제휴 플랫폼과의 API 연동 ㆍ.NET Core 기반 백엔드 서비스 설계 및 고도화 ㆍ데이터베이스 모델링 및 ORM(EF Core) 기반 비즈니스 로직 구현 ㆍ시스템 성능 개선 및 오류 모니터링, 로그 분석",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "ㆍ대규모 트래픽 처리 및 성능 최적화 경험 ㆍGDS, 예약/재고 시스템 또는 외부 API 연동 프로젝트 경험 ㆍAWS, Azure 등 클라우드 환경에서의 서비스 운영 경험 ㆍGit, Jira, Jenkins 등 협업 툴 활용 능숙자 ㆍAI 기반 개발 도구를 활용한 코드 작성, 리팩토링, 테스트 코드 생성 등 바이브 코딩 경험 ㆍ적극적인 커뮤니케이션과 문제 해결 능력을 갖춘 분",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)아이엠폼",
+          공고제목: "[경력 3년 이상] 백엔드 개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326373&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=ab158376-693e-4a29-ae0d-47b1928ec162&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강남구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(2,3년제) 이상",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "- 백엔드 개발 경력 3년 이상\\n- Node.js, Python, Java등 하나 이상의 백엔드 언어 사용 경험\\n- REST API 설계 및 개발 경험 (Spring Boot)\\n- MySQL, PostgreSQL, MongoDB 등 데이터베이스 사용 경험\\n- AWS, Docker, Linux 서버 환경에 대한 기본 이해\\n- 비동기 작업 처리, 큐 시스템, 배치 처리 등에 대한 이해 또는 경험\\n- Git 기반 협업 경험",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "백엔드 개발자 채용",
+          직무_카테고리_코드: "M2",
+          주요업무_원문: "벡엔드 개발자",
+          인재상_원문:
+            "- 자사 솔루션 DAIMS 서비스 및 관리자 백엔드 API 설계 및 개발\\n- AI Agent 기반 워크플로우 실행 및 관리 기능 개발\\n- 다양한 AI 모델 및 외부 API 연동을 위한 서버 로직 개발\\n- 작업 큐, 비동기 처리, 배치 작업 등 장시간 실행되는 AI 작업 처리 구조 설계\\n- 데이터베이스 설계, 성능 최적화 및 검색 기능 고도화\\n- AWS, Docker, Linux 기반 서버 인프라 운영 및 배포 환경 관리\\n- 프론트엔드 및 기획/디자인 팀과 협업하여 서비스 기능 고도화",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- AI Agent, LLM, 이미지 생성 모델 또는 AI SaaS 서비스 개발 경험\\n- LangChain, LangGraph, OpenAI API, Gemini API 등 AI Agent/LLM 관련 기술 사용 경험\\n- GPU 서버, 모델 서빙, ComfyUI, Stable Diffusion, Flux 등 이미지 생성 파이프라인 운영 경험\\n- AWS, Docker Compose, Nginx, CloudFront, S3 등 인프라 운영 경험\\n- 작업 큐, 스케줄러, 모니터링, 로그 관리 등 운영 자동화 경험\\n- 결제, 구독, 사용자 권한 관리 기능 개발 경험\\n- 초기 단계 서비스에서 빠르게 문제를 정의하고 구조를 개선해본 경험",
+          "지원 마감일": "2026.08.29",
+        },
+        {
+          회사명: "컴즈(주)",
+          공고제목: "AI 기반 QA 자동화 플랫폼 기획/디자이너 채용의 건",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54326365&location=ts&searchword=ai+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=recently&paid_fl=n&search_uuid=ab158376-693e-4a29-ae0d-47b1928ec162&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 구로구",
+          근무지역_코드: "1",
+          근무형태: "프리랜서",
+          학력요건: "대졸(2,3년제) 이상",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "웹 서비스 기획 및 UI·UX 디자인 실무 경력 2년 이상, 기획과 디자인을 겸직으로 수행 가능한 분, 개발팀과의 협업 프로세스 이해 및 원활한 커뮤니케이션 역량, 기능 명세, 화면 설계 등 문서화 능력 보유",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "2년 이상",
+          경력연차_숫자: "2",
+          직무명: "AI 기반 QA 자동화 플랫폼 기획/디자이너 채용의 건",
+          직무_카테고리_코드: "M4",
+          주요업무_원문: "서비스 기획 / UX·UI 디자인",
+          인재상_원문:
+            "[서비스 기획] AI 기반 테스트 자동화 플랫폼 웹 서비스 기획 및 기능 정책 수립, 신규 기능 요구사항 분석, 화면 설계(스토리보드·와이어프레임) 작성, 사용자 시나리오 및 서비스 플로우 정의, 기능 명세서(PRD) 작성 [UX·UI 디자인] 플랫폼 UI 디자인 및 디자인 시스템 구축·운영(컴포넌트, 가이드라인), 와이어프레임 → 프로토타입 → 최종 디자인 산출물 제작, 개발자 핸드오프용 디자인 스펙 산출물 작성(Figma 기반)",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "QA, AI/ML 관련 서비스 기획·디자인 경험, Figma 활용 능숙(와이어프레임·프로토타이핑·디자인 산출물 제작), Jira, Confluence 등 협업 툴 활용 경험, 기초 수준의 HTML/CSS 이해(개발 협업 관점), UX 리서치(사용자 인터뷰·사용성 테스트 등) 수행 경험, 국가 유공자 및 장애인 등 취업보호대상자 우대",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)유캔랩스",
+          공고제목: "[상시인재풀] 교육·개발·컨설팅 파트너를 모십니다",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54323500&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=87fac077-65b6-4096-819c-ce6b2687b00e&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역:
+            "경기 남양주시 (재택근무 가능) / 서울 및 전국 주요 지역 또는 온라인",
+          근무지역_코드: "9",
+          근무형태: "계약직, 프리랜서",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "생성형 AI 툴 활용 / 프롬프트 엔지니어링 (디지털 전환 / 업무 프로세스 개선)\n \n AI 코딩 도구 / 개발 생산성 (Claude Code, Codex 등)\n \n 데이터 분석 / SQL / BI\n \n 머신러닝 / 딥러닝 개발 교육\n \n LLM 앱 개발 / AI Agent / RAG\n \n UI/UX / 디자인\n \n PM / 서비스 기획 / 창업",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명:
+            "교육·개발·컨설팅 파트너 (주강사, 보조강사, 콘텐츠 제작자, 개발자, 컨설턴트)",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "주강사 : 강의 설계 및 메인 강의 진행 등\n \n 보조강사 : 실습 지원, 질의응답, 멘토링, 프로젝트 코칭 등\n \n 콘텐츠 제작자 : 교안, 실습 예제, 아티클 작성 등\n \n 개발자 : 유캔랩스 내부 프로젝트 및 솔루션 개발 참여\n \n 컨설턴트 : 기업/기관 대상 교육 방향성 제안, 업무 개선, 기술 도입 자문 등\n \n [함께 할 수 있는 프로젝트 예시]\n \n 풀타임 장기 교육과정\n \n 단기 특강 및 기업/공공기관 강의\n \n 교육 콘텐츠 및 교안 제작\n \n 기업·기관 대상 컨설팅\n \n 개발 및 솔루션 구축 프로젝트",
+          인재상_원문:
+            "AI를 잘 아는 것도 중요하지만, 그보다 더 중요한 것은 사람과 기업의 가능성을 진심으로 믿고 그것을 실제 성과로 바꿔낼 수 있는 태도입니다.",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "강의, 멘토링, 튜터링, 사내 교육 등 교육 경험이 있으신 분\n \n 자신의 실무 경험을 교육 콘텐츠로 풀어낼 수 있는 분\n \n 수강생이나 고객사의 눈높이에 맞춰 쉽고 정확하게 설명할 수 있는 분\n \n 실습형 교육, 프로젝트 기반 교육, 컨설팅 경험이 있으신 분\n \n 기업 교육, 공공기관 교육, 정부지원 교육사업 등 유관 경험이 있으신 분\n \n NCS 확인 강사로 등록되어 있거나 관련 요건을 충족하시는 분",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "이지케어텍(주)",
+          공고제목:
+            "[의료IT1위] 솔루션 풀스택 .NET 개발자 (석/박사) 전문연구요원",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54323547",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 중구",
+          근무지역_코드: "1",
+          근무형태: "계약직",
+          학력요건: "석사 졸업 이상(예정자 가능)",
+          학력_코드: "H4",
+          전공요건: "컴퓨터공학, 소프트웨어, 전산, AI 등 관련 전공",
+          자격요건:
+            "석사 이상 졸업(예정) 또는 박사\n \n 전문연구요원 신규편입(현역) 또는 전직 가능하신 분\n \n 컴퓨터공학, 소프트웨어, 전산, AI 등 관련 전공\n \n C# / .NET(Core) 기반 개발 경험 또는 이에 준하는 역량\n \n 객체지향 프로그래밍(OOP) 및 설계 원칙에 대한 이해\n \n REST API 설계 및 연동 경험\n \n RDBMS(Oracle, PostgreSQL, MySQL 등) 활용 경험",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "솔루션 풀스택 .NET 개발자 (전문연구요원)",
+          직무_카테고리_코드: "M3",
+          주요업무_원문:
+            "의료정보시스템(HIS) 기반 의료IT 솔루션 연구/개발\n \n C# / .NET(Core) 기반 업무용 애플리케이션 개발\n \n WPF 기반 Desktop Application 개발 및 고도화\n \n ASP.NET(Core) 기반 Web/API 서버 개발 및 운영\n \n 의료 데이터 처리 및 RDBMS 설계, 성능 최적화\n \n 병원 내·외부 시스템(API, Interface) 솔루션 개발\n \n Clean Architecture 및 CQRS 기반 시스템 설계\n \n 의료IT 신기술 연구 및 서비스 적용\n \n 연구과제 수행 및 연구개발 프로젝트 참여",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "전문연구요원 대상 정부 R&D 과제 수행 경험의료IT(HIS, EMR, PACS 등) 개발 또는 연구 경험WPF(Windows Presentation Foundation) 기반 Desktop 개발 경험ASP.NET Core 기반 서비스 개발 경험Clean Architecture, CQRS, DDD 적용 경험OAuth2.0, OpenID Connect, JWT 기반 인증 시스템 구축 경험Docker, Kubernetes 기반 컨테이너 환경 운영 경험Azure, AWS 등 Cloud 환경 개발 경험Linux / Windows Server 운영 경험Git, Azure DevOps, GitHub Actions 등 DevOps 활용 경험논문, 특허 또는 연구 프로젝트 수행 경험",
+          "지원 마감일": "2026.08.29",
+        },
+        {
+          회사명: "디에스(주) (DeepSeers)",
+          공고제목:
+            "[디에스(DeepSeers)] 경력/신입 AI 엔지니어(개발자) 채용 공고",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54323224&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=87fac077-65b6-4096-819c-ce6b2687b00e&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "인천 연수구",
+          근무지역_코드: "3",
+          근무형태: "정규직",
+          학력요건: "석사졸업 이상",
+          학력_코드: "H4",
+          전공요건: "컴퓨터 비전, 컴퓨터공학, 전자공학 또는 관련 학과",
+          자격요건:
+            "• 석사 이상(컴퓨터 비전, 컴퓨터공학, 전자공학 또는 관련 학과) 또는 이에 준하는 경력을 보유하고 계신 분\n • 해외출장에 결격사유가 없는 자",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "AI 엔지니어 (개발자)",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "ㆍ반도체 도메인의 비전 AI 알고리즘 및 딥러닝 모델 설계·구현·검증\n ㆍC#/WPF 기반 비전 소프트웨어의 실시간 멀티모델 추론 파이프라인 설계 및 최적화\n ㆍ연구·개발 성과의 특허 출원 및 학회·논문 발표, 기술 문서화",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• Vision AI or 생성형 AI 관련 석사 이상 학위 보유 혹은 관련 실무 3년 이상 보유자 우대\n • AI모델 개발의 전문성을 보유하신 분\n • 컴퓨터 비전 관련 학술대회나 저널에 논문 게재 경험 보유하신 분\n • 프로젝트 PM, PL 유경험자\n • OpenCV 등 Conventional Computer Vision 역량, 딥러닝 프레임워크(Pytorch, Tensorflow, Keras) 및 S/W 개발(Python, C++) 고급 역량 보유자\n • VLM, Generative AI 등의 거대 모델 학습/고도화 유경험자\n • 머신러닝 시스템 및 산업용 장비 경험자 우대\n • 팀과 함께 성장하며 지식을 공유하는 문화를 지향하시는 분",
+          "지원 마감일": "2026.07.29",
+        },
+        {
+          회사명: "(주)프로보티브",
+          공고제목: "ERP Product Owner (PO) - 시니어",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54323084&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=87fac077-65b6-4096-819c-ce6b2687b00e&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 영등포구",
+          근무지역_코드: "1",
+          근무형태: "정규직, 계약직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• 5년 이상 ~ 10년 이하\n • B2B SaaS / 엔터프라이즈 소프트웨어 PM 또는 PO 경력 5년 이상, 리드급 이상 (시니어)\n • 고객 대면 PoC 또는 엔터프라이즈 도입 프로젝트를 직접 리드해본 경험\n • 기능 spec 작성과 엔지니어링 리뷰가 가능한 기술 리터러시 (직접 코드 작성은 불필요)\n • 한국어 모국어, 영어 비즈니스 가능(필수) : CEO 및 글로벌 PoC 대응\n • 주도적으로 문제 범위를 정의하고 실행해본 경험 (주어진 backlog 처리가 아닌 고객 문제를 발견하고 제품 방향을 만든 경험)\n • 필요 시 해외/국내 출장 가능",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "5년 이상",
+          경력연차_숫자: "5",
+          직무명: "ERP Product Owner (PO) - 시니어",
+          직무_카테고리_코드: "M5",
+          주요업무_원문:
+            "제품 오너십 (End-to-End)\n • 패커티브 원(Packative One)의 도입·확장·정착을 제품 관점에서 총괄\n • 글로벌/국내 엔터프라이즈 PoC를 디스커버리부터 정착까지 단일 오너로 책임\n • 제품 로드맵·우선순위 의사결정 주도\n \n 고객•세일즈 인터페이스\n • 고객사 피드백을 직접 수집·구조화하고 제품 개선으로 연결\n • 엔터프라이즈 세일즈를 제품 관점에서 서포팅 (데모, 기능 설명, 도입 의사결정 지원)\n • 고객 IT·현장 운영자·경영진과 직접 소통하며 도입 라인에 참여\n \n Product ↔ Engineering 브리지 & 품질\n • 고객 요구를 기능 명세(spec)로 번역, 업무를 정리해 CEO와 논의 후 개발자에게 연결\n • 엔지니어링과 우선순위, 일정, 트레이드오프 협상\n • 기능 검수, QA 기준 정의, 릴리즈 시점 결정 참여\n \n 플레이북 자산화 & 전사 기여\n • 첫 PoC 경험을 재사용 가능한 디스커버리 템플릿, 온보딩 가이드와 매뉴얼로 정립\n • 도입 후 정착과 확장을 위한 adoption KPI 설계 및 운영\n • AI 기반 워크플로우 자동화 방향에 현장 피드백 반영",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "영어 비즈니스 가능",
+          우대사항_원문:
+            "• 제2외국어 비즈니스 가능 (일본어, 중국어 등)\n • 제조, 패키징, 물류, ERP 도메인 경험\n • Series A 전후 스타트업 0에서 1로 만든 PM 경험\n • AI 기반 워크플로우 자동화 제품 설계와 도입 경험\n • 고객 성공(CS) 또는 솔루션 컨설팅 백그라운드",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "씨메디에이아이 주식회사",
+          공고제목: "[씨메디에이아이 주식회사] 기획자 채용 공고",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54322965&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=87fac077-65b6-4096-819c-ce6b2687b00e&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 서초구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• 경력 (연수 무관)\n • 학력무관\n • 폐쇄망(네트워크 격리) 환경에서의 시스템 기획 또는 운영 경험\n • 웹, 앱, 설치 파일 등 멀티 플랫폼 프로젝트를 통합 관리한 경험\n • 서비스·프로젝트 단위의 권한별 접근 제어(RBAC 등) 설계 경험\n • 데이터 접근 권한 체계 설계 및 관리 경험\n • 관계형 DB 구조 이해 및 유기적 데이터 연계 설계 능력\n • 통합 시스템 아키텍처 설계 및 산출물 작성 경험\n • AI 기술(LLM, STT, 영상 분석 등)에 대한 개념적 이해 및 기획 적용 경험\n • Figma를 활용한 화면 설계 경험\n • Excel, PowerPoint, Docs 등을 활용한 기획 문서 작성 능력",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "AI기획자",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "• 시스템 아키텍쳐 문서화 및 설계 보조\n • DB 아키텍처 및 데이터 흐름 문서화 및 설계 보조\n • 사용자 접근 구조 및 권한 체계 설계\n • 개발자용 아키텍처 정의서 작성\n • UI/UX 기획 및 Figma 기반 와이어프레임·프로토타입 작성\n • 기획 산출물 문서 관리 (기능 명세서, 플로우차트, 회의록 등)\n • 면접 후 결정 직급으로 함께할 예정이에요.",
+          인재상_원문:
+            "• 기능 단위가 아닌 '시스템 전체 구조 관점'에서 기획할 수 있는 분\n • 보안과 확장성을 처음부터 설계에 반영한 경험이 있는 분\n • 신규 프로젝트 운영 설계 경험이 있는 분\n • 개발자, 디자이너, 의료 현장 담당자와 원활하게 소통할 수 있는 분\n • AI 기능이 포함된 의료 소프트웨어의 흐름을 이해하고 기획에 녹여낼 수 있는 분",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 의료기기 소프트웨어 인증(SaMD, IEC 62304, 식약처 가이드라인 등) 관련 업무 경험\n • PM 역할 병행 경험 (일정 관리, 이해관계자 커뮤니케이션, 리소스 조율 등)\n • 보안 요건을 반영한 시스템 설계 경험 (접근 제어, 감사 로그, 데이터 암호화 등)",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "키클롭스(주)",
+          공고제목: "[키클롭스㈜] 백엔드 개발자 모집",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54322940&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=87fac077-65b6-4096-819c-ce6b2687b00e&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "대전 유성구",
+          근무지역_코드: "5",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "· 재직자, 졸업예정자 중 합격 후 1개월 이내 입사 가능하신 분\n · 해외여행에 결격 사유가 없는 자(남성의 경우 병역 필 또는 면제자 포함)",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "백엔드 개발자",
+          직무_카테고리_코드: "M2",
+          주요업무_원문:
+            "· 백엔드 개발(경력 무관)\n \n Nest, Spring 프레임워크 개발\n \n MariaDB, Oracle 등 RDB 스키마 설계\n \n Docker, K8S 컨테이너 배포 환경 구성\n \n CI/CD 파이프라인 구성\n \n Git을 통한 개발 관리\n \n Java, TypeScript 숙련자\n \n REST, GraphQL, RPC의 이해가 있는분",
+          인재상_원문: "",
+          우대_자격증: "정보처리기사, 정보보안기사 등 관련 자격증 보유자",
+          우대_어학기준: "",
+          우대사항_원문:
+            "· 컴퓨터/정보통신공학 등 관련 전공자\n · 관련 자격증 보유자 (정보처리기사, 정보보안기사 등)\n · 협업 툴 경험자 (Jira, Confluence, Notion 등)\n · Project Leading 경험자\n · AI 페어코딩, 바이브코딩에 대한 이해가 있는분\n · OOP, Design Pattern 에 대한 이해가 있는분\n · Flutter 환경 Application 개발 경험자\n · 다양한 언어 (C++, C#, Python 등) 가능자\n · 다양한 OS (Windows, Linux, MAC) 가능자",
+          "지원 마감일": "채용시 마감",
+        },
+        {
+          회사명: "나이스인베스팅(주)",
+          공고제목: "[NICE인베스팅] PM (Product Manager) 채용(경력)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54322504&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=87fac077-65b6-4096-819c-ce6b2687b00e&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 영등포구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "• 경력 3년 이상 ~ 7년 이하\n • 대학교졸업(4년)이상\n • PM/PO/기획 등 유관 경력 3년~7년 보유자\n • 고객으로부터 도출한 인사이트를 바탕으로 제품화한 경험이 있으신 분\n • 데이터 기반 사고 및 데이터 시각화, 정보 전달에대한 이해도가 높은 분\n \n • 사용자 중심 사고방식과 문제 해결 능력이 있으신 분\n • 다양한 직군의 이해관계자와의 커뮤니케이션을 통해 합의된 의사결정을 이끌어 낼 수 있으신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "PM (Product Manager)",
+          직무_카테고리_코드: "M5",
+          주요업무_원문:
+            "• 자본시장 정보서비스의 전략 및 로드맵 수립\n \n 시장 조사, 사용자 니즈 분석, 경쟁사 및 Pain Point 분석을 통해 신규 서비스의 전략을 수립하고, 기획 및 개발의 로드맵을 구축\n • 서비스 운영 및 프로세스 설계\n \n 서비스 정책을 설계하고, 안정적인 서비스 운영을 위한 백오피스, 운영 프로세스 설계\n • 요구사항 정의 및 관리\n \n 비즈니스 목표를 달성하기 위한 구체적인 서비스 기능(웹/앱, Excel Add-in) 정의,IA 설계,스토리보드 등 작성\n • 커뮤니케이션을 통해 제품 실행력 확보\n \n 개발자· 디자이너· 사업 파트 등 다양한 이해관계자의 관점을 조율하여 제품 개발 과정을 리딩 - 우선 순위와 리소스를 조정하여 실행 속도와 품질을 확보\n • 서비스 출시 및 피드백 수렴\n \n 서비스 출시 준비 및 출시 후 사용자 피드백을 바탕으로 서비스 개선 방안 도출",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 금융 도메인 지식 및 금융 관련 서비스 또는 제품에 대한 경험\n \n • 최신 기술 트렌드(Agentic AI, LLM 등)에 대한 이해도\n \n • SQL 또는 Python을 활용한 데이터 분석 경험",
+          "지원 마감일": "2026.08.29",
+        },
+        {
+          회사명: "(주)스마트큐브",
+          공고제목: "웹 개발자 채용 공고",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54323392&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=87fac077-65b6-4096-819c-ce6b2687b00e&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "전남 나주시",
+          근무지역_코드: "9",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "◦ HTML, CSS, JavaScript 활용 능력\n ◦ Java, JSP 기반 웹 서비스 개발 경험\n ◦ RESTful API 설계 및 연동 경험\n ◦ 전자정부프레임워크 기반 프로젝트 수행 경험\n ◦ RDBMS(MySQL, Oracle, PostgreSQL 등)에 대한 이해 및 SQL 활용 능력",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "4년 이상",
+          경력연차_숫자: "4",
+          직무명: "웹 개발자",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "◦ 전자정부프레임워크 기반 웹 서비스 개발 및 유지보수\n ◦ Java/JSP 기반 기존 시스템 고도화\n ◦ React 기반 프론트엔드 전환 및 구조 개선\n ◦ 데이터 수집 시스템 및 디지털트윈·AI 연계 기능 개발\n ◦ RESTful API 설계 및 성능 개선",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "◦ React 기반 SPA 개발 경험\n ◦ 프론트엔드 아키텍처 설계 경험\n ◦ 시스템 분석 및 설계 경험\n ◦ 공공기관 및 대규모 SI 프로젝트 참여 경험",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)와따에이아이",
+          공고제목: "Java 백엔드 개발자(8-15년)/판교",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54322350&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=87fac077-65b6-4096-819c-ce6b2687b00e&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "스타트업",
+          기업규모_코드: "C",
+          근무지역: "경기 성남시 분당구, 성남시, 용인시",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• 경력 : JAVA Spring 경력 8년 이상 \\n• 플랫폼(솔루션), 프로젝트의 각 단계와 결과물을 이해하시는 분\\n• java, spring 또는 spring boot를 익숙하게 사용해 오신 분(3년 이상)\\n• REST API개발 경험이 있으신 분\\n• RDB 정규화 설계 및 구조 파악이 무난하신 분 \\n• 적극적인 업무 수행 및 커뮤니케이션을 하실 수 있는 분\\n• AWS 상에서의 개발/배포의 경험이 있으신 분\\n• CI/CD 구축 및 운영이 가능하신 분(jenkins, github actions, kubernetes 중 하나 이상)",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "8년 이상",
+          경력연차_숫자: "8",
+          직무명: "Java 백엔드 개발자",
+          직무_카테고리_코드: "M2",
+          주요업무_원문:
+            "• 물류/안전관리 서비스 플랫폼의 백엔드 서비스 개발/운영\\n• 해당 DB, API 설계/개발\\n• 기존 Legacy 시스템 파악 및 통합 작업\\n• AWS 서버 운영 및 모니터링\\n\\n[개발환경]\\n• 개발 언어 및 기술 : java, springboot\\n• 인프라 : AWS(EC2, S3, EBS …)\\n• DBMS : PostgreSQL, MongoDB, Redis\\n• 소스버전 관리 : Github\\n• 협업 도구 : Jira, Confluence, Google Chat, Slack\\n• 기타 : InteliJ, Postman, Datagrid, VS Code, 등",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 공학계열\\n• 위치 기반 시스템 업무 경험\\n• MongoDB 사용 경험이 있으신 분\\n• 웹소켓 개발 경험이 있으신 분\\n• Node.js, jsp 등 개발 경험\\n• 데이터베이스 모니터링 및 튜닝 능력\\n• AWS 환경에서의 DevOps 가능\\n\\n[사용 기술]\\nJava, Linux, Objective-C, Python, Spring Framework, REST API, JSP",
+          "지원 마감일": "2026.07.29",
+        },
+        {
+          회사명: "티에이시스템 주식회사",
+          공고제목: "[티에이시스템(주)] Vision System 개발자 모집 (경력무관)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54322332&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=66d16eef-394f-4783-a28c-c522780febe9&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "울산 동구",
+          근무지역_코드: "7",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "관련 전공 우대",
+          자격요건:
+            "• 경력 무관 (신입 지원 가능) • 학력무관, 졸업 예정자 지원가능 • 신입 / 경력 • 학력 무관 (관련 전공 우대) • 해외 출장에 결격 사유가 없는 자 • 운전 가능자 • 울산 거주자 우대 (동구 거주자 환영) • 기본적인 프로그래밍 지식 보유자 • 새로운 기술 학습에 대한 의지가 있는 자 • 팀 단위 프로젝트 수행 및 협업에 문제가 없는 자",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "Vision System 개발자 & 기술 엔지니어",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "- Vision 검사 시스템 개발 및 현장 적용 (C#, MSSQL, MariaDB, Winform, WPF) - 2D·3D 카메라 기반 영상 처리 및 검사 로직 개발 (LUA) - AI·알고리즘 학습 및 산업 현장 적용 (Python) - PLC·로봇 연동 자동화 시스템 구성 - 국내·해외 자동차 제조 프로젝트 참여 (미국, 체코, 브라질, 인도 등)",
+          인재상_원문: "",
+          우대_자격증: "정보처리기사,ADsP",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 프로그램 개발 전공자 • C#(.NET), Python, Lua 중 1개 이상 사용 경험 • 자동차 제조 공정 또는 생산 설비 프로젝트 경험 + 기술스택: C#, MSSQL, MariaDB, Winform, WPF, LUA, Python",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)이에스티소프트",
+          공고제목: "oo기업 생성형 AI Agent 서비스 구축 / Python / 시청",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54322230",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 중구 서소문로 인근지역",
+          근무지역_코드: "1",
+          근무형태: "정규직, 계약직, 프리랜서",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건: "• 경력 무관 • 학력무관",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "AI 개발자 / AI Ops 개발자",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "[ oo기업 생성형 AI Agent 서비스 구축 / Python / 시청] - 기간:즉시 ~27.03.31 - skillset : AI Agent, 파이썬, devops, AI Ops 개발자, Google adk (or 조건으로)/은행권 경험자 우대 - 장소 : 시청역 - 기타 : 경력증빙 가능자 (KOSA 혹은 건보대체가능) - 인원 : 초급~고급 00",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "아래 관련 기술 중 해당되는 기술 보유자 우대 - Python / - Elasticsearch(Vector DB) - Object Storage (S3 Compatible) / - Apache Kafka - Web Crawling / - OCR / - Parsing - RAG / - LLMOps - MCP / - RBAC / ABAC - Docker / Kubernetes",
+          "지원 마감일": "2026.07.07",
+        },
+        {
+          회사명: "메디케이시스템",
+          공고제목: "AI, 빅 데이터분석 R&D연구 [박사급]",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54322153&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=66d16eef-394f-4783-a28c-c522780febe9&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역:
+            "경기 하남시, 구리시, 성남시, 서울전체, 서울 강동구, 광진구, 송파구",
+          근무지역_코드: "2",
+          근무형태: "정규직, 계약직",
+          학력요건: "박사졸업 연구업적 3편이상 or 5년이상",
+          학력_코드: "H5",
+          전공요건: "",
+          자격요건: "박사졸업 연구업적 3편이상 or 5년이상",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "책임연구원 (AI, 빅 데이터분석 R&D연구)",
+          직무_카테고리_코드: "M4",
+          주요업무_원문: "AI, 빅 데이터분석 R&D연구",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문: "",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "가천대학교산학협력단",
+          공고제목: "영상처리전문가/인공지능/딥러닝 연구원 모집",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54322066&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=66d16eef-394f-4783-a28c-c522780febe9&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "교육기관",
+          기업규모_코드: "D",
+          근무지역: "인천 남동구",
+          근무지역_코드: "3",
+          근무형태: "계약직",
+          학력요건: "대학교졸업(4년)이상, 졸업 예정자 지원가능",
+          학력_코드: "H3",
+          전공요건: "컴퓨터/시스템공학, 기계/자동차/조선공학",
+          자격요건:
+            "• 경력 무관 (신입 지원 가능) • 대학교졸업(4년)이상, 졸업 예정자 지원가능",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "개발자 (영상처리전문가/인공지능/딥러닝 연구원)",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "• 엔드-투-엔드 영상 AI 파이프라인 구축 • 의료영상 전처리 및 표준화(DICOM/NIfTI) • 세그멘테이션 모델 개발 및 튜닝 • 병변(객체) 단위 평가 및 오류 분석(TP/FP/FN) • 정량 지표 및 통계 검증 체계 구축 • 후처리·기하학적 처리 알고리즘 적용 • 데이터 엔지니어링 및 라벨링 체계 설계 • 가천대 의대 의공학과/길병원 R&D센터/ 의공학교실 부서 소속, 주임연구원/선임연구원/책임연구원 직급으로 함께할 예정이에요.",
+          인재상_원문: "",
+          우대_자격증: "정보처리기능사, 전기기사",
+          우대_어학기준: "영어능통자",
+          우대사항_원문:
+            "• 전공: 컴퓨터/시스템공학, 기계/자동차/조선공학 • 보유역량: 영어능통자, 컴퓨터활용능력 우수, 해당직무 근무경험, 우수사원 수상자, 문서작성 우수자, Spring 개발 경험 • 자격증: 정보처리기능사, 전기기사",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)위즈코리아",
+          공고제목:
+            "㈜위즈코리아 '26년 하반기 AI-Native 소프트웨어 개발자 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54321709&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=66d16eef-394f-4783-a28c-c522780febe9&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강서구, 서울전체",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "ㆍAI 도구 실무 활용 능력 및 숙련도 - GitHub Copilot, ChatGPT, Claude 등을 실무 개발 환경에 깊숙이 이식하여 사용해 본 경험 - AI 어시스턴트를 활용해 개발 생산성을 혁신하고 생성된 코드의 로직을 완벽히 이해 및 디버깅할 수 있는 분 - 매주 쏟아지는 새로운 AI 기술 및 도구를 빠르게 학습하고 실무에 적용하는 것을 즐기시는 분 ㆍ개발자 중심의 QA 역량 - \"내가 작성한 코드는 반드시 스스로 검증한다\"는 마인드를 보유하고, AI를 활용해 테스트 코드 작성 및 검증 로직을 구현할 수 있는 분 - 스스로 테스트 시나리오를 설계하고 AI로 검증하는 'Self-Testing' 습관을 가지신 분 ㆍ탄탄한 CS기초 지식 및 문제 해결 능력 - AI가 생성한 코드의 오류를 빠르게 파악(Debugging)하고 최적화할 수 있는 자료구조, 알고리즘, 네트워크 지식 등을 보유한 분",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "AI-Native 소프트웨어 개발자",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "*AI 기반 코딩* ㆍClaude, Cursor, GitHub Copilot 등 AI 도구를 활용하여 아키텍처 설계 및 코드 생산성을 극대화하고 보안 취약점을 최소화한 견고한 솔루션 개발 *Self QA 및 테스트 자동화* ㆍQA 팀의 피드백 전 AI를 활용해 단위/통합 테스트 코드 작성, 비즈니스 로직의 무결성 검증 *품질 검증 프로세스 리딩* ㆍQA전 AI를 통해 코드의 논리적 오류와 보안 취약점 등 1차 검증 *프롬프트 엔지니어링 및 효율적인 파이프 라인 구축* ㆍ효율적인 개발을 위한 팀 내 표준 프롬프트 및 AI 워크플로우 구축 ㆍAI를 활용한 코드 리뷰 자동화 및 자동 문서화 프로세스 참여.",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "ㆍAI 에이전트를 활용해 사내 개발 프로세스를 자동화해 본 경험 ㆍCI/CD 파이프라인 내에서 AI 기반 코드 리뷰 및 QA 도구를 도입해 본 경험 ㆍAI 도구를 활용하여 퍼징(Fuzzing) 테스트나 취약점 스캐닝 프로세스를 개선해 본 경험 ㆍLLM을 활용한 코드 보안 분석 프롬프트 엔지니어링 경험 ㆍ보안 관련 자격증 보유 또는 해킹 방어 대회(CTF) 참여 경험. (기술스택: Claude, Cursor, GitHub Copilot, Docker, Linux, Python, Kubernetes, NoSQL, Pytorch, Tensorflow)",
+          "지원 마감일": "2026.08.31",
+        },
+        {
+          회사명: "(주)건강누리",
+          공고제목: "펌웨어 개발자 채용[과장]",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54321807&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=66d16eef-394f-4783-a28c-c522780febe9&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 영등포구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "• 4년제 대학 졸업(예정)자\\n• C, C++, C# 언어 사용 가능자)\\n• 8Bit 이상의 AVR 경험자",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "6년 이상",
+          경력연차_숫자: "6",
+          직무명: "펌웨어 개발자",
+          직무_카테고리_코드: "M7",
+          주요업무_원문: "• 의료기기 펌웨어 개발 및 검증",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• 전기,전자,컴퓨터,의공학과등 공학계열 우대\\n• Wi-Fi, Bluetooth등 통신제어 경험자 우대\\n• 기술스택: HW, FW, C#, SW, C, C++",
+          "지원 마감일": "2026.07.29",
+        },
+        {
+          회사명: "한국퀀텀컴퓨팅(주)",
+          공고제목: "Full Stack Developer 채용",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54321708&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=66d16eef-394f-4783-a28c-c522780febe9&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강남구 (재택근무 가능)",
+          근무지역_코드: "9",
+          근무형태: "정규직, 프리랜서",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "[필수 요건] • Python과 TypeScript/React 모두를 활용한 Full Stack 개발 경력 3년 이상 • FastAPI 또는 유사 Python 웹 프레임워크 실무 경험과 RDBMS 기반 데이터 모델링 경험 • REST API 설계 및 인증/인가(JWT 등) 구현 경험이 필요하며, Git 기반 협업과 테스트 주도 개발 경험",
+          경력유형: "신입+경력",
+          경력유형_코드: "신입+경력",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "Full Stack Developer",
+          직무_카테고리_코드: "M3",
+          주요업무_원문:
+            "1. 백엔드 • API 기반 백엔드의 기능 확장 • Multi-LLM Provider 추상화 계층(Claude, GPT, Gemini)을 활용한 AI 기능을 개발 • D-Wave 양자 어닐러 및 Gate 기반 양자 서버 연동 파이프라인 고도화 • 최적화 모델 생성 엔진과 DFT 에너지 계산 연동을 포함한 도메인별 서비스 로직을 구현 • DB 스키마 설계 및 데이터 아키텍처 2. 프론트엔드 • 도메인 중심 아키텍처 기반 웹 UI를 구현 • 반응형 UI 개발 • 채팅 기반 사용자 인터페이스와 Flow • 결과 시각화(3D 구조 뷰어, KPI 대시보드) • 실시간 작업 상태 추적 3. AI Agent 및 LLM 통합 • LLM Function Calling/Tool Use를 활용한 AI Agent 루프를 설계·구역 • Context Engineering 전략(컨텍스트 압축, 구조화된 메모, Sub-agent 아키텍처)을 수립하고 적용 • API와 Skill을 Agent가 사용할 수 있는 Tool Schema로 정의하며, 사용자 확인이 필요한 고비용 작업에 대한 Human-in-the-Loop 루프 구현 4. AI 기반 개발 도구 활용 • AI 코딩 에이전트(Claude Code 등)를 활용한 Harness 기반 개발 워크플로우로 효율적인 개발을 수행",
+          인재상_원문:
+            "이제 곧 다가올 양자컴퓨팅 시대의 중심에 있는 KQC와 함께할 인재를 모집합니다!",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "[우대 사항] • LLM API 활용 솔루션 개발 경험 • AI Agent 또는 LLM 기반 자동화 시스템 설계 경험 • Prompt Engineering 또는 Context Engineering에 대한 이해 • 양자 컴퓨팅에 대한 기본 이해(QUBO, 양자 어닐링, Gate 기반 양자 회로 등) • 소재 과학, 물류 최적화, 스케줄링 등 도메인 지식 • D-Wave Ocean SDK, Qiskit 등 양자 컴퓨팅 프레임워크 사용 경험 • Docker/CI-CD 파이프라인 구축 경험 • Claude Code, Cursor, Codex 등 AI 기반 코딩 도구를 활용한 개발 경험 (기술스택: IT개발·데이터, 백엔드/서버개발, 프론트엔드, 아키텍쳐, AI(인공지능), 풀스택, Git, Python)",
+          "지원 마감일": "채용시 마감",
+        },
+        {
+          회사명: "(주)에이아이브이와이",
+          공고제목: "HW개발자(오디오 개발 경험자 우대)",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54321583&location=ts&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&paid_fl=n&search_uuid=66d16eef-394f-4783-a28c-c522780febe9&t_ref=search&t_ref_content=generic#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "경기 성남시 수정구",
+          근무지역_코드: "2",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "- ORCAD 툴을 이용한 회로 설계 및 스케매틱(Schematic) 작성이 원활하신 분\\n- Audio 회로 설계 및 튜닝 경험이 있으신 분\\n- MCU 및 NPU 구조에 대한 깊은 이해와 이를 활용한 보드 설계 경험이 있으신 분\\n- 주도적으로 문제를 해결하며, 초기 스타트업의 속도감 있는 문화에서 함께 성장하고 싶으신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "5년 이상",
+          경력연차_숫자: "5",
+          직무명: "HW개발자",
+          직무_카테고리_코드: "M7",
+          주요업무_원문:
+            "- AI 에이전트 웨어러블 디바이스 회로 설계 및 아트웍(PCB Artwork)\\n- 오디오 회로(오디오 코덱, 앰프 등) 설계 및 음질 최적화\\n- MCU/NPU 기반의 메인 보드 시스템 설계 및 사양 검토\\n- HW 프로토타입 제작, 디버깅 및 신뢰성 검증\\n- SW 개발 팀 및 기구 설계 팀과의 협업을 통한 제품 고도화",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "-골전도(Bone Conduction) 기술을 포함한 오디오 관련 디바이스 개발/출시 경험이 있으신 분\\n-소형 웨어러블 기기(Wearable Device) 또는 IoT 디바이스의 회로 소형화/저전력 설계 경험이 있으신 분\\n-다양한 센서 인터페이스(I2C, SPI, UART 등) 및 무선 통신(Bluetooth, Wi-Fi) 설계 경험자\\n-시제품 제작부터 양산(MP)까지의 프로세스를 경험해 보신 분 (기술스택: ORCAD, PCB Artwork, Audio 코덱, 앰프, MCU, NPU, I2C, SPI, UART, Bluetooth, Wi-Fi)",
+          "지원 마감일": "2026.07.30",
+        },
+        {
+          회사명: "(주)컬처릿",
+          공고제목: "제조/물류 분야 풀스택 개발자",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54255521",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강서구",
+          근무지역_코드: "1",
+          근무형태: "정규직, 계약직, 프리랜서",
+          학력요건: "학력무관",
+          학력_코드: "H1",
+          전공요건: "",
+          자격요건:
+            "• 경력 (연수 무관) • 학력무관 - 제조업 또는 물류 관련 IT 시스템 개발 경험 3년 이상 - MES, WMS, ERP 등 업무 시스템 개발 경험 - Front-end 및 Back-end 개발이 가능한 Full-Stack 개발 역량 - Java/Spring Boot 기반 서버 개발 경험 - React 또는 Next.js 기반 웹 서비스 개발 경험 - RDBMS(MySQL, PostgreSQL 등) 설계 및 개발 경험 - 제조 및 물류 업무 프로세스에 대한 이해 - 고객 및 현업 담당자와 원활한 커뮤니케이션 능력 - AI 기반 개발 도구(바이브 코딩)를 활용한 생산성 중심 개발 경험",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "제조/물류 분야 풀스택 개발자",
+          직무_카테고리_코드: "M3",
+          주요업무_원문:
+            "- 제조 및 물류 현장을 위한 MES, WMS 등 업무 시스템 설계 및 개발 - Vision AI 기반 제조·물류 솔루션 개발 및 기능 고도화 - CCTV 및 영상 데이터를 활용한 재고 관리, 물류 추적, 생산 모니터링 기능 개발 - 데이터베이스 설계 및 API 개발 - 고객사 현장 요구사항 분석 및 시스템 개선 - 시스템 구축, 운영 및 유지보수 지원",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "- Vision AI 관련 프로젝트 수행 경험 - OpenCV, PyTorch, TensorFlow 등 AI Framework 활용 경험 - CCTV 기반 영상 분석 시스템 구축 경험 - 디지털 트윈, 생산 모니터링, 설비 데이터 연계 경험 - PLC, 센서, 설비 데이터 연동 경험 - 새로운 기술을 빠르게 학습하고 적용하는 데 적극적인 분 + 기술스택: HTML5, Javascript, Java, JSP, JPA, MariaDB, MyBatis, Node.js, MySQL, OpenCV, React, Ubuntu",
+          "지원 마감일": "2026.07.23",
+        },
+        {
+          회사명: "(주)아이도트",
+          공고제목: "인공지능 의료 진단 솔루션 백엔드 개발자",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54255470&recommend_ids=eJxNjbERAkEMA6shl3SyfY4phP67gIfh%2FOHOalZhKhx6bfJRz7CEdhyEs1RjqyAcpDt67BIU%2FUH8rJA1Y5Gr17Ff9B9XJkDO705s38pirNtvMGfMdotT3kbkZd%2Bx7C%2BN&view_type=search&searchword=AI+%EA%B0%9C%EB%B0%9C%EC%9E%90&searchType=search&gz=1&t_ref_content=generic&t_ref=search&relayNonce=977cce4caa3344b9bade&paid_fl=n&search_uuid=75a1c19d-d3eb-4ba9-bc1d-de3ddf0649c1&immediately_apply_layer_open=n#seq=0",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 송파구",
+          근무지역_코드: "1",
+          근무형태: "정규직",
+          학력요건: "대졸(4년제) 이상",
+          학력_코드: "H3",
+          전공요건: "",
+          자격요건:
+            "• 경력 3년 이상 ㆍJava, Kotlin, JavaScript 등 언어 사용 경험이 있으신 분 ㆍSpring Boot 및 RDBMS 설계/사용 경험이 능숙하신 분 ㆍRESTful API 설계 및 구현 경험이 있으신 분 ㆍ시스템 아키텍처를 설계하고, 이를 문서화/시각화하여 소통할 수 있는 분 ㆍ논리적인 문제 해결 능력 및 분석 능력이 있으신 분",
+          경력유형: "경력",
+          경력유형_코드: "경력",
+          경력연차_최소: "3년 이상",
+          경력연차_숫자: "3",
+          직무명: "백엔드 개발자 (Tech Lead/Senior)",
+          직무_카테고리_코드: "M2",
+          주요업무_원문:
+            "ㆍSpring Boot 기반 시스템 아키텍처 설계 구현 및 유지 보수 -의료 디바이스, AI 솔루션, 병원 시스템 간의 데이터 통신 구조 설계, 개발 ㆍ개발 업무 리딩 및 관리 -팀원 업무 분배 및 일정 관리, 코드 리뷰 등 기술 리더십 발휘 ㆍ비즈니스 모델(BM) 시각화 및 부서 간 커뮤니케이션 -시스템 아키텍처를 마케팅 및 사업부서, 디스트리뷰터가 이해할 수 있도록 시각화 및 정리 -기술적 관점에서 비즈니스 모델을 구체화하고 제안",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "ㆍ의료/헬스케어 분야 도메인 경험이 있으신 분 -HL7, DICOM 등 의료 표준 프로토콜 이해 및 병원 시스템 연동 경험 ㆍGit, DevOps, CI/CD 파이프라인 구축 경험이 있으신 분 ㆍAWS 등 클라우드 기반 시스템 개발 및 인프라 운영 경험이 있으신 분 ㆍ프론트엔드 개발 경험이 있어 전체 서비스 흐름 이해가 빠르신 분",
+          "지원 마감일": "채용시 마감",
+        },
+        {
+          회사명: "리버에이아이",
+          공고제목: "리버에이아이 - AI 신입 개발자 모집",
+          출처URL:
+            "https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=54255455",
+          기업규모: "중소기업",
+          기업규모_코드: "C",
+          근무지역: "서울 강서구",
+          근무지역_코드: "1",
+          근무형태: "계약직",
+          학력요건: "대졸(2,3년제) 이상(예정자 가능)",
+          학력_코드: "H2",
+          전공요건: "",
+          자격요건:
+            "• 신입\\n• 대학졸업(2,3년)이상, 졸업 예정자 지원가능\\n• 논리적 문제 해결 능력\\n• 팀워크와 커뮤니케이션 원활\\n• Python 등 기초 프로그래밍 언어 지식\\n• 신기술 학습에 열정 있는 분",
+          경력유형: "신입",
+          경력유형_코드: "신입",
+          경력연차_최소: "신입(0년)",
+          경력연차_숫자: "0",
+          직무명: "AI 신입 개발자",
+          직무_카테고리_코드: "M4",
+          주요업무_원문:
+            "• 시계열 데이터 기반 AI 모델 연구 및 개발\\n• RNN, GNN 등 딥러닝 모델 실험 및 성능 개선 지원\\n• 데이터 수집, 전처리, 학습 데이터셋 구축",
+          인재상_원문: "",
+          우대_자격증: "",
+          우대_어학기준: "",
+          우대사항_원문:
+            "• IT계열 대학교 졸업자 또는 졸업 예정자\\n• AI 시계열 데이터 분석 또는 예측 모델 프로젝트 경험자\\n• AI / 머신러닝 / 딥러닝에 대한 기본 이해가 있는 분",
+          "지원 마감일": "2026.07.23",
+        },
+      ];
+
+      // ── 코드 → 한국어 라벨 ──────────────────────────
+      const REGION_LABEL = {
+        1: "서울",
+        2: "경기·인천",
+        3: "부산·경남",
+        4: "대구·경북",
+        5: "대전·충청",
+        6: "광주·전라",
+        7: "강원",
+        8: "제주",
+        9: "재택·전국",
+      };
+      const SIZE_LABEL = {
+        A: "대기업",
+        B: "중견기업",
+        C: "중소기업",
+        D: "스타트업",
+        E: "공공·교육",
+      };
+      const EDU_LEVEL = { H1: 1, H2: 2, H3: 3, H4: 4, H5: 5 };
+
+      // ── 칩 선택 로직 ─────────────────────────────────
+      function initChips() {
+        document.querySelectorAll(".chip-group").forEach((group) => {
+          const isSingle = group.id === "chips-job";
+          group.querySelectorAll(".chip").forEach((chip) => {
+            chip.addEventListener("click", () => {
+              if (isSingle) {
+                group
+                  .querySelectorAll(".chip")
+                  .forEach((c) => c.classList.remove("selected"));
+                chip.classList.add("selected");
+              } else {
+                chip.classList.toggle("selected");
+              }
+            });
+          });
+        });
+      }
+
+      function getSelected(groupId) {
+        return [...document.querySelectorAll(`#${groupId} .chip.selected`)].map(
+          (c) => c.dataset.val,
+        );
+      }
+
+      // ── 필터 로직 ────────────────────────────────────
+      function runFilter() {
+        const profile = {
+          filter_company_size: getSelected("chips-size"),
+          filter_job_major: getSelected("chips-job")[0] || null,
+          filter_region: getSelected("chips-region"),
+          filter_work_type: getSelected("chips-work"),
+          education_level: document.getElementById("sel-edu").value || null,
+          career_type: document.getElementById("sel-career-type").value || null,
+          career_years: parseInt(
+            document.getElementById("sel-career-years").value || "0",
+          ),
+        };
+
+        const passed = [],
+          majorWarnings = [];
+
+        for (const job of JOBS) {
+          const fail = [];
+
+          // 기업규모
+          if (profile.filter_company_size.length > 0) {
+            if (!profile.filter_company_size.includes(job["기업규모_코드"]))
+              fail.push("규모");
+          }
+          // 지역
+          if (profile.filter_region.length > 0) {
+            const isRemote =
+              (job["근무지역"] || "").includes("재택") ||
+              (job["근무지역"] || "").includes("전국");
+            if (
+              !isRemote &&
+              !profile.filter_region.includes(String(job["근무지역_코드"]))
+            )
+              fail.push("지역");
+          }
+          // 직무
+          if (profile.filter_job_major) {
+            if (job["직무_카테고리_코드"] !== profile.filter_job_major)
+              fail.push("직무");
+          }
+          // 근무형태
+          if (profile.filter_work_type.length > 0) {
+            const jdWork = job["근무형태"] || "";
+            if (!profile.filter_work_type.some((t) => jdWork.includes(t)))
+              fail.push("근무형태");
+          }
+          // 학력
+          if (profile.education_level) {
+            const userLv = EDU_LEVEL[profile.education_level] || 1;
+            const jdLv = EDU_LEVEL[job["학력_코드"]] || 1;
+            if (userLv < jdLv) fail.push("학력");
+          }
+          // 경력
+          if (profile.career_type) {
+            const jdType = job["경력유형_코드"] || "";
+            const jdYears = parseInt(job["경력연차_숫자"] || "0");
+            if (profile.career_type === "신입") {
+              if (!jdType.includes("신입") && !jdType.includes("무관"))
+                fail.push("경력");
+            } else {
+              if (
+                !jdType.includes("경력") &&
+                !jdType.includes("무관") &&
+                !jdType.includes("신입+경력")
+              )
+                fail.push("경력");
+              else if (profile.career_years < jdYears) fail.push("연차");
+            }
+          }
+          // 전공 SOFT
+          const jdMajor = job["전공요건"] || "";
+          if (jdMajor && !jdMajor.includes("무관") && jdMajor.trim() !== "") {
+            majorWarnings.push(job);
+          }
+
+          if (fail.length === 0) passed.push(job);
+        }
+
+        renderResult(passed, majorWarnings);
+      }
+
+      // ── 결과 렌더링 ──────────────────────────────────
+      function renderResult(passed, warnings) {
+        document.getElementById("pass-count").textContent = passed.length;
+
+        // 전공 경고
+        const wb = document.getElementById("warning-box");
+        if (warnings.length > 0) {
+          wb.innerHTML = `<div class="major-warning">⚠️ 전공 요건이 있는 공고 ${warnings.length}개 포함 — 실무 경험으로 대체 가능한 경우가 많아 필터에서 제외하지 않았어요.</div>`;
+        } else {
+          wb.innerHTML = "";
+        }
+
+        const list = document.getElementById("card-list");
+        if (passed.length === 0) {
+          list.innerHTML = `<div class="empty-state"><div class="emoji">🫧</div><p>조건을 만족하는 공고가 없어요.<br>필터를 조금 넓혀볼까요?</p></div>`;
+        } else {
+          list.innerHTML = passed
+            .map((job) => {
+              const regionLabel =
+                REGION_LABEL[job["근무지역_코드"]] || job["근무지역"] || "";
+              const sizeLabel =
+                SIZE_LABEL[job["기업규모_코드"]] || job["기업규모"] || "";
+              const careerLabel =
+                job["경력유형_코드"] === "신입"
+                  ? "신입"
+                  : job["경력연차_숫자"] > 0
+                    ? `경력 ${job["경력연차_숫자"]}년↑`
+                    : "경력무관";
+              const url = job["출처URL"] || "#";
+
+              return `<a class="card" href="${url}" target="_blank" rel="noopener">
+        <div class="card-top">
+          <div>
+            <div class="card-company">${sizeLabel} · ${job["회사명"]}</div>
+            <div class="card-title">${job["공고제목"]}</div>
+          </div>
+          <div class="card-match">매칭</div>
+        </div>
+        <div class="card-tags">
+          <span class="tag region">📍 ${regionLabel}</span>
+          <span class="tag work">${job["근무형태"]}</span>
+          <span class="tag career">${careerLabel}</span>
+        </div>
+        <div class="card-link">공고 원본 보기 →</div>
+      </a>`;
+            })
+            .join("");
+        }
+
+        // 화면 전환
+        document.getElementById("filter-screen").classList.remove("active");
+        document.getElementById("result-screen").classList.add("active");
+        window.scrollTo(0, 0);
+      }
+
+      function goBack() {
+        document.getElementById("result-screen").classList.remove("active");
+        document.getElementById("filter-screen").classList.add("active");
+        window.scrollTo(0, 0);
+      }
+
+      // 초기화
+      initChips();
+    </script>
+  </body>
+</html>
