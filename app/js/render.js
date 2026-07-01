@@ -191,7 +191,8 @@ function renderJobSubcategories() {
 // 특정 세부직무를 고르면 "전체"는 자동으로 빠진다 (전체 vs 특정은 서로 배타적).
 function toggleJobSubcategory(code, value) {
   const p = AppState.profile;
-  const current = p.filters.job_subcategory[code] || [];
+  const raw = p.filters.job_subcategory[code];
+  const current = Array.isArray(raw) ? raw : raw ? [raw] : [];
 
   if (value === "전체") {
     p.filters.job_subcategory[code] = current.includes("전체") ? [] : ["전체"];

@@ -40,7 +40,10 @@ function filterJobs(profile, jobs) {
     }
     // 세부직무(전체가 아닌 값, 복수선택 가능)를 골랐으면, 그중 하나라도 job_title에
     // 키워드가 있는 공고만 남긴다 (선택한 세부직무들 사이는 OR 조건).
-    const subcategories = (filters.job_subcategory?.[job.filter_job_major] || []).filter((v) => v !== "전체");
+    const rawSubcategory = filters.job_subcategory?.[job.filter_job_major];
+    const subcategories = (Array.isArray(rawSubcategory) ? rawSubcategory : rawSubcategory ? [rawSubcategory] : []).filter(
+      (v) => v !== "전체"
+    );
     if (subcategories.length > 0) {
       const subOptions = JOB_SUBCATEGORY_OPTIONS[job.filter_job_major] || [];
       const matchesAny = subcategories.some((value) => {

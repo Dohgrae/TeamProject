@@ -83,6 +83,19 @@ function mockExtractKeywords(answers) {
   return Array.from(found);
 }
 
+// 세부직무를 문자열 하나(예: "백엔드")로 저장하던 예전 버전의 draft가 localStorage에
+// 남아있으면 배열(예: ["백엔드"])로 바꿔준다. 안 바꾸면 matching.js의 .filter() 호출에서
+// "필터/데이터.filter is not a function" 오류가 난다.
+function migrateProfile(profile) {
+  const jobSub = profile?.filters?.job_subcategory;
+  if (jobSub && typeof jobSub === "object") {
+    for (const code of Object.keys(jobSub)) {
+      if (!Array.isArray(jobSub[code])) jobSub[code] = jobSub[code] ? [jobSub[code]] : [];
+    }
+  }
+  return profile;
+}
+
 const AppState = {
   profile: null,
 
@@ -90,7 +103,7 @@ const AppState = {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       try {
-        this.profile = JSON.parse(raw);
+        this.profile = migrateProfile(JSON.parse(raw));
         return;
       } catch {
         // 손상된 draft는 무시하고 새로 시작
