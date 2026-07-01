@@ -43,11 +43,15 @@
   -webkit-font-smoothing: antialiased;
 }
 
-/* 결과 화면만 위저드의 흰 배경 대신 연보라 그라디언트를 쓴다(첨부 디자인 기준).
+/* 결과 화면에서는 페이지 배경 자체(회색)를 연보라로 바꾼다. #screen-result 자체는
+   흰 카드처럼 튀어 보이지 않도록 배경/그림자를 없애 body의 연보라와 하나로 이어지게 한다.
    위저드 공통 헤더+스텝네비는 #screen-result 바깥에 있어서 그대로 유지된다. */
-#screen-result.active {
+body:has(#screen-result.screen.active) {
   background: linear-gradient(160deg, #f1e9fb 0%, #eae3fb 100%);
-  padding: 40px 24px;
+}
+
+#screen-result.active {
+  background: transparent;
   box-shadow: none;
 }
 
@@ -836,25 +840,36 @@
    ============================================================ */
 #screen-result.is-loading .main > h1,
 #screen-result.is-loading .main > .sub,
-#screen-result.is-loading .button-area {
+#screen-result.is-loading .button-area,
+#screen-result.is-loading > .nav-row {
   display: none;
 }
 
 #screen-result.is-loading {
-  --card-height: 560px;
+  --card-height: 680px;
 }
 
+/* 로딩 중에는 흰 카드 박스 없이 캐릭터/하트/문구가 연보라 배경 위에 바로 떠 있도록 한다 */
+#screen-result.is-loading .card-front {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* 하트(font-size 380px)가 박스 밖으로 삐져나오지 않도록 히어로 박스 자체도 그만큼 키워서,
+   그 아래 제목/문구가 하트에 안 겹치고 제대로 밀려나도록 한다. */
 #screen-result.is-loading .match-loading-hero {
-  width: 240px;
-  height: 240px;
+  width: 380px;
+  height: 380px;
 }
 
 #screen-result.is-loading .match-loading-mascot {
   width: 130px;
 }
 
+/* 하트가 캐릭터 전신을 다 감쌀 만큼 훨씬 크고, 흐릿하지 않게 진하게 보이도록 함 */
 #screen-result.is-loading .match-loading-heart {
-  font-size: 220px;
+  font-size: 380px;
+  opacity: 0.9;
 }
 
 #screen-result.is-loading .match-loading-title {
