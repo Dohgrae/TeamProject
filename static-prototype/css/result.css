@@ -60,7 +60,7 @@ body:has(#screen-result.screen.active) {
    메인 레이아웃 — .screen이 이미 32px 패딩을 주므로 여기서는 최소한만
    ============================================================ */
 .main {
-  max-width: 480px;
+  max-width: 640px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -148,7 +148,7 @@ body:has(#screen-result.screen.active) {
 .card-peek {
   position: absolute;
   top: 50%;
-  width: 82%;
+  width: 78%;
   height: calc(var(--card-height) - 48px);
   transform: translateY(-45%) scale(0.92);
   border-radius: var(--card-radius);
@@ -165,8 +165,9 @@ body:has(#screen-result.screen.active) {
 .card-peek:hover { opacity: 0.85; }
 .card-peek:empty { visibility: hidden; }
 
-.card-peek-prev { left: -8%; }
-.card-peek-next { right: -8%; }
+/* 카드끼리 덜 겹치고 양옆으로 더 퍼지도록 오프셋을 늘림(기존 -8% -> -22%) */
+.card-peek-prev { left: -22%; }
+.card-peek-next { right: -22%; }
 
 .card-peek .card-banner { padding: 14px 16px 34px; }
 .card-peek .card-avatar-wrap { margin-top: -32px; }
@@ -178,6 +179,7 @@ body:has(#screen-result.screen.active) {
 .card-peek .card-position-sub { font-size: 13px; margin-top: 4px; }
 .card-peek .card-comment,
 .card-peek .card-chips-front,
+.card-peek .card-rate-center,
 .card-peek .flip-hint,
 .card-peek .card-deadline-front { display: none; }
 
@@ -370,23 +372,20 @@ body:has(#screen-result.screen.active) {
   opacity: 0.9;
 }
 
-.card-banner-rate {
-  position: absolute;
-  right: 20px;
-  top: 38px;
-  text-align: right;
+/* 매칭률 — 카드 가운데(태그 칩 아래, 탭해서 상세보기 위)에 크게, 포인트 컬러로 강조 */
+.card-rate-center {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-mid);
+  margin-top: 16px;
 }
 
-.card-banner-rate-label {
-  display: block;
-  font-size: 11px;
-  opacity: 0.85;
-}
-
-.card-banner-rate-value {
-  font-size: 22px;
+.card-rate-center-value {
+  font-size: 32px;
   font-weight: 900;
-  line-height: 1.1;
+  color: var(--point);
+  margin-left: 4px;
 }
 
 /* 배너와 본문 경계에 걸쳐 겹쳐지는 원형 마스코트 아바타 */
