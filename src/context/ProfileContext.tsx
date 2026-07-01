@@ -30,10 +30,8 @@ function emptyProfile(): UserProfileDraft {
     },
     filters: {
       region: [],
-      industry: [],
       job_category: [],
       company_size: [],
-      company_type: [],
       employment_type: [],
     },
     qualifications: {

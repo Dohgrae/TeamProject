@@ -1,66 +1,50 @@
 // 프로토타입 단계 하드코딩 옵션 상수.
-// filters 코드값(REGION/INDUSTRY/JOB_CATEGORY)과 tech_stack 옵션 목록은
-// 결과 도출 파트와 공유 코드 테이블로 확정되면 이 파일만 교체하면 된다.
+// region/company_size/job_category/employment_type 코드값은 johyejune이 만든
+// src/data(jobs.json)의 filter_region/filter_company_size/filter_job_major와
+// ekgus020330-lgtm의 src/filterlogic 칩 코드에 맞춘 실제 코드다. 절대 임의로 바꾸지 말 것.
 
 export const REGION_OPTIONS = [
-  { value: "SEOUL", label: "서울" },
-  { value: "GYEONGGI", label: "경기" },
-  { value: "INCHEON", label: "인천" },
-  { value: "BUSAN", label: "부산" },
-  { value: "DAEGU", label: "대구" },
-  { value: "DAEJEON", label: "대전" },
-  { value: "GWANGJU", label: "광주" },
-  { value: "ETC", label: "기타" },
-];
-
-export const INDUSTRY_OPTIONS = [
-  { value: "IT_TELECOM", label: "IT·정보통신" },
-  { value: "MANUFACTURING", label: "제조" },
-  { value: "FINANCE", label: "금융" },
-  { value: "TRADE_DISTRIBUTION", label: "무역·유통" },
-  { value: "FOOD_FMCG", label: "식품·FMCG" },
-  { value: "PUBLIC", label: "공공·기관" },
-  { value: "ETC", label: "기타" },
+  { value: "1", label: "서울" },
+  { value: "2", label: "경기·인천" },
+  { value: "3", label: "부산·경남" },
+  { value: "4", label: "대구·경북" },
+  { value: "5", label: "대전·충청" },
+  { value: "6", label: "광주·전라" },
+  { value: "7", label: "강원" },
+  { value: "8", label: "제주" },
+  { value: "9", label: "재택·전국" },
 ];
 
 export const JOB_CATEGORY_OPTIONS = [
-  { value: "BACKEND_DEV", label: "백엔드 개발" },
-  { value: "FRONTEND_DEV", label: "프론트엔드 개발" },
-  { value: "FULLSTACK_DEV", label: "풀스택 개발" },
-  { value: "AI_ENGINEER", label: "AI 엔지니어" },
-  { value: "DATA_ENGINEER", label: "데이터 엔지니어" },
-  { value: "MOBILE_DEV", label: "모바일 개발" },
-  { value: "DEVOPS", label: "DevOps" },
-  { value: "QA", label: "QA" },
-  { value: "EMBEDDED_DEV", label: "임베디드 개발" },
-  { value: "ETC", label: "기타" },
+  { value: "M1", label: "기획·PM" },
+  { value: "M2", label: "영업·BD" },
+  { value: "M3", label: "마케팅" },
+  { value: "M4", label: "개발·AI" },
+  { value: "M5", label: "디자인" },
+  { value: "M6", label: "재무·회계" },
+  { value: "M7", label: "연구·생산" },
 ];
 
 export const COMPANY_SIZE_OPTIONS = [
-  { value: "LARGE", label: "대기업" },
-  { value: "MID", label: "중견기업" },
-  { value: "SMALL", label: "중소기업" },
-  { value: "STARTUP", label: "스타트업" },
+  { value: "A", label: "대기업" },
+  { value: "B", label: "중견기업" },
+  { value: "C", label: "중소기업" },
+  { value: "D", label: "스타트업" },
+  { value: "E", label: "공공/교육" },
 ];
 
-export const COMPANY_TYPE_OPTIONS = [
-  { value: "GENERAL", label: "일반기업" },
-  { value: "FOREIGN", label: "외국계" },
-  { value: "PUBLIC", label: "공공기관" },
-];
+export const WORK_EMPLOYMENT_TYPE_OPTIONS = ["정규직", "계약직", "인턴", "프리랜서"] as const;
 
-export const EMPLOYMENT_TYPE_OPTIONS = [
-  { value: "FULL_TIME", label: "정규직" },
-  { value: "INTERN", label: "인턴" },
-  { value: "CONTRACT", label: "계약직" },
-];
+// 채용공고의 employment_type 필드는 코드 없이 이 문자열 그대로 저장돼 있어 값=라벨로 둔다.
+export const EMPLOYMENT_TYPE_OPTIONS = WORK_EMPLOYMENT_TYPE_OPTIONS.map((v) => ({ value: v, label: v }));
 
+// H1~H5는 filterlogic/jobs.json의 학력 서열(EDU_LEVEL_RANK)과 동일한 코드.
 export const EDUCATION_LEVEL_OPTIONS = [
-  { value: "HIGH_SCHOOL", label: "고졸" },
-  { value: "ASSOCIATE", label: "전문학사" },
-  { value: "BACHELOR", label: "학사" },
-  { value: "MASTER", label: "석사" },
-  { value: "DOCTOR", label: "박사" },
+  { value: "H1", label: "고졸" },
+  { value: "H2", label: "전문학사" },
+  { value: "H3", label: "학사" },
+  { value: "H4", label: "석사" },
+  { value: "H5", label: "박사" },
 ];
 
 export const MAJOR_CATEGORY_OPTIONS = [
@@ -114,8 +98,6 @@ export const TECH_STACK_CATEGORIES: { key: string; label: string; options: strin
     options: ["Git", "GitHub", "Jira", "Notion", "Figma"],
   },
 ];
-
-export const WORK_EMPLOYMENT_TYPE_OPTIONS = ["정규직", "계약직", "인턴", "프리랜서"] as const;
 
 export const EXTRACURRICULAR_TYPE_OPTIONS = [
   "프로젝트",
