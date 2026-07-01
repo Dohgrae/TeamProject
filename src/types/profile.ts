@@ -18,12 +18,13 @@ export interface BasicInfo {
   };
 }
 
+// region/job_category/company_size/employment_type 값은 채용공고 DB(src/data)의
+// filter_region/filter_job_major/filter_company_size/employment_type 코드와 1:1로 맞춘다.
+// 실제 데이터에 industry(산업군)/company_type(기업형태) 필드가 없어 이 스킴에는 포함하지 않는다.
 export interface Filters {
   region: string[];
-  industry: string[];
   job_category: string[];
   company_size: string[];
-  company_type: string[];
   employment_type: string[];
 }
 

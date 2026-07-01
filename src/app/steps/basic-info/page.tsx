@@ -6,10 +6,8 @@ import { useProfile } from "@/context/ProfileContext";
 import { ButtonGroup } from "@/components/ButtonGroup";
 import {
   COMPANY_SIZE_OPTIONS,
-  COMPANY_TYPE_OPTIONS,
   EDUCATION_LEVEL_OPTIONS,
   EMPLOYMENT_TYPE_OPTIONS,
-  INDUSTRY_OPTIONS,
   JOB_CATEGORY_OPTIONS,
   LANGUAGE_TEST_OPTIONS,
   MAJOR_CATEGORY_OPTIONS,
@@ -254,10 +252,8 @@ export default function BasicInfoPage() {
       {(
         [
           ["region", "희망 지역", REGION_OPTIONS],
-          ["industry", "산업군", INDUSTRY_OPTIONS],
-          ["job_category", "직무/세부직무", JOB_CATEGORY_OPTIONS],
+          ["job_category", "직무", JOB_CATEGORY_OPTIONS],
           ["company_size", "기업규모", COMPANY_SIZE_OPTIONS],
-          ["company_type", "기업형태", COMPANY_TYPE_OPTIONS],
           ["employment_type", "희망 고용형태", EMPLOYMENT_TYPE_OPTIONS],
         ] as [keyof Filters, string, { value: string; label: string }[]][]
       ).map(([key, label, options]) => (
