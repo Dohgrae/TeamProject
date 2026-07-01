@@ -863,7 +863,7 @@ body:has(#screen-result.screen.active) {
 }
 
 #screen-result.is-loading .match-loading-mascot {
-  width: 130px;
+  width: 175px;
 }
 
 /* 하트가 캐릭터 전신을 다 감쌀 만큼 훨씬 크고, 흐릿하지 않게 진하게 보이도록 함 */
