@@ -1,7 +1,8 @@
-// 뽑아듀오 — 1차 필터링 + 키워드 매칭 (서버 없이 브라우저에서 fetch로 정적 json을 읽어 전부 계산)
+// 뽑아듀오 — 1차 필터링 + 2차 스코어링(역량/업무성향/우대요건 가중합) (서버 없이 브라우저에서 fetch로 정적 json을 읽어 전부 계산)
 
 let JOBS_CACHE = null;
 let KEYWORDS_CACHE = null;
+let PERSONALITY_KEYWORDS_CACHE = null;
 
 async function loadJobs() {
   if (!JOBS_CACHE) {
@@ -18,6 +19,22 @@ async function loadKeywords() {
   }
   return KEYWORDS_CACHE;
 }
+
+async function loadPersonalityKeywords() {
+  if (!PERSONALITY_KEYWORDS_CACHE) {
+    const res = await fetch("data/personalityKeywords.json");
+    PERSONALITY_KEYWORDS_CACHE = (await res.json()).keywords;
+  }
+  return PERSONALITY_KEYWORDS_CACHE;
+}
+
+// KEYWORD_TRIGGERS(constants.js)에서 나올 수 있는 역량 라벨을 keywords.json과 같은 {id, aliases}
+// 사전 형태로 만든다. 인터뷰 답변에서 뽑힌 exp.keywords가 이 라벨 중 하나이므로, 공고 텍스트에도
+// 그 라벨이 직접 등장하는지를 keywords.json과 동일한 방식으로 매칭할 수 있게 해준다.
+const COMPETENCY_LABEL_DICT = Array.from(new Set(KEYWORD_TRIGGERS.flatMap(([, labels]) => labels))).map((label) => ({
+  id: label,
+  aliases: [label],
+}));
 
 // ekgus020330-lgtm의 filterlogic runFilter()를 그대로 이식한 1차 필터링.
 function filterJobs(profile, jobs) {
@@ -38,13 +55,19 @@ function filterJobs(profile, jobs) {
     if (filters.job_category.length > 0 && !filters.job_category.includes(job.filter_job_major)) {
       fail.push("직무");
     }
-    // 세부직무(전체가 아닌 값)를 골랐으면, job_title에 해당 세부직무 키워드가 있는 공고만 남긴다.
-    const subcategory = filters.job_subcategory?.[job.filter_job_major];
-    if (subcategory && subcategory !== "전체") {
-      const sub = (JOB_SUBCATEGORY_OPTIONS[job.filter_job_major] || []).find((o) => o.value === subcategory);
-      if (sub && sub.keywords.length > 0 && !sub.keywords.some((k) => job.job_title.includes(k))) {
-        fail.push("세부직무");
-      }
+    // 세부직무(전체가 아닌 값, 복수선택 가능)를 골랐으면, 그중 하나라도 job_title에
+    // 키워드가 있는 공고만 남긴다 (선택한 세부직무들 사이는 OR 조건).
+    const rawSubcategory = filters.job_subcategory?.[job.filter_job_major];
+    const subcategories = (Array.isArray(rawSubcategory) ? rawSubcategory : rawSubcategory ? [rawSubcategory] : []).filter(
+      (v) => v !== "전체"
+    );
+    if (subcategories.length > 0) {
+      const subOptions = JOB_SUBCATEGORY_OPTIONS[job.filter_job_major] || [];
+      const matchesAny = subcategories.some((value) => {
+        const sub = subOptions.find((o) => o.value === value);
+        return sub && sub.keywords.some((k) => job.job_title.includes(k));
+      });
+      if (!matchesAny) fail.push("세부직무");
     }
     if (filters.employment_type.length > 0) {
       if (!filters.employment_type.some((t) => job.employment_type.includes(t))) fail.push("근무형태");
@@ -88,50 +111,106 @@ function textIncludesAnyAlias(text, keyword) {
   return keyword.aliases.some((alias) => aliasMatches(text, alias));
 }
 
-// 사용자 신호(기술스택/자격증 → keywords.json 사전 매칭, 인터뷰 키워드/성향 태그 → 원문 직접 매칭)를 만든다.
-function buildUserSignals(profile, keywords) {
-  const signals = [];
-
-  const taggedSources = [...Object.values(profile.qualifications.tech_stack).flat(), ...profile.qualifications.certificates];
-  for (const keyword of keywords) {
-    if (taggedSources.some((tag) => textIncludesAnyAlias(tag, keyword))) {
-      signals.push({ label: keyword.id, weight: 1.0, matchesJobText: (t) => textIncludesAnyAlias(t, keyword) });
-    }
+// 사전(dict: [{id, aliases}]) 기준으로 텍스트 안에 등장하는 키워드 id 집합을 뽑는다.
+function extractKeywordIds(text, dict) {
+  const found = new Set();
+  if (!text) return found;
+  for (const keyword of dict) {
+    if (textIncludesAnyAlias(text, keyword)) found.add(keyword.id);
   }
-
-  const workKeywords = new Set(profile.career.work_experiences.flatMap((e) => e.keywords));
-  for (const phrase of workKeywords) {
-    signals.push({ label: phrase, weight: 1.0, matchesJobText: (t) => t.includes(phrase) });
-  }
-
-  for (const [tag, weight] of Object.entries(profile.personality_survey.derived_tag_weights)) {
-    signals.push({ label: tag, weight, matchesJobText: (t) => t.includes(tag) });
-  }
-
-  return signals;
+  return found;
 }
 
-function buildJobText(job) {
-  return [job.job_title, job.main_tasks, job.qualifications, job.ideal_person, job.preferred_cert, job.preferred_language, job.preferred_etc]
-    .filter(Boolean)
-    .join("\n");
+function joinText(parts) {
+  return parts.filter(Boolean).join("\n");
 }
 
-// 사용자가 가진 신호 중 이 공고 원문에서 실제로 발견되는 비율로 매칭률을 계산 (0~100 정수, 초안 버전).
-function scoreJob(job, signals) {
-  if (signals.length === 0) return { matchRate: 0, matchedKeywords: [] };
-  const jobText = buildJobText(job);
-  const matched = signals.filter((s) => s.matchesJobText(jobText));
-  const weightSum = matched.reduce((sum, s) => sum + s.weight, 0);
-  return { matchRate: Math.min(100, Math.round((weightSum / signals.length) * 100)), matchedKeywords: matched.map((s) => s.label) };
+// ── 공고 쪽 카테고리별 키워드 집합 ──────────────────────────────
+// 역량: 자격요건 + 주요업무 텍스트에서 keywords.json(하드스킬) + 역량 라벨 사전을 함께 뽑는다.
+function extractJobCompetencyKeywords(job, keywords) {
+  const text = joinText([job.qualifications, job.main_tasks]);
+  const skillIds = extractKeywordIds(text, keywords);
+  const labelIds = extractKeywordIds(text, COMPETENCY_LABEL_DICT);
+  return new Set([...skillIds, ...labelIds]);
 }
 
-function buildMatchReasons(job, matchedKeywords, majorWarning) {
+// 우대요건: 우대사항 + 우대 자격증/어학기준 텍스트에서 keywords.json 하드스킬을 뽑는다.
+function extractJobPreferredKeywords(job, keywords) {
+  const text = joinText([job.preferred_etc, job.preferred_cert, job.preferred_language]);
+  return extractKeywordIds(text, keywords);
+}
+
+// 업무성향: 인재상 텍스트에서 성향 키워드 사전(personalityKeywords.json)을 뽑는다.
+function extractJobPersonalityKeywords(job, personalityKeywords) {
+  return extractKeywordIds(job.ideal_person || "", personalityKeywords);
+}
+
+// ── 사용자 쪽 카테고리별 키워드 집합 ──────────────────────────────
+// 역량/우대요건에 공통으로 쓰는 하드스킬: 기술스택/자격증(구조화된 값) + 인터뷰 답변·학내외활동
+// 설명(자유 텍스트)을 모두 keywords.json 사전으로 매칭한다.
+function extractUserSkillKeywords(profile, keywords) {
+  const structured = joinText([
+    ...Object.values(profile.qualifications.tech_stack).flat(),
+    ...profile.qualifications.certificates,
+  ]);
+  const freeText = joinText([
+    ...profile.career.work_experiences.flatMap((exp) => exp.answers),
+    ...profile.activities.academic_extracurricular.map((item) => item.description),
+    ...profile.activities.awards.map((item) => item.description),
+  ]);
+  return new Set([...extractKeywordIds(structured, keywords), ...extractKeywordIds(freeText, keywords)]);
+}
+
+// 역량 카테고리 전용: 인터뷰에서 이미 라벨로 뽑아 둔 exp.keywords(KEYWORD_TRIGGERS 라벨)를 더한다.
+function extractUserCompetencyLabels(profile) {
+  return new Set(profile.career.work_experiences.flatMap((exp) => exp.keywords));
+}
+
+// 업무성향: 성향 설문에서 이미 태그 id로 도출되어 있으므로 텍스트 매칭 없이 그대로 사용.
+function extractUserPersonalityTags(profile) {
+  return new Set(Object.keys(profile.personality_survey.derived_tag_weights));
+}
+
+// 공고 기준 재현율: 공고가 요구하는 키워드 중 사용자가 가진 비율(0~100).
+// 공고 쪽에 해당 카테고리 텍스트/키워드가 아예 없으면 감점 요인이 아니므로 만점 처리한다.
+function recallScore(jobIds, userIds) {
+  if (jobIds.size === 0) return { score: 100, matched: [] };
+  const matched = [...jobIds].filter((id) => userIds.has(id));
+  return { score: Math.round((matched.length / jobIds.size) * 100), matched };
+}
+
+const CATEGORY_WEIGHTS = { competency: 0.5, personality: 0.2, preferred: 0.3 };
+
+// 매칭률(%) = 역량점수×0.5 + 업무성향점수×0.2 + 우대요건점수×0.3
+function scoreJob(job, userSignals, keywords, personalityKeywords) {
+  const competency = recallScore(
+    extractJobCompetencyKeywords(job, keywords),
+    new Set([...userSignals.skillIds, ...userSignals.competencyLabels])
+  );
+  const personality = recallScore(extractJobPersonalityKeywords(job, personalityKeywords), userSignals.personalityTags);
+  const preferred = recallScore(extractJobPreferredKeywords(job, keywords), userSignals.skillIds);
+
+  const matchRate = Math.round(
+    competency.score * CATEGORY_WEIGHTS.competency +
+      personality.score * CATEGORY_WEIGHTS.personality +
+      preferred.score * CATEGORY_WEIGHTS.preferred
+  );
+
+  const matchedKeywords = Array.from(new Set([...competency.matched, ...preferred.matched, ...personality.matched]));
+
+  return { matchRate, matchedKeywords, breakdown: { competency, personality, preferred } };
+}
+
+function buildMatchReasons(job, breakdown, majorWarning) {
   const reasons = [];
-  if (matchedKeywords.length > 0) {
-    reasons.push(`${matchedKeywords.slice(0, 3).map((k) => `#${k}`).join(", ")} 관련 역량이 이 공고와 겹쳐요.`);
+  const topSkills = [...breakdown.competency.matched, ...breakdown.preferred.matched].slice(0, 3);
+  if (topSkills.length > 0) {
+    reasons.push(`${topSkills.map((k) => `#${k}`).join(", ")} 관련 역량이 이 공고와 겹쳐요.`);
   } else {
     reasons.push("직무·지역·경력 조건은 맞지만, 겹치는 역량 키워드는 아직 못 찾았어요.");
+  }
+  if (breakdown.personality.matched.length > 0) {
+    reasons.push(`${breakdown.personality.matched.slice(0, 2).map((k) => `#${k}`).join(", ")} 업무성향이 이 회사 인재상과 잘 맞아요.`);
   }
   reasons.push(`${job.career_type}(${job.career_years}) · ${job.employment_type} 조건이 회원님과 맞아요.`);
   if (majorWarning) {
@@ -144,14 +223,19 @@ function buildMatchReasons(job, matchedKeywords, majorWarning) {
 
 // profile을 받아 필터링+매칭까지 끝난 결과 배열(매칭률 내림차순)을 돌려준다.
 async function matchJobs(profile) {
-  const [jobs, keywords] = await Promise.all([loadJobs(), loadKeywords()]);
+  const [jobs, keywords, personalityKeywords] = await Promise.all([loadJobs(), loadKeywords(), loadPersonalityKeywords()]);
   const { passed, majorWarnings } = filterJobs(profile, jobs);
   const majorWarningIds = new Set(majorWarnings.map((j) => j.id));
-  const signals = buildUserSignals(profile, keywords);
+
+  const userSignals = {
+    skillIds: extractUserSkillKeywords(profile, keywords),
+    competencyLabels: extractUserCompetencyLabels(profile),
+    personalityTags: extractUserPersonalityTags(profile),
+  };
 
   const results = passed
     .map((job) => {
-      const { matchRate, matchedKeywords } = scoreJob(job, signals);
+      const { matchRate, matchedKeywords, breakdown } = scoreJob(job, userSignals, keywords, personalityKeywords);
       const majorWarning = majorWarningIds.has(job.id);
       return {
         id: job.id,
@@ -163,7 +247,7 @@ async function matchJobs(profile) {
         short_description: job.main_tasks.slice(0, 60) + (job.main_tasks.length > 60 ? "..." : ""),
         match_rate: matchRate,
         matched_keywords: matchedKeywords,
-        match_reasons: buildMatchReasons(job, matchedKeywords, majorWarning),
+        match_reasons: buildMatchReasons(job, breakdown, majorWarning),
         major_warning: majorWarning,
       };
     })
