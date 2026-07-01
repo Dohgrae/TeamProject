@@ -64,13 +64,13 @@
   gap: 20px;
 }
 
-/* 첨부 이미지 기준: 제목/부제는 가운데 정렬 (align-items:center로 이미 가운데 정렬됨) */
-.card-carousel-panel > h1 {
+/* 제목/부제는 연보라 캐러셀 바깥, .main 안에 그대로 두고 가운데 정렬만 준다 */
+#result-title {
   font-size: 22px;
   text-align: center;
 }
 
-.card-carousel-panel > .sub {
+#result-subtitle {
   text-align: center;
 }
 
@@ -117,8 +117,16 @@
    .card-front/.card-back → 앞/뒷면 (backface-visibility: hidden)
    ============================================================ */
 /* 결과 카드들이 담기는 넓찍한 패널. 연보라 배경은 여기에만 준다(로딩 중에는 뺌). */
+/* 제목/부제/돌아가기 링크는 .main 폭(640px)에 맞춰 두고, 캐러셀 패널만 그보다
+   1.8배 넓게(약 1150px) 화면 가운데로 튀어나오도록 한다. .main이 폭을 제한해도
+   position:relative + left:50% + translateX(-50%)로 부모 폭과 무관하게 가운데 정렬된다. */
 .card-carousel-panel {
-  width: 100%;
+  /* .main이 이미 align-items:center로 가운데 정렬하고 있어서, 패널이 .main보다
+     넓어도(92vw, 최대 1152px) 그 정렬만으로 화면 중앙에 맞게 넘쳐 퍼진다.
+     (예전엔 여기에 left:50%+translateX(-50%)도 같이 걸어서 이중으로 밀려
+     왼쪽으로 치우쳐 보였던 버그가 있었음 — 그래서 제거함.) */
+  width: 92vw;
+  max-width: 1152px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -384,7 +392,7 @@
 .card-avatar-wrap {
   display: flex;
   justify-content: center;
-  margin-top: 8px;
+  margin-top: 14px;
   position: relative;
   z-index: 2;
 }
@@ -412,7 +420,7 @@
   display: flex;
   flex-direction: column;
   text-align: center;
-  padding: 10px 24px 20px;
+  padding: 18px 26px 24px;
 }
 
 /* 회사명 */
@@ -420,6 +428,7 @@
   font-size: 15px;
   font-weight: 600;
   color: var(--text-mid);
+  letter-spacing: -0.1px;
 }
 
 /* 직무명 — 카드에서 가장 강조되는 텍스트 */
@@ -427,8 +436,8 @@
   font-size: 20px;
   font-weight: 800;
   color: var(--text-dark);
-  margin-top: 2px;
-  line-height: 1.35;
+  margin-top: 6px;
+  line-height: 1.4;
   letter-spacing: -0.3px;
 }
 
@@ -471,11 +480,12 @@
 .chip-front {
   font-size: 12px;
   font-weight: 700;
-  padding: 5px 12px;
+  padding: 6px 14px;
   border-radius: 99px;
   background: #ffffff;
   color: #111827;
   border: 1px solid #e5e7eb;
+  letter-spacing: -0.1px;
 }
 
 /* 지원 마감일 (앞면) */
@@ -911,8 +921,8 @@
    크게 띄운다 (main.js가 #screen-result에 is-loading을 토글). 다른 화면들과
    똑같이 위저드 헤더/스텝네비는 항상 그대로 보이도록 유지한다.
    ============================================================ */
-#screen-result.is-loading .card-carousel-panel > h1,
-#screen-result.is-loading .card-carousel-panel > .sub,
+#screen-result.is-loading #result-title,
+#screen-result.is-loading #result-subtitle,
 #screen-result.is-loading .button-area,
 #screen-result.is-loading .card-carousel-controls,
 #screen-result.is-loading .nav-row-back {
@@ -1026,6 +1036,8 @@
    ============================================================ */
 .button-area {
   width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
   display: flex;
   align-items: stretch;
   gap: 12px;
