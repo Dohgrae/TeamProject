@@ -471,6 +471,10 @@ function buildCardFrontHtml(job) {
     <div class="card-banner" style="background:${getBannerColor(job.id)}">
       <span class="card-badge-hiring">지금 채용중</span>
       <span class="card-badge-ddate">${ddayText}</span>
+      <div class="card-banner-rate">
+        <span class="card-banner-rate-label">매칭률</span>
+        <span class="card-banner-rate-value">${job.match_rate}%</span>
+      </div>
     </div>
     <div class="card-avatar-wrap">
       <div class="card-avatar">
@@ -483,7 +487,6 @@ function buildCardFrontHtml(job) {
       <p class="card-position-sub">${escapeHtml(job.job_title)}</p>
       <p class="card-comment">${getMatchComment(job.match_rate)}</p>
       <div class="card-chips-front">${chips.join("")}</div>
-      <p class="card-rate-center">매칭률 <span class="card-rate-center-value">${job.match_rate}%</span></p>
       <p class="flip-hint">👆 탭해서 상세 보기</p>
       <p class="card-deadline-front">📅 지원 마감 · ${escapeHtml(job.deadline)}</p>
     </div>`;

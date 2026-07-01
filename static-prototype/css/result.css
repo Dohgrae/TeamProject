@@ -60,7 +60,7 @@ body:has(#screen-result.screen.active) {
    메인 레이아웃 — .screen이 이미 32px 패딩을 주므로 여기서는 최소한만
    ============================================================ */
 .main {
-  max-width: 640px;
+  max-width: 480px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -179,7 +179,6 @@ body:has(#screen-result.screen.active) {
 .card-peek .card-position-sub { font-size: 13px; margin-top: 4px; }
 .card-peek .card-comment,
 .card-peek .card-chips-front,
-.card-peek .card-rate-center,
 .card-peek .flip-hint,
 .card-peek .card-deadline-front { display: none; }
 
@@ -372,20 +371,23 @@ body:has(#screen-result.screen.active) {
   opacity: 0.9;
 }
 
-/* 매칭률 — 카드 가운데(태그 칩 아래, 탭해서 상세보기 위)에 크게, 포인트 컬러로 강조 */
-.card-rate-center {
-  text-align: center;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-mid);
-  margin-top: 16px;
+.card-banner-rate {
+  position: absolute;
+  right: 20px;
+  top: 38px;
+  text-align: right;
 }
 
-.card-rate-center-value {
-  font-size: 32px;
+.card-banner-rate-label {
+  display: block;
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.card-banner-rate-value {
+  font-size: 22px;
   font-weight: 900;
-  color: var(--point);
-  margin-left: 4px;
+  line-height: 1.1;
 }
 
 /* 배너와 본문 경계에 걸쳐 겹쳐지는 원형 마스코트 아바타 */
