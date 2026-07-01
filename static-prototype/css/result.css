@@ -177,6 +177,7 @@ body:has(#screen-result.screen.active) {
 .card-peek .card-body { padding: 8px 16px 16px; }
 .card-peek .card-company-big { font-size: 14px; }
 .card-peek .card-position-sub { font-size: 13px; margin-top: 4px; }
+.card-peek .card-rate-big,
 .card-peek .card-comment,
 .card-peek .card-chips-front,
 .card-peek .flip-hint,
@@ -452,6 +453,15 @@ body:has(#screen-result.screen.active) {
   margin-top: 2px;
   line-height: 1.35;
   letter-spacing: -0.3px;
+}
+
+/* 매칭률 큰 숫자 — 카드 가운데, 직무명 바로 아래 */
+.card-rate-big {
+  font-size: 48px;
+  font-weight: 900;
+  color: var(--point);
+  line-height: 1.1;
+  margin-top: 8px;
 }
 
 /* 한 줄 코멘트 — 매칭률 구간별 멘트, 포인트 컬러로 강조 */

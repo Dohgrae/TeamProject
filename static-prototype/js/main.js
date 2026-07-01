@@ -485,6 +485,7 @@ function buildCardFrontHtml(job) {
     <div class="card-body">
       <p class="card-company-big">${escapeHtml(job.company_name)}</p>
       <p class="card-position-sub">${escapeHtml(job.job_title)}</p>
+      <p class="card-rate-big">${job.match_rate}%</p>
       <p class="card-comment">${getMatchComment(job.match_rate)}</p>
       <div class="card-chips-front">${chips.join("")}</div>
       <p class="flip-hint">👆 탭해서 상세 보기</p>
