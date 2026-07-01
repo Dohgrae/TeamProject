@@ -30,8 +30,8 @@
 /* 클릭/포커스로 이 구역에 입력 중일 때: 눈에 띄게 위로 슬라이드하며 떠오르고 그림자/테두리가 강조됨 */
 .focus-card.active {
   transform: translateY(-22px) scale(1.03);
-  box-shadow: 0 24px 48px rgba(243, 212, 255, 0.6);
-  border-color: #f3d4ff;
+  box-shadow: 0 24px 48px rgba(125, 0, 184, 0.28);
+  border-color: #7d00b8;
 }
 
 /* 다른 카드는 반대로 아래로 살짝 가라앉으며 흐려져서, 뜨고 가라앉는 대비가 슬라이드처럼 느껴지게 한다 */
@@ -90,7 +90,7 @@ input:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: #f3d4ff;
+  border-color: #7d00b8;
 }
 
 textarea {
@@ -113,18 +113,18 @@ textarea {
   border: none;
   border-radius: 999px;
   padding: 0 20px;
-  background: linear-gradient(135deg, #f3d4ff 0%, #a855f7 100%);
-  color: #4c1d6e;
+  background: linear-gradient(135deg, #7d00b8 0%, #a855f7 100%);
+  color: #ffffff;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 2px 8px rgba(243, 212, 255, 0.6);
+  box-shadow: 0 2px 8px rgba(125, 0, 184, 0.35);
 }
 
 .input-with-button button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(243, 212, 255, 0.7);
+  box-shadow: 0 4px 14px rgba(125, 0, 184, 0.45);
 }
 
 .input-with-button button:active {
@@ -150,13 +150,13 @@ textarea {
 }
 
 .chip-group button:hover {
-  border-color: #f3d4ff;
+  border-color: #7d00b8;
 }
 
 .chip-group button.selected {
-  background: #f3d4ff;
-  border-color: #f3d4ff;
-  color: #6b21a8;
+  background: #7d00b8;
+  border-color: #7d00b8;
+  color: #ffffff;
 }
 
 .tech-category,
@@ -212,12 +212,12 @@ textarea {
 }
 
 .btn-primary {
-  background: #f3d4ff;
-  color: #6b21a8;
+  background: #7d00b8;
+  color: #ffffff;
 }
 
 .btn-primary:hover {
-  background: #e6b8ff;
+  background: #5c008a;
 }
 
 .btn-primary:disabled {
@@ -265,8 +265,8 @@ textarea {
 }
 
 .btn-dashed:hover {
-  border-color: #f3d4ff;
-  color: #6b21a8;
+  border-color: #7d00b8;
+  color: #7d00b8;
 }
 
 .btn-text {
@@ -306,13 +306,13 @@ textarea {
   writing-mode: vertical-rl;
   text-orientation: mixed;
   background: #ffffff;
-  border: 1px solid #f3d4ff;
+  border: 1px solid #7d00b8;
   border-right: none;
   border-radius: 10px 0 0 10px;
   padding: 12px 7px;
   font-size: 12px;
   font-weight: 600;
-  color: #6b21a8;
+  color: #7d00b8;
   cursor: pointer;
   box-shadow: -2px 2px 10px rgba(17, 24, 39, 0.08);
   transition: padding-right 0.2s ease, box-shadow 0.2s ease;
@@ -320,7 +320,7 @@ textarea {
 
 .btn-save-tab:hover {
   padding-right: 11px;
-  box-shadow: -3px 3px 12px rgba(243, 212, 255, 0.7);
+  box-shadow: -3px 3px 12px rgba(125, 0, 184, 0.4);
 }
 
 .btn-save-tab:disabled {
@@ -393,8 +393,8 @@ textarea {
 
 .career-badge {
   display: inline-block;
-  background: #f3d4ff;
-  color: #6b21a8;
+  background: #7d00b8;
+  color: #ffffff;
   font-size: 13px;
   font-weight: 600;
   border-radius: 999px;
@@ -414,7 +414,7 @@ textarea {
 
 .progress-bar-wrap .progress-bar {
   height: 100%;
-  background: #f3d4ff;
+  background: #7d00b8;
   transition: width 0.2s;
 }
 
@@ -445,13 +445,13 @@ textarea {
 }
 
 .option-btn:hover {
-  border-color: #f3d4ff;
+  border-color: #7d00b8;
 }
 
 .option-btn.selected {
-  border-color: #f3d4ff;
-  background: #f3d4ff;
-  color: #6b21a8;
+  border-color: #7d00b8;
+  background: #7d00b8;
+  color: #ffffff;
 }
 
 /* ── 완료(JSON 뷰) ── */
@@ -551,8 +551,8 @@ textarea {
 
 .msg.user {
   align-self: flex-end;
-  background: #f3d4ff;
-  color: #6b21a8;
+  background: #7d00b8;
+  color: #ffffff;
 }
 
 .msg-hint {

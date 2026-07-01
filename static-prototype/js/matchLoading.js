@@ -38,8 +38,10 @@ function startMatchLoadingAnimation(container, name) {
         <span class="match-loading-particle p4">💗</span>
         <span class="match-loading-particle p5">💗</span>
       </div>
-      <img src="img/qpi-mascot.png" alt="큐피" class="match-loading-mascot" />
-      <span class="match-loading-heart" aria-hidden="true">❤️</span>
+      <div class="match-loading-hero">
+        <span class="match-loading-heart" aria-hidden="true">❤️</span>
+        <img src="img/qpi-mascot.png" alt="큐피" class="match-loading-mascot" />
+      </div>
       <h2 class="match-loading-title">두근두근, 매칭 중이에요</h2>
       <p class="match-loading-message" id="match-loading-message">${messages[0]}</p>
       <div class="match-loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>

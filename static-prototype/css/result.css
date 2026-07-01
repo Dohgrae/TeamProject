@@ -1,28 +1,21 @@
 /* ============================================================
    뽑아듀오 — style.css
-   테마: 소개팅 앱 스타일 · 핑크 × 보라 그라디언트
+   테마: 입력 위저드(style.css/wizard.css)와 통일된 포인트 컬러 · 중립 배경
    ============================================================ */
 
 /* ── 디자인 토큰 ── */
 :root {
-  --pink:          #ff6b9d;
-  --pink-light:    #ff8fb3;
-  --pink-deep:     #e8527a;
-  --purple:        #c44dff;
-  --purple-deep:   #9b30e8;
-  --purple-light:  #dbb8ff;
+  --point:         #7d00b8;
+  --point-deep:    #5c008a;
 
-  --grad:          linear-gradient(135deg, #ff6b9d 0%, #c44dff 100%);
-  --grad-card-back: linear-gradient(145deg, #b428ee 0%, #e84b8a 100%);
-
-  --bg:            #fff0f6;
-  --text-dark:     #2d1b3d;
-  --text-mid:      #6b5b7b;
-  --text-light:    #a896bb;
+  --bg:            #f9fafb;
+  --text-dark:     #1f2937;
+  --text-mid:      #6b7280;
+  --text-light:    #9ca3af;
 
   --card-radius:   24px;
-  --card-shadow:   0 8px 40px rgba(196, 77, 255, 0.18),
-                   0 2px 10px rgba(0, 0, 0, 0.07);
+  --card-shadow:   0 1px 3px rgba(0, 0, 0, 0.06),
+                   0 8px 28px rgba(17, 24, 39, 0.07);
   --card-height:   520px;
 }
 
@@ -48,7 +41,7 @@
 .result-page {
   font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
                'Noto Sans KR', 'Segoe UI', sans-serif;
-  background: linear-gradient(160deg, #fff0f6 0%, #f6f0ff 100%);
+  background: var(--bg);
   min-height: 100vh;
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
@@ -56,13 +49,11 @@
 
 
 /* ============================================================
-   헤더
+   헤더 — 입력 위저드의 .app-header와 동일한 톤
    ============================================================ */
 .header {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(255, 107, 157, 0.15);
+  background: #ffffff;
+  border-bottom: 1px solid #f3f4f6;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -89,10 +80,7 @@
   font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.5px;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--point);
 }
 
 .logo-tagline {
@@ -157,14 +145,14 @@
 .progress-bar-wrap {
   width: 100%;
   height: 5px;
-  background: rgba(196, 77, 255, 0.12);
+  background: rgba(125, 0, 184, 0.12);
   border-radius: 99px;
   overflow: hidden;
 }
 
 .progress-bar {
   height: 100%;
-  background: var(--grad);
+  background: var(--point);
   border-radius: 99px;
   width: 0%;
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -182,7 +170,37 @@
    ============================================================ */
 .card-area {
   width: 100%;
+  position: relative;
   perspective: 1400px;
+}
+
+/* 이전 공고 다시 보기 — 카드 왼쪽에 겹쳐 뜨는 희미한 삼각형 아이콘 (버튼 박스 없이 아이콘만) */
+.card-nav-prev {
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  border: none;
+  background: none;
+  padding: 10px 8px;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--text-light);
+  opacity: 0.45;
+  cursor: pointer;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.card-nav-prev:hover, .card-nav-prev:focus-visible {
+  opacity: 0.9;
+  color: var(--point);
+  outline: none;
+}
+
+.card-nav-prev:disabled {
+  opacity: 0.15;
+  cursor: not-allowed;
 }
 
 .card-wrap { width: 100%; }
@@ -240,7 +258,7 @@
 
 /* 포커스 링 (키보드 탐색) */
 .card:focus-visible {
-  outline: 3px solid var(--pink);
+  outline: 3px solid var(--point);
   outline-offset: 4px;
 }
 
@@ -331,16 +349,13 @@
   56%       { transform: scale(1); }
 }
 
-/* 매칭률 숫자 — 그라디언트 텍스트, 초대형 */
+/* 매칭률 숫자 — 초대형. 기본은 포인트 컬러, 점수 구간별로 아래에서 초록/주황으로 덮어씀 */
 .score-pct {
   font-size: 80px;
   font-weight: 900;
   line-height: 1;
   letter-spacing: -4px;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--point);
 }
 
 /* 90점 이상 — 초록 */
@@ -380,7 +395,7 @@
    카드 뒷면
    ============================================================ */
 .card-back {
-  background: var(--grad-card-back);
+  background: var(--point);
   transform: rotateY(180deg);
   box-shadow: var(--card-shadow);
   color: white;
@@ -458,7 +473,7 @@
   margin-top: 14px;
   padding: 14px 16px;
   background: rgba(255, 255, 255, 0.95);
-  color: var(--purple-deep);
+  color: var(--point-deep);
   text-align: center;
   font-size: 14px;
   font-weight: 700;
@@ -507,8 +522,8 @@
 .loading-spinner {
   width: 44px;
   height: 44px;
-  border: 3px solid rgba(196, 77, 255, 0.18);
-  border-top-color: var(--purple);
+  border: 3px solid rgba(125, 0, 184, 0.18);
+  border-top-color: var(--point);
   border-radius: 50%;
   animation: spin 0.85s linear infinite;
 }
@@ -568,7 +583,7 @@
   height: 36px;
   border: none;
   border-radius: 50%;
-  background: rgba(196, 77, 255, 0.1);
+  background: rgba(125, 0, 184, 0.1);
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
@@ -578,7 +593,7 @@
   transition: background 0.15s, transform 0.15s;
 }
 
-.match-loading-sound-toggle:hover { background: rgba(196, 77, 255, 0.18); }
+.match-loading-sound-toggle:hover { background: rgba(125, 0, 184, 0.18); }
 .match-loading-sound-toggle:active { transform: scale(0.9); }
 
 /* 떠다니는 하트 파티클 */
@@ -610,26 +625,42 @@
   100% { transform: translateY(-320px) scale(1.05); opacity: 0; }
 }
 
-/* 큐피 마스코트 — 둥실둥실 떠 있는 느낌 */
+/* 큐피 마스코트 + 하트를 한 덩어리로 겹쳐서, 두근거리는 대형 하트를 배경 삼아
+   그 앞에서 마스코트가 둥실둥실 떠다니는 것처럼 보이게 한다. */
+.match-loading-hero {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 뒤쪽의 대형 하트 — 마스코트보다 눈에 띄게 커야 뒤에서 삐져나와 보인다.
+   기존 heartbeat 키프레임 재사용(효과음과 박자를 맞춤).
+   효과음을 1.25배속으로 재생하므로(matchLoading.js) 박자도 1.6s÷1.25=1.28s로 맞춘다. */
+.match-loading-heart {
+  position: absolute;
+  z-index: 1;
+  font-size: 190px;
+  line-height: 1;
+  opacity: 0.5;
+  animation: heartbeat 1.28s ease-in-out infinite;
+}
+
+/* 앞쪽의 큐피 마스코트 — 하트보다 작게 그 앞에서 둥실둥실 떠 있는 느낌 */
 .match-loading-mascot {
-  width: 124px;
+  position: relative;
+  z-index: 2;
+  width: 110px;
   height: auto;
   animation: mascotFloat 2.4s ease-in-out infinite;
-  filter: drop-shadow(0 10px 16px rgba(196, 77, 255, 0.22));
+  filter: drop-shadow(0 10px 16px rgba(125, 0, 184, 0.22));
 }
 
 @keyframes mascotFloat {
   0%, 100% { transform: translateY(0) rotate(-2deg); }
   50%      { transform: translateY(-10px) rotate(2deg); }
-}
-
-/* 중앙 대형 하트 — 기존 heartbeat 키프레임 재사용(효과음과 박자를 맞춤).
-   효과음을 1.25배속으로 재생하므로(matchLoading.js) 박자도 1.6s÷1.25=1.28s로 맞춘다. */
-.match-loading-heart {
-  font-size: 54px;
-  line-height: 1;
-  margin-top: -4px;
-  animation: heartbeat 1.28s ease-in-out infinite;
 }
 
 .match-loading-title {
@@ -664,7 +695,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--grad);
+  background: var(--point);
   animation: dotBounce 1.2s ease-in-out infinite;
 }
 
@@ -709,12 +740,17 @@
   padding-bottom: 24px;
 }
 
+#screen-result.is-loading .match-loading-hero {
+  width: 320px;
+  height: 320px;
+}
+
 #screen-result.is-loading .match-loading-mascot {
-  width: 168px;
+  width: 170px;
 }
 
 #screen-result.is-loading .match-loading-heart {
-  font-size: 72px;
+  font-size: 300px;
 }
 
 #screen-result.is-loading .match-loading-title {
@@ -772,21 +808,21 @@
 .btn-reset {
   margin-top: 8px;
   padding: 14px 32px;
-  background: var(--grad);
+  background: var(--point);
   color: white;
   border: none;
   border-radius: 99px;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(255, 107, 157, 0.38);
+  box-shadow: 0 4px 18px rgba(125, 0, 184, 0.35);
   transition: transform 0.18s, box-shadow 0.18s;
   font-family: inherit;
 }
 
 .btn-reset:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(255, 107, 157, 0.48);
+  box-shadow: 0 6px 22px rgba(125, 0, 184, 0.48);
 }
 
 .btn-reset:active { transform: scale(0.96); }
@@ -819,53 +855,29 @@
 
 .btn:active { transform: scale(0.94) !important; }
 
-/* 이전 공고 다시 보기 */
-.btn-prev {
-  flex: 0.7;
-  background: white;
-  border: 1.5px solid #ede0f8;
-  color: var(--text-mid);
-}
-
-.btn-prev:hover, .btn-prev:focus-visible {
-  background: #fdf5ff;
-  border-color: var(--purple-light);
-  outline: none;
-}
-
-.btn-prev:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.btn-prev:disabled:hover {
-  background: white;
-  border-color: #ede0f8;
-}
-
 /* 관심 없어요 */
 .btn-skip {
   background: white;
-  border: 1.5px solid #ede0f8;
+  border: 1.5px solid #e5e7eb;
   color: var(--text-mid);
 }
 
 .btn-skip:hover, .btn-skip:focus-visible {
-  background: #fdf5ff;
-  border-color: var(--purple-light);
+  background: #faf5ff;
+  border-color: var(--point);
   outline: none;
 }
 
 /* 카드 뒤집기 */
 .btn-flip {
   background: white;
-  border: 1.5px solid rgba(196, 77, 255, 0.28);
-  color: var(--purple-deep);
+  border: 1.5px solid rgba(125, 0, 184, 0.28);
+  color: var(--point-deep);
 }
 
 .btn-flip:hover, .btn-flip:focus-visible {
-  background: #fdf5ff;
-  border-color: var(--purple);
+  background: #faf5ff;
+  border-color: var(--point);
   outline: none;
 }
 
@@ -873,13 +885,13 @@
 .btn-view {
   flex: 1.55;
   padding: 16px 12px;
-  background: var(--grad);
+  background: var(--point);
   color: white;
-  box-shadow: 0 4px 18px rgba(255, 107, 157, 0.38);
+  box-shadow: 0 4px 18px rgba(125, 0, 184, 0.35);
 }
 
 .btn-view:hover, .btn-view:focus-visible {
-  box-shadow: 0 6px 24px rgba(255, 107, 157, 0.52);
+  box-shadow: 0 6px 24px rgba(125, 0, 184, 0.48);
   transform: translateY(-2px);
   outline: none;
 }
@@ -915,8 +927,8 @@
   .score-label { font-size: 15px; }
   .btn-icon { font-size: 20px; }
   .btn-label { font-size: 11px; }
-  .match-loading-mascot { width: 96px; }
-  .match-loading-heart { font-size: 44px; }
+  .match-loading-mascot { width: 80px; }
+  .match-loading-heart { font-size: 130px; }
   .match-loading-title { font-size: 17px; }
 }
 
