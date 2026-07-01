@@ -102,7 +102,7 @@ const MAJOR_CATEGORY_OPTIONS = [
   { value: "CS_ENGINEERING", label: "컴퓨터·공학" },
   { value: "NATURAL_SCIENCE", label: "자연과학" },
   { value: "BUSINESS", label: "경영·경제" },
-  { value: "HUMANITIES", label: "인문·어학" },
+  { value: "HUMANITIES", label: "인문·사회·어학" },
   { value: "ARTS", label: "예체능" },
   { value: "ETC", label: "기타" },
 ];
