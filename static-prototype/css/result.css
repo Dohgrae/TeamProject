@@ -208,6 +208,26 @@
   animation: cardEnter 0.32s cubic-bezier(0, 0, 0.2, 1) forwards;
 }
 
+/* "이전" 카드로 되돌아갈 때는 반대 방향(오른쪽으로 퇴장 → 왼쪽에서 등장)으로 슬라이드한다 */
+@keyframes cardLeaveReverse {
+  0%   { opacity: 1; transform: translateX(0) rotate(0deg) scale(1); }
+  100% { opacity: 0; transform: translateX(90px) rotate(5deg) scale(0.93); }
+}
+
+@keyframes cardEnterReverse {
+  0%   { opacity: 0; transform: translateX(-50px) scale(0.96); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+.card-wrap.leaving-reverse {
+  animation: cardLeaveReverse 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+
+.card-wrap.entering-reverse {
+  animation: cardEnterReverse 0.32s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
 /* 카드 기본 */
 .card {
   width: 100%;
@@ -603,12 +623,13 @@
   50%      { transform: translateY(-10px) rotate(2deg); }
 }
 
-/* 중앙 대형 하트 — 기존 heartbeat 키프레임 재사용(효과음과 박자를 맞춤) */
+/* 중앙 대형 하트 — 기존 heartbeat 키프레임 재사용(효과음과 박자를 맞춤).
+   효과음을 1.25배속으로 재생하므로(matchLoading.js) 박자도 1.6s÷1.25=1.28s로 맞춘다. */
 .match-loading-heart {
   font-size: 54px;
   line-height: 1;
   margin-top: -4px;
-  animation: heartbeat 1.6s ease-in-out infinite;
+  animation: heartbeat 1.28s ease-in-out infinite;
 }
 
 .match-loading-title {
@@ -663,6 +684,46 @@
   .match-loading-dots span {
     animation: none;
   }
+}
+
+/* ============================================================
+   매칭 대기 중에는 헤더/히어로/조작 버튼을 다 걷어내고 "두근두근" 카드만
+   화면 가운데 크게 띄운다 (main.js가 #screen-result에 is-loading을 토글).
+   ============================================================ */
+#screen-result.is-loading .header,
+#screen-result.is-loading .hero,
+#screen-result.is-loading .button-area,
+#screen-result.is-loading > .nav-row {
+  display: none;
+}
+
+#screen-result.is-loading {
+  --card-height: 640px;
+}
+
+#screen-result.is-loading .main {
+  min-height: 100vh;
+  justify-content: center;
+  max-width: 560px;
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+#screen-result.is-loading .match-loading-mascot {
+  width: 168px;
+}
+
+#screen-result.is-loading .match-loading-heart {
+  font-size: 72px;
+}
+
+#screen-result.is-loading .match-loading-title {
+  font-size: 24px;
+}
+
+#screen-result.is-loading .match-loading-message {
+  font-size: 16px;
+  max-width: 380px;
 }
 
 
@@ -757,6 +818,30 @@
 }
 
 .btn:active { transform: scale(0.94) !important; }
+
+/* 이전 공고 다시 보기 */
+.btn-prev {
+  flex: 0.7;
+  background: white;
+  border: 1.5px solid #ede0f8;
+  color: var(--text-mid);
+}
+
+.btn-prev:hover, .btn-prev:focus-visible {
+  background: #fdf5ff;
+  border-color: var(--purple-light);
+  outline: none;
+}
+
+.btn-prev:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-prev:disabled:hover {
+  background: white;
+  border-color: #ede0f8;
+}
 
 /* 관심 없어요 */
 .btn-skip {

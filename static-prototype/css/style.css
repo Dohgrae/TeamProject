@@ -58,7 +58,7 @@ hr {
 .app-header .logo {
   font-weight: 800;
   font-size: 18px;
-  color: #ec4899;
+  color: #6b21a8;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -99,8 +99,8 @@ hr {
 
 .step-nav .step.active .step-dot,
 .step-nav .step.done .step-dot {
-  background: #ec4899;
-  color: #ffffff;
+  background: #f3d4ff;
+  color: #6b21a8;
 }
 
 /* ── 위저드 본문 ── */

@@ -49,6 +49,7 @@ function startMatchLoadingAnimation(container, name) {
   const audio = document.getElementById("match-loading-audio");
   const toggleBtn = document.getElementById("match-loading-sound-toggle");
   const messageEl = document.getElementById("match-loading-message");
+  audio.playbackRate = 1.25;
 
   function applySoundState() {
     toggleBtn.textContent = soundOn ? "🔊" : "🔇";

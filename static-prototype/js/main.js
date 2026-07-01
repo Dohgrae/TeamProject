@@ -439,7 +439,7 @@ async function startResultScreen() {
   renderResultCard();
 }
 
-function renderResultCard() {
+function renderResultCard(direction = "forward") {
   const front = document.getElementById("card-front");
   const back = document.getElementById("card-back");
   const cardInner = document.getElementById("card-inner");
@@ -447,6 +447,9 @@ function renderResultCard() {
 
   cardInner.classList.remove("flipped");
   resultState.isFlipped = false;
+
+  // 매칭을 기다리는 동안에는 헤더/히어로/조작 버튼을 다 숨기고 대기 카드만 화면 가운데 크게 띄운다.
+  document.getElementById("screen-result").classList.toggle("is-loading", resultState.jobs === null && !resultState.error);
 
   // 대기 화면(마스코트/하트/효과음)을 벗어나는 모든 경우에 인터벌·오디오를 정리한다.
   stopMatchLoadingAnimation();
@@ -460,6 +463,7 @@ function renderResultCard() {
   if (resultState.jobs === null) {
     startMatchLoadingAnimation(front, AppState.profile.basic_info.name);
     progressArea.style.display = "none";
+    document.getElementById("button-area").style.display = "none";
     return;
   }
   if (resultState.jobs.length === 0) {
@@ -506,11 +510,12 @@ function renderResultCard() {
 
   document.getElementById("card-counter").textContent = `${resultState.currentIndex + 1} / ${resultState.jobs.length}`;
   document.getElementById("result-progress-bar").style.width = `${((resultState.currentIndex + 1) / resultState.jobs.length) * 100}%`;
+  document.getElementById("btn-prev-card").disabled = resultState.currentIndex === 0;
 
   const wrap = document.getElementById("card-wrap");
-  wrap.classList.remove("entering");
+  wrap.classList.remove("entering", "entering-reverse");
   void wrap.offsetWidth;
-  wrap.classList.add("entering");
+  wrap.classList.add(direction === "back" ? "entering-reverse" : "entering");
 }
 
 function flipResultCard() {
@@ -528,11 +533,24 @@ function showNextResultCard() {
   }
   const wrap = document.getElementById("card-wrap");
   wrap.classList.add("leaving");
-  wrap.classList.remove("entering");
+  wrap.classList.remove("entering", "entering-reverse");
   setTimeout(() => {
     resultState.currentIndex++;
     wrap.classList.remove("leaving");
-    renderResultCard();
+    renderResultCard("forward");
+  }, 280);
+}
+
+// "관심 없어요"로 넘겨버린 공고도 다시 볼 수 있도록, 처음 카드가 아니면 이전 공고로 되돌아간다.
+function showPreviousResultCard() {
+  if (!resultState.jobs || resultState.currentIndex <= 0) return;
+  const wrap = document.getElementById("card-wrap");
+  wrap.classList.add("leaving-reverse");
+  wrap.classList.remove("entering", "entering-reverse");
+  setTimeout(() => {
+    resultState.currentIndex--;
+    wrap.classList.remove("leaving-reverse");
+    renderResultCard("back");
   }, 280);
 }
 
@@ -647,6 +665,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 결과 카드 조작
   document.getElementById("job-card").addEventListener("click", flipResultCard);
+  document.getElementById("btn-prev-card").addEventListener("click", showPreviousResultCard);
   document.getElementById("btn-flip-card").addEventListener("click", flipResultCard);
   document.getElementById("btn-skip-card").addEventListener("click", showNextResultCard);
   document.getElementById("btn-view-card").addEventListener("click", openCurrentJobLink);
@@ -668,6 +687,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "ArrowRight") {
       e.preventDefault();
       showNextResultCard();
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      showPreviousResultCard();
     } else if (e.key === " " && tag !== "button" && tag !== "a") {
       e.preventDefault();
       flipResultCard();
