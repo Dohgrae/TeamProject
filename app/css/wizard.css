@@ -1,5 +1,29 @@
 /* 뽑아듀오 — 입력 위저드 화면 스타일 */
 
+/* ── 기본 인적사항: 항목 하나씩 슬라이드로 보여주는 뷰포트 ── */
+.field-step-counter {
+  font-size: 13px;
+  color: #9ca3af;
+  margin-bottom: 6px;
+}
+
+.field-step-viewport {
+  overflow: hidden;
+  min-height: 92px;
+}
+
+.field-step {
+  display: none;
+}
+
+.field-step label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

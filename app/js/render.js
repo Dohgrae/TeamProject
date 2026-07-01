@@ -143,11 +143,8 @@ function renderBasicInfo() {
     renderBasicInfo();
   });
 
-  document.getElementById("btn-basic-info-next").disabled = !(
-    p.basic_info.name.trim() &&
-    p.basic_info.birth_date &&
-    p.basic_info.education.level
-  );
+  // 항목별 슬라이드 네비게이션(main.js)이 있으면 현재 항목 기준으로 다음 버튼 상태를 갱신한다.
+  if (typeof updateFieldStepNav === "function") updateFieldStepNav();
 }
 
 // ============================================================

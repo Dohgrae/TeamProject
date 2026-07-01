@@ -1,7 +1,10 @@
 // 뽑아듀오 — 화면 전환/이벤트 연결/초기화 (프레임워크 없이 순수 JS)
 
 const RENDERERS = {
-  "basic-info": renderBasicInfo,
+  "basic-info": () => {
+    renderBasicInfo();
+    setupFieldSteps();
+  },
   work: renderWork,
   extracurricular: renderExtracurricular,
   awards: renderAwards,
@@ -9,6 +12,83 @@ const RENDERERS = {
   review: renderReview,
   result: () => startResultScreen(),
 };
+
+// ============================================================
+// 기본 인적사항: 항목을 한 번에 하나씩 슬라이드로 보여주는 로직
+// ============================================================
+const FIELD_STEP_TRANSITION_MS = 260;
+let fieldStepIndex = 0;
+
+function getFieldStepEls() {
+  return Array.from(document.querySelectorAll("#field-step-viewport .field-step"));
+}
+
+// 필수 항목(이름/출생년월일/학력단계)만 유효성 검사, 나머지는 항목 없이도 넘어갈 수 있다.
+function isFieldStepValid(index) {
+  const p = AppState.profile;
+  const steps = getFieldStepEls();
+  const el = steps[index];
+  if (!el || el.dataset.required !== "true") return true;
+  if (el.querySelector("#input-name")) return p.basic_info.name.trim() !== "";
+  if (el.querySelector("#input-birth")) return p.basic_info.birth_date !== "";
+  if (el.querySelector("#education-level-chips")) return p.basic_info.education.level !== "";
+  return true;
+}
+
+function updateFieldStepNav() {
+  const steps = getFieldStepEls();
+  document.getElementById("field-step-counter").textContent = `${fieldStepIndex + 1} / ${steps.length}`;
+  document.getElementById("field-step-progress-bar").style.width = `${((fieldStepIndex + 1) / steps.length) * 100}%`;
+  document.getElementById("btn-basic-info-prev").style.visibility = fieldStepIndex === 0 ? "hidden" : "visible";
+  document.getElementById("btn-basic-info-next").textContent = fieldStepIndex === steps.length - 1 ? "다음 단계" : "다음";
+  document.getElementById("btn-basic-info-next").disabled = !isFieldStepValid(fieldStepIndex);
+}
+
+// 첫 진입(또는 다시 이 화면으로 돌아왔을 때) 첫 항목부터 보여주도록 초기화.
+function setupFieldSteps() {
+  const steps = getFieldStepEls();
+  steps.forEach((el, i) => {
+    el.style.transition = "";
+    el.style.transform = "";
+    el.style.opacity = "";
+    el.style.display = i === 0 ? "block" : "none";
+  });
+  fieldStepIndex = 0;
+  updateFieldStepNav();
+}
+
+// direction: 1 = 다음 항목(위로 슬라이드), -1 = 이전 항목(아래로 슬라이드)
+function goToFieldStep(newIndex, direction) {
+  const steps = getFieldStepEls();
+  if (newIndex < 0 || newIndex >= steps.length) return;
+
+  const curEl = steps[fieldStepIndex];
+  const nextEl = steps[newIndex];
+  const outY = direction === 1 ? -28 : 28;
+  const inY = direction === 1 ? 28 : -28;
+
+  curEl.style.transition = `transform ${FIELD_STEP_TRANSITION_MS}ms ease, opacity ${FIELD_STEP_TRANSITION_MS}ms ease`;
+  curEl.style.transform = `translateY(${outY}px)`;
+  curEl.style.opacity = "0";
+
+  setTimeout(() => {
+    curEl.style.display = "none";
+    curEl.style.transition = "";
+    curEl.style.transform = "";
+    curEl.style.opacity = "";
+
+    fieldStepIndex = newIndex;
+    nextEl.style.display = "block";
+    nextEl.style.transition = "none";
+    nextEl.style.transform = `translateY(${inY}px)`;
+    nextEl.style.opacity = "0";
+    void nextEl.offsetHeight; // 강제 리플로우로 위 스타일을 먼저 적용시킨 뒤 트랜지션 시작
+    nextEl.style.transition = `transform ${FIELD_STEP_TRANSITION_MS}ms ease, opacity ${FIELD_STEP_TRANSITION_MS}ms ease`;
+    nextEl.style.transform = "translateY(0)";
+    nextEl.style.opacity = "1";
+    updateFieldStepNav();
+  }, FIELD_STEP_TRANSITION_MS);
+}
 
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
@@ -27,12 +107,12 @@ function bindBasicInfoInputs() {
   document.getElementById("input-name").addEventListener("input", (e) => {
     p().basic_info.name = e.target.value;
     AppState.save();
-    document.getElementById("btn-basic-info-next").disabled = !(p().basic_info.name.trim() && p().basic_info.birth_date && p().basic_info.education.level);
+    updateFieldStepNav();
   });
   document.getElementById("input-birth").addEventListener("input", (e) => {
     p().basic_info.birth_date = e.target.value;
     AppState.save();
-    document.getElementById("btn-basic-info-next").disabled = !(p().basic_info.name.trim() && p().basic_info.birth_date && p().basic_info.education.level);
+    updateFieldStepNav();
   });
   document.getElementById("input-major-detail").addEventListener("input", (e) => {
     p().basic_info.education.major_detail = e.target.value;
@@ -279,7 +359,15 @@ document.addEventListener("DOMContentLoaded", () => {
   AppState.load();
   bindBasicInfoInputs();
 
-  document.getElementById("btn-basic-info-next").addEventListener("click", () => showScreen("work"));
+  document.getElementById("btn-basic-info-next").addEventListener("click", () => {
+    if (!isFieldStepValid(fieldStepIndex)) return;
+    const isLastStep = fieldStepIndex === getFieldStepEls().length - 1;
+    if (isLastStep) showScreen("work");
+    else goToFieldStep(fieldStepIndex + 1, 1);
+  });
+  document.getElementById("btn-basic-info-prev").addEventListener("click", () => {
+    if (fieldStepIndex > 0) goToFieldStep(fieldStepIndex - 1, -1);
+  });
   document.getElementById("btn-work-prev").addEventListener("click", () => showScreen("basic-info"));
   document.getElementById("btn-work-next").addEventListener("click", () => showScreen("extracurricular"));
   document.getElementById("btn-extracurricular-prev").addEventListener("click", () => showScreen("work"));
