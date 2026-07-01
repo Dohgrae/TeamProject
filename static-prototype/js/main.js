@@ -523,7 +523,7 @@ async function startResultScreen() {
   resultState.isFlipped = false;
   resultState.error = null;
   document.getElementById("end-screen").style.display = "none";
-  document.getElementById("card-area").style.display = "block";
+  document.getElementById("card-area").style.display = "flex";
   document.getElementById("button-area").style.display = "flex";
   renderResultCard();
 
@@ -791,7 +791,7 @@ document.addEventListener("DOMContentLoaded", () => {
     resultState.currentIndex = 0;
     resultState.isFlipped = false;
     document.getElementById("end-screen").style.display = "none";
-    document.getElementById("card-area").style.display = "block";
+    document.getElementById("card-area").style.display = "flex";
     renderResultCard();
   });
 

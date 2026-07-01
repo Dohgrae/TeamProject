@@ -16,9 +16,6 @@
   --card-radius:   24px;
   --card-shadow:   0 1px 3px rgba(0, 0, 0, 0.06),
                    0 8px 28px rgba(17, 24, 39, 0.07);
-  /* 화면 높이가 낮아도 결과 화면 전체가 스크롤 없이 한 화면에 들어오도록,
-     카드 높이를 뷰포트 높이에서 헤더/여백 등 나머지 요소 높이를 뺀 값으로 제한한다. */
-  --card-height:   clamp(420px, calc(100vh - 560px), 520px);
 }
 
 /* ── 기본 리셋 ── */
@@ -43,21 +40,46 @@
                'Noto Sans KR', 'Segoe UI', sans-serif;
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 결과/로딩 화면도 다른 입력 화면들과 같은 기본 배경(연회색)을 그대로 쓴다.
    #screen-result 자체는 흰 카드처럼 튀어 보이지 않게 배경/그림자를 없애 body의
    연회색과 하나로 이어지게 한다. 연보라는 카드 캐러셀 패널(.card-carousel-panel)에만 준다. */
+/* 결과 화면은 뷰포트 높이에 정확히 맞춰 넣고(overflow:hidden), 그 안의 패널/카드는
+   전부 flex:1로 남는 세로 공간을 나눠 채우게 한다. 이렇게 하면 화면 높이가 얼마든
+   내용이 뷰포트 안에 딱 맞아 페이지 스크롤이 생기지 않는다(대신 카드 안 텍스트가
+   너무 길면 카드 내부에서만 스크롤된다 — .card-front/.card-back의 overflow-y:auto). */
 #screen-result.active {
   background: transparent;
   box-shadow: none;
   padding: 16px 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/* 결과 화면은 세로 스크롤이 생기지 않도록 위저드 공통 하단 여백을 줄인다 */
+/* 헤더 실제 높이를 추측해서 빼는 대신, body 자체를 뷰포트 높이로 고정하고
+   헤더는 auto, wizard-main은 flex:1로 "남는 만큼"을 정확히 채우게 한다. */
+body:has(#screen-result.active) {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 .wizard-main:has(#screen-result.active) {
+  flex: 1;
+  min-height: 0;
+  height: auto;
   padding-top: 12px;
   padding-bottom: 16px;
+  overflow: hidden;
+  display: flex;
 }
 
 
@@ -66,11 +88,14 @@
    ============================================================ */
 .main {
   max-width: 640px;
+  width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 14px;
+  flex: 1;
+  min-height: 0;
 }
 
 /* 제목/부제는 연보라 캐러셀 바깥, .main 안에 그대로 두고 가운데 정렬만 준다 */
@@ -151,6 +176,8 @@
   box-shadow: var(--card-shadow);
   border-radius: 24px;
   padding: 20px 28px;
+  flex: 1;
+  min-height: 0;
 }
 
 #screen-result.is-loading .card-carousel-panel {
@@ -168,6 +195,8 @@
   flex-direction: column;
   align-items: center;
   gap: 18px;
+  flex: 1;
+  min-height: 0;
 }
 
 /* 카드 캐러셀 — 가운데 카드(.card-wrap)는 실제 뒤집기가 되는 카드, 양옆의 .card-peek는
@@ -176,22 +205,25 @@
   position: relative;
   width: 100%;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   perspective: 1400px;
+  flex: 1;
+  min-height: 0;
 }
 
 .card-wrap {
   position: relative;
   z-index: 3;
   width: 100%;
+  height: 100%;
 }
 
 .card-peek {
   position: absolute;
   top: 50%;
   width: 78%;
-  height: calc(var(--card-height) - 48px);
+  height: 88%;
   transform: translateY(-45%) scale(0.92);
   border-radius: var(--card-radius);
   background: #ffffff;
@@ -325,10 +357,12 @@
   animation: cardEnterReverse 0.32s cubic-bezier(0, 0, 0.2, 1) forwards;
 }
 
-/* 카드 기본 */
+/* 카드 기본 — 높이는 고정값이 아니라 위쪽 flex 체인(.card-area/.card-carousel)이
+   남는 세로 공간을 그대로 채워준 값을 100%로 물려받는다(뷰포트 높이가 얼마든
+   자동으로 맞춰져서 페이지 스크롤이 생기지 않는다). */
 .card {
   width: 100%;
-  height: var(--card-height);
+  height: 100%;
   cursor: pointer;
   position: relative;
   outline: none;
@@ -849,32 +883,36 @@
   56%       { transform: scale(1); }
 }
 
-/* 앞쪽의 큐피 마스코트 — 하트보다 작게 그 앞에서 둥실둥실 떠 있는 느낌.
-   기존 drop-shadow 필터가 캐릭터 뒤에 뿌연 후광처럼 번져 하트 모양을 가렸어서 뺐다. */
-.match-loading-mascot {
-  position: relative;
+/* 하트 양옆에 비대칭하게 떠서 하트 주변을 맴도는 느낌의 두 캐릭터.
+   좌/우 크기·위치·애니메이션을 서로 다르게 줘서 대칭이 아니라 자연스럽게 떠도는 느낌을 낸다. */
+.match-loading-mascot-side {
+  position: absolute;
   z-index: 2;
-  width: 110px;
   height: auto;
-  animation: mascotFloat 5.5s ease-in-out infinite;
 }
 
-/* 새 그림을 그릴 수는 없어서, 하나의 긴 애니메이션 안에 둥실 뜨기·좌우로 갸우뚱·
-   통통 튀는 작은 홉·살짝 커지는 스케일 펄스를 섞어 "다양한 동작"처럼 보이게 만들었다. */
-@keyframes mascotFloat {
-  0%   { transform: translateY(0)    translateX(0)   rotate(0deg)  scale(1); }
-  8%   { transform: translateY(-16px) translateX(-4px) rotate(-6deg) scale(1.03); }
-  16%  { transform: translateY(-4px) translateX(-8px) rotate(-9deg) scale(1); }
-  25%  { transform: translateY(-20px) translateX(0)   rotate(0deg)  scale(1.04); }
-  34%  { transform: translateY(-6px) translateX(8px)  rotate(9deg)  scale(1); }
-  42%  { transform: translateY(-16px) translateX(4px) rotate(6deg)  scale(1.03); }
-  50%  { transform: translateY(0)    translateX(0)   rotate(0deg)  scale(1); }
-  58%  { transform: translateY(-3px) translateX(0)    rotate(0deg)  scale(1.05); }
-  63%  { transform: translateY(-12px) translateX(0)   rotate(0deg)  scale(0.98); }
-  68%  { transform: translateY(-2px) translateX(0)    rotate(0deg)  scale(1.03); }
-  80%  { transform: translateY(-14px) translateX(-6px) rotate(-5deg) scale(1); }
-  90%  { transform: translateY(-4px) translateX(4px)  rotate(4deg)  scale(1.02); }
-  100% { transform: translateY(0)    translateX(0)   rotate(0deg)  scale(1); }
+.match-loading-mascot-a {
+  width: 78px;
+  left: 4px;
+  bottom: 18px;
+  animation: mascotOrbitA 6s ease-in-out infinite;
+}
+
+.match-loading-mascot-b {
+  width: 96px;
+  right: -6px;
+  top: 8px;
+  animation: mascotOrbitB 6.8s ease-in-out infinite;
+}
+
+@keyframes mascotOrbitA {
+  0%, 100% { transform: translateY(0)    translateX(0)   rotate(-4deg); }
+  50%      { transform: translateY(-16px) translateX(8px) rotate(5deg); }
+}
+
+@keyframes mascotOrbitB {
+  0%, 100% { transform: translateY(0)   translateX(0)    rotate(5deg); }
+  50%      { transform: translateY(-10px) translateX(-10px) rotate(-4deg); }
 }
 
 .match-loading-title {
@@ -923,7 +961,7 @@
 
 /* 애니메이션을 원치 않는 사용자를 위한 배려 */
 @media (prefers-reduced-motion: reduce) {
-  .match-loading-mascot,
+  .match-loading-mascot-side,
   .match-loading-heart,
   .match-loading-particle,
   .match-loading-dots span {
@@ -944,10 +982,6 @@
   display: none;
 }
 
-#screen-result.is-loading {
-  --card-height: min(680px, 70vh);
-}
-
 /* 로딩 중에는 흰 카드 박스 없이 캐릭터/하트/문구가 연보라 배경 위에 바로 떠 있도록 한다 */
 #screen-result.is-loading .card-front {
   background: transparent;
@@ -961,8 +995,16 @@
   height: 380px;
 }
 
-#screen-result.is-loading .match-loading-mascot {
-  width: 175px;
+#screen-result.is-loading .match-loading-mascot-a {
+  width: 140px;
+  left: 4px;
+  bottom: 30px;
+}
+
+#screen-result.is-loading .match-loading-mascot-b {
+  width: 172px;
+  right: -10px;
+  top: 16px;
 }
 
 /* 하트가 캐릭터 전신을 다 감쌀 만큼 훨씬 크고, 흐릿하지 않게 진하게 보이도록 함 */
@@ -996,6 +1038,8 @@
   background: white;
   border-radius: var(--card-radius);
   box-shadow: var(--card-shadow);
+  flex: 1;
+  min-height: 0;
 }
 
 .end-emoji {
@@ -1121,19 +1165,18 @@
 /* 소형 모바일 (380px 미만) */
 @media (max-width: 380px) {
   .main { gap: 16px; }
-  :root { --card-height: 480px; }
   .card-back { padding: 22px 18px; }
   .card-position-sub { font-size: 17px; }
   .btn-icon { font-size: 20px; }
   .btn-label { font-size: 11px; }
-  .match-loading-mascot { width: 80px; }
+  .match-loading-mascot-a { width: 58px; }
+  .match-loading-mascot-b { width: 70px; }
   .match-loading-heart { font-size: 130px; }
   .match-loading-title { font-size: 17px; }
 }
 
 /* 태블릿 · 데스크톱 (481px 이상) */
 @media (min-width: 481px) {
-  :root { --card-height: clamp(420px, calc(100vh - 560px), 540px); }
   .card-position-sub { font-size: 21px; }
   .btn { padding: 16px 12px; }
   .btn-view { padding: 18px 14px; }

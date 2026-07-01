@@ -64,6 +64,12 @@ hr {
   gap: 6px;
 }
 
+.app-header .logo-icon {
+  width: 24px;
+  height: auto;
+  display: block;
+}
+
 .step-nav {
   display: flex;
   align-items: center;
