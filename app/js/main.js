@@ -77,6 +77,44 @@ function setupFocusCards() {
     },
     true
   );
+
+  setupAutoAdvance(list);
+}
+
+// 각 카드의 마지막 항목을 입력/선택하면, 사용자가 직접 클릭하지 않아도
+// 자동으로 다음 카드가 위로 떠오르며 강조되고 화면도 그쪽으로 스크롤된다.
+function setupAutoAdvance(list) {
+  function advanceTo(index) {
+    const target = list.querySelectorAll(".focus-card")[index];
+    if (!target) return;
+    setActiveFocusCard(target);
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  // 카드1(이름~이메일) 마지막 항목: 이메일
+  document.getElementById("input-email").addEventListener("blur", () => advanceTo(1));
+  // 카드2(학력/전공) 마지막 항목: 학과
+  document.getElementById("input-major-detail").addEventListener("blur", () => advanceTo(2));
+  // 카드3(자격증/어학) 마지막 항목: 어학 점수/등급
+  document.getElementById("input-lang-score").addEventListener("blur", () => advanceTo(3));
+  // 칩 클릭은 onToggle 안에서 바로 컨테이너를 다시 그려 자기 자신을 DOM에서 떼어내므로,
+  // 여기서도 버블링을 기다리지 않고 캡처링 단계에서 먼저 판단해야 한다.
+  // 카드4(기술스택) 마지막 항목: 협업툴·형상관리 칩 (컨테이너에 위임, 안에서 매번 다시 그려지므로)
+  document.getElementById("tech-stack-container").addEventListener(
+    "click",
+    (e) => {
+      if (e.target.closest('[id="tech-협업툴_형상관리"]')) advanceTo(4);
+    },
+    true
+  );
+  // 카드5(직무+세부직무) 마지막 항목: 직무 칩 (세부직무는 부가 선택이라 트리거로 안 씀)
+  document.getElementById("filter-job-category-chips").addEventListener(
+    "click",
+    (e) => {
+      if (e.target.tagName === "BUTTON") advanceTo(5);
+    },
+    true
+  );
 }
 
 // 필수 항목(이름/출생년월일/학력단계)만 유효성 검사, 나머지는 비워도 다음 단계로 넘어갈 수 있다.
