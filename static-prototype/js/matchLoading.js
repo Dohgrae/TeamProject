@@ -43,7 +43,7 @@ function startMatchLoadingAnimation(container, name) {
       <h2 class="match-loading-title">두근두근, 매칭 중이에요</h2>
       <p class="match-loading-message" id="match-loading-message">${messages[0]}</p>
       <div class="match-loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
-      <audio id="match-loading-audio" src="sounds/heartbeat.wav" loop preload="auto"></audio>
+      <audio id="match-loading-audio" src="sounds/heartbeat.mp3" loop preload="auto"></audio>
     </div>`;
 
   const audio = document.getElementById("match-loading-audio");
