@@ -450,8 +450,10 @@ function truncateAroundHighlight(line, highlightStart, highlightEnd, maxLength) 
 }
 
 function getMatchComment(score) {
-  if (score >= 91) return "천생연분! 뽑아듀오가 맺어준 최고의 궁합이에요 💯🔮";
-  if (score >= 81) return "심장이 쿵! 이건 운명이에요 🔥";
+  if (score >= 95) return "천생연분! 뽑아듀오가 응원하는 최고의 궁합이에요 💯💍";
+  if (score >= 90) return "심장이 쿵! 이건 운명이에요 🔥";
+  if (score >= 85) return "이 케미, 그냥 지나칠 수 없어요 💫";
+  if (score >= 80) return "자꾸 생각나는 사이? 이미 시작된 것 같아요 😳";
   if (score >= 71) return "이 정도면 애프터 각! 서로에게 딱이에요 💕";
   if (score >= 61) return "대화가 술술 풀릴 궁합이에요. 적극 추천! 💬";
   if (score >= 51) return "어? 은근 잘 맞는데요? 소개팅 성공 예감 👀";

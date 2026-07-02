@@ -582,10 +582,14 @@ function resetCards() {
 // getMatchComment(score): 매칭률에 따라 소개팅 앱 스타일 친구 리액션 멘트 반환
 // fitScore(0~100) → 단계별 멘트 (소개팅 앱 컨셉)
 function getMatchComment(score) {
-  if (score >= 91) {
-    return "천생연분! 뽑아듀오가 맺어준 최고의 궁합이에요 💯🔮";
-  } else if (score >= 81) {
+  if (score >= 95) {
+    return "천생연분! 뽑아듀오가 응원하는 최고의 궁합이에요 💯💍";
+  } else if (score >= 90) {
     return "심장이 쿵! 이건 운명이에요 🔥";
+  } else if (score >= 85) {
+    return "이 케미, 그냥 지나칠 수 없어요 💫";
+  } else if (score >= 80) {
+    return "자꾸 생각나는 사이? 이미 시작된 것 같아요 😳";
   } else if (score >= 71) {
     return "이 정도면 애프터 각! 서로에게 딱이에요 💕";
   } else if (score >= 61) {
