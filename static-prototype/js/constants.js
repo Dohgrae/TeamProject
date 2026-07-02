@@ -107,7 +107,7 @@ const MAJOR_CATEGORY_OPTIONS = [
   { value: "ETC", label: "기타" },
 ];
 
-const LANGUAGE_TEST_OPTIONS = ["TOEIC", "TOEFL", "OPIc", "TEPS", "JLPT", "HSK", "기타"];
+const LANGUAGE_TEST_OPTIONS = ["TOEIC", "TOEFL", "OPIc", "TEPS", "JLPT", "HSK", "해외 대학/대학원 졸업", "기타"];
 
 const TECH_STACK_CATEGORIES = [
   { key: "언어", label: "언어", options: ["Java", "Python", "JavaScript", "TypeScript", "C++", "C#", "Go", "Kotlin"] },

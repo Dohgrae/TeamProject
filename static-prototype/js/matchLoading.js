@@ -67,7 +67,7 @@ function startMatchLoadingAnimation(container, name) {
     toggleBtn.textContent = soundOn ? "🔊" : "🔇";
     toggleBtn.setAttribute("aria-label", soundOn ? "두근두근 효과음 끄기" : "두근두근 효과음 켜기");
     if (soundOn) {
-      audio.volume = 0.5;
+      audio.volume = 1;
       // 브라우저 자동재생 정책으로 막힐 수 있어 실패하면 조용히 음소거 상태로 전환.
       audio.play().catch(() => {
         soundOn = false;

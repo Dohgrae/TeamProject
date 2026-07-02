@@ -1349,6 +1349,20 @@ body:has(#screen-result.active) {
   transform: scale(0.96);
 }
 
+.end-restart-guide {
+  margin-top: 18px;
+  font-size: 13px;
+  color: var(--text-light);
+  line-height: 1.6;
+  max-width: 280px;
+}
+
+#btn-end-restart-basic-info {
+  margin-top: 6px;
+  padding: 10px 24px;
+  font-size: 13px;
+}
+
 /* ============================================================
    하단 버튼 영역
    ============================================================ */

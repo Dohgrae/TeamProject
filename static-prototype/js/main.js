@@ -1123,6 +1123,11 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("card-area").style.display = "flex";
     renderResultCard();
   });
+  // 카드 캐러셀만 처음으로 되돌리는 버튼과 달리, 이 버튼은 입력한 내용은 그대로 둔 채
+  // 맨 처음 화면(기본 인적사항)으로 이동해서 원하면 처음부터 다시 입력할 수 있게 해준다.
+  document
+    .getElementById("btn-end-restart-basic-info")
+    .addEventListener("click", () => showScreen("basic-info"));
 
   document.addEventListener("keydown", (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
