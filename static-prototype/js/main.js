@@ -623,7 +623,10 @@ function renderResultCard(direction = "forward") {
 
   progressArea.style.display = "flex";
   document.getElementById("button-area").style.display = "flex";
-  document.getElementById("result-subtitle").textContent = `경험과 선호 조건에 꼭 맞는 공고 ${resultState.jobs.length}건을 찾았어요`;
+  const userName = AppState.profile.basic_info.name.trim();
+  document.getElementById("result-subtitle").textContent = userName
+    ? `${userName}님께 꼭 맞는 공고 ${resultState.jobs.length}건을 찾았어요`
+    : `꼭 맞는 공고 ${resultState.jobs.length}건을 찾았어요`;
   const job = resultState.jobs[resultState.currentIndex];
 
   front.innerHTML = buildCardFrontHtml(job);
