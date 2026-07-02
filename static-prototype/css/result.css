@@ -174,8 +174,6 @@ body:has(#screen-result.active) {
   width: 720px;
   max-width: 90vw;
   min-height: 520px;
-  height: calc(100vh - 190px);
-  max-height: 760px;
   display: flex;
   flex-direction: column;
   align-items: center;
