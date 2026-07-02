@@ -23,7 +23,9 @@ const RENDERERS = {
 // 클릭/포커스한 카드만 위로 떠오르며 강조되고 나머지는 은은하게 가라앉는 효과
 // ============================================================
 function setActiveFocusCard(list, card) {
-  list.querySelectorAll(".focus-card").forEach((c) => c.classList.toggle("active", c === card));
+  list
+    .querySelectorAll(".focus-card")
+    .forEach((c) => c.classList.toggle("active", c === card));
   list.classList.toggle("has-active", !!card);
 }
 
@@ -35,11 +37,16 @@ function bindFocusCardOutsideClick() {
   document.addEventListener(
     "click",
     (e) => {
-      if (!e.target.closest(".focus-card") && !e.target.closest(".modal-overlay")) {
-        document.querySelectorAll(".focus-card-list").forEach((list) => setActiveFocusCard(list, null));
+      if (
+        !e.target.closest(".focus-card") &&
+        !e.target.closest(".modal-overlay")
+      ) {
+        document
+          .querySelectorAll(".focus-card-list")
+          .forEach((list) => setActiveFocusCard(list, null));
       }
     },
-    true
+    true,
   );
 }
 
@@ -52,7 +59,7 @@ function bindFocusCardList(list) {
       const card = e.target.closest(".focus-card");
       if (card) setActiveFocusCard(list, card);
     },
-    true
+    true,
   );
 
   // 칩/옵션 버튼 클릭은 onToggle 안에서 바로 innerHTML을 다시 그려서 자기 자신을 DOM에서
@@ -64,7 +71,7 @@ function bindFocusCardList(list) {
       const card = e.target.closest(".focus-card");
       if (card) setActiveFocusCard(list, card);
     },
-    true
+    true,
   );
 
   bindFocusCardOutsideClick();
@@ -81,7 +88,12 @@ function activateFirstCardIfEmpty() {
   if (list.querySelector(".focus-card.active")) return;
 
   const b = AppState.profile.basic_info;
-  const isEmpty = !b.name && !b.birth_date && !b.gender && !b.contact.phone && !b.contact.email;
+  const isEmpty =
+    !b.name &&
+    !b.birth_date &&
+    !b.gender &&
+    !b.contact.phone &&
+    !b.contact.email;
   if (isEmpty) setActiveFocusCard(list, list.querySelector(".focus-card"));
 }
 
@@ -105,14 +117,20 @@ function setupAutoAdvance(list) {
   }
 
   // 카드1(이름~이메일) 마지막 항목: 이메일
-  document.getElementById("input-email").addEventListener("blur", () => advanceTo(1));
+  document
+    .getElementById("input-email")
+    .addEventListener("blur", () => advanceTo(1));
   // 카드2(학력/전공) 마지막 항목: 학과
-  document.getElementById("input-major-detail").addEventListener("blur", () => advanceTo(2));
+  document
+    .getElementById("input-major-detail")
+    .addEventListener("blur", () => advanceTo(2));
   // 카드3(자격증/어학) 마지막 항목: 어학 점수/등급
   // "추가" 버튼을 누르면 그 클릭 자체가 이 입력의 blur를 먼저 발생시키는데, 그 즉시 카드가
   // scrollIntoView로 이동해버리면 클릭 중간에 버튼이 밀려나 첫 클릭이 씹힌 것처럼 보인다.
   // 그래서 "추가" 클릭이 완전히 처리될 시간을 준 뒤에 넘어가도록 살짝 지연시킨다.
-  document.getElementById("input-lang-score").addEventListener("blur", () => setTimeout(() => advanceTo(3), 200));
+  document
+    .getElementById("input-lang-score")
+    .addEventListener("blur", () => setTimeout(() => advanceTo(3), 200));
   // 칩 클릭은 onToggle 안에서 바로 컨테이너를 다시 그려 자기 자신을 DOM에서 떼어내므로,
   // 여기서도 버블링을 기다리지 않고 캡처링 단계에서 먼저 판단해야 한다.
   // 카드4(기술스택) 마지막 항목: 협업툴·형상관리 칩 (컨테이너에 위임, 안에서 매번 다시 그려지므로)
@@ -121,7 +139,7 @@ function setupAutoAdvance(list) {
     (e) => {
       if (e.target.closest('[id="tech-협업툴_형상관리"]')) advanceTo(4);
     },
-    true
+    true,
   );
   // 카드5(직무+세부직무) 마지막 항목: 직무 칩 (세부직무는 부가 선택이라 트리거로 안 씀)
   document.getElementById("filter-job-category-chips").addEventListener(
@@ -129,7 +147,7 @@ function setupAutoAdvance(list) {
     (e) => {
       if (e.target.tagName === "BUTTON") advanceTo(5);
     },
-    true
+    true,
   );
 }
 
@@ -139,8 +157,11 @@ let personalityFocusBound = false;
 function activateFirstPersonalityCardIfEmpty() {
   const list = document.getElementById("personality-questions");
   if (list.querySelector(".focus-card.active")) return;
-  const allUnanswered = AppState.profile.personality_survey.answers.every((a) => a.choice === null);
-  if (allUnanswered) setActiveFocusCard(list, list.querySelector(".focus-card"));
+  const allUnanswered = AppState.profile.personality_survey.answers.every(
+    (a) => a.choice === null,
+  );
+  if (allUnanswered)
+    setActiveFocusCard(list, list.querySelector(".focus-card"));
 }
 
 function setupPersonalityFocusCards() {
@@ -156,7 +177,9 @@ function setupPersonalityFocusCards() {
 function advanceToNextPersonalityCard(answeredQuestionId) {
   const list = document.getElementById("personality-questions");
   const cards = Array.from(list.querySelectorAll(".focus-card"));
-  const idx = PERSONALITY_QUESTIONS.findIndex((q) => q.question_id === answeredQuestionId);
+  const idx = PERSONALITY_QUESTIONS.findIndex(
+    (q) => q.question_id === answeredQuestionId,
+  );
   const next = cards[idx + 1];
   if (next) {
     setActiveFocusCard(list, next);
@@ -183,11 +206,17 @@ function wireInterimSaveButton(buttonId) {
 // 필수 항목(이름/출생년월일/학력단계)만 유효성 검사, 나머지는 비워도 다음 단계로 넘어갈 수 있다.
 function isBasicInfoValid() {
   const p = AppState.profile;
-  return p.basic_info.name.trim() !== "" && p.basic_info.birth_date !== "" && p.basic_info.education.level !== "";
+  return (
+    p.basic_info.name.trim() !== "" &&
+    p.basic_info.birth_date !== "" &&
+    p.basic_info.education.level !== ""
+  );
 }
 
 function showScreen(id) {
-  document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+  document
+    .querySelectorAll(".screen")
+    .forEach((s) => s.classList.remove("active"));
   document.getElementById(`screen-${id}`).classList.add("active");
   renderStepNav(id);
   RENDERERS[id]?.();
@@ -202,17 +231,21 @@ function bindBasicInfoInputs() {
   document.getElementById("input-name").addEventListener("input", (e) => {
     p().basic_info.name = e.target.value;
     AppState.save();
-    document.getElementById("btn-basic-info-next").disabled = !isBasicInfoValid();
+    document.getElementById("btn-basic-info-next").disabled =
+      !isBasicInfoValid();
   });
   document.getElementById("input-birth").addEventListener("input", (e) => {
     p().basic_info.birth_date = e.target.value;
     AppState.save();
-    document.getElementById("btn-basic-info-next").disabled = !isBasicInfoValid();
+    document.getElementById("btn-basic-info-next").disabled =
+      !isBasicInfoValid();
   });
-  document.getElementById("input-major-detail").addEventListener("input", (e) => {
-    p().basic_info.education.major_detail = e.target.value;
-    AppState.save();
-  });
+  document
+    .getElementById("input-major-detail")
+    .addEventListener("input", (e) => {
+      p().basic_info.education.major_detail = e.target.value;
+      AppState.save();
+    });
   document.getElementById("input-phone").addEventListener("input", (e) => {
     p().basic_info.contact.phone = e.target.value;
     AppState.save();
@@ -253,7 +286,11 @@ function bindBasicInfoInputs() {
 // ============================================================
 // 직장경험 추가: 1) 기간/고용형태 미니 모달 -> 2) 인터뷰 챗봇 모달
 // ============================================================
-const periodState = { employment_type: "정규직", start_date: "", end_date: null };
+const periodState = {
+  employment_type: "정규직",
+  start_date: "",
+  end_date: null,
+};
 
 function openPeriodModal() {
   periodState.employment_type = "정규직";
@@ -263,17 +300,20 @@ function openPeriodModal() {
   const chips = document.getElementById("period-emptype-chips");
   chips.innerHTML = chipGroupHtml(
     WORK_EMPLOYMENT_TYPE_OPTIONS.map((v) => ({ value: v, label: v })),
-    [periodState.employment_type]
+    [periodState.employment_type],
   );
   chips.querySelectorAll("button").forEach((btn) =>
     btn.addEventListener("click", () => {
       periodState.employment_type = btn.dataset.value;
-      chips.querySelectorAll("button").forEach((b) => b.classList.toggle("selected", b === btn));
-    })
+      chips
+        .querySelectorAll("button")
+        .forEach((b) => b.classList.toggle("selected", b === btn));
+    }),
   );
 
   document.getElementById("period-start-year").innerHTML = yearOptionsHtml("");
-  document.getElementById("period-start-month").innerHTML = monthOptionsHtml("");
+  document.getElementById("period-start-month").innerHTML =
+    monthOptionsHtml("");
   document.getElementById("period-end-year").innerHTML = yearOptionsHtml("");
   document.getElementById("period-end-month").innerHTML = monthOptionsHtml("");
   document.getElementById("period-end-year").disabled = false;
@@ -298,14 +338,19 @@ function openExtracurricularTypeModal() {
 
   const chips = document.getElementById("extracurricular-type-chips");
   chips.innerHTML = chipGroupHtml(
-    EXTRACURRICULAR_TYPE_OPTIONS.map((v) => ({ value: v, label: EXTRACURRICULAR_TYPE_LABELS[v] })),
-    [extracurricularTypeState.type]
+    EXTRACURRICULAR_TYPE_OPTIONS.map((v) => ({
+      value: v,
+      label: EXTRACURRICULAR_TYPE_LABELS[v],
+    })),
+    [extracurricularTypeState.type],
   );
   chips.querySelectorAll("button").forEach((btn) =>
     btn.addEventListener("click", () => {
       extracurricularTypeState.type = btn.dataset.value;
-      chips.querySelectorAll("button").forEach((b) => b.classList.toggle("selected", b === btn));
-    })
+      chips
+        .querySelectorAll("button")
+        .forEach((b) => b.classList.toggle("selected", b === btn));
+    }),
   );
 
   document.getElementById("extracurricular-type-modal").hidden = false;
@@ -317,14 +362,20 @@ function closeExtracurricularTypeModal() {
 
 // ── 인터뷰 챗봇 (직장경험/학내외경험/수상공모전이 공통으로 쓰는 범용 모달) ──
 // questions: 이번에 물어볼 질문 세트, onComplete: 4개 다 답하면 호출되는 콜백(answers, keywords)
-const interviewState = { questions: [], answers: [], finishing: false, onComplete: null };
+const interviewState = {
+  questions: [],
+  answers: [],
+  finishing: false,
+  onComplete: null,
+};
 
 // 문자열을 안정적인(같은 입력엔 항상 같은 결과) 숫자로 바꿔서 배열에서 하나를 고른다.
 // Math.random()을 쓰면 "이전"으로 돌아갔다 다시 렌더링될 때마다 반응 문구가 바뀌어버려서
 // 답변 내용 자체를 시드로 쓴다.
 function pickStableReply(list, seed) {
   let hash = 0;
-  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  for (let i = 0; i < seed.length; i++)
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
   return list[hash % list.length];
 }
 
@@ -347,7 +398,10 @@ function buildInterviewMessages(questions, answers) {
       messages.push({ role: "user", text: answers[i] });
       messages.push({
         role: "assistant",
-        text: i < total - 1 ? buildInterviewReaction(answers[i]) : "말씀해주셔서 감사해요! 잘 정리해서 저장할게요.",
+        text:
+          i < total - 1
+            ? buildInterviewReaction(answers[i])
+            : "말씀해주셔서 감사해요! 잘 정리해서 저장할게요.",
       });
     } else {
       break; // 아직 답변 안 한 질문에서 멈추고 여기서 입력 대기
@@ -376,15 +430,20 @@ function closeInterviewModal() {
 function renderInterviewMessages() {
   const box = document.getElementById("interview-messages");
   const total = interviewState.questions.length;
-  const messages = buildInterviewMessages(interviewState.questions, interviewState.answers);
+  const messages = buildInterviewMessages(
+    interviewState.questions,
+    interviewState.answers,
+  );
   box.innerHTML = messages
     .map(
       (m) =>
-        `<div class="msg ${m.role}">${m.text}${m.hint ? `<span class="msg-hint">${m.hint}</span>` : ""}</div>`
+        `<div class="msg ${m.role}">${m.text}${m.hint ? `<span class="msg-hint">${m.hint}</span>` : ""}</div>`,
     )
     .join("");
-  document.getElementById("interview-progress").textContent = `${Math.min(interviewState.answers.length + 1, total)} / ${total}`;
-  document.getElementById("btn-interview-prev").disabled = interviewState.answers.length === 0 || interviewState.finishing;
+  document.getElementById("interview-progress").textContent =
+    `${Math.min(interviewState.answers.length + 1, total)} / ${total}`;
+  document.getElementById("btn-interview-prev").disabled =
+    interviewState.answers.length === 0 || interviewState.finishing;
   box.scrollTop = box.scrollHeight;
 }
 
@@ -423,7 +482,12 @@ function goToPreviousInterviewAnswer() {
 // ============================================================
 // 결과 카드 (feature3 이식)
 // ============================================================
-const resultState = { jobs: null, currentIndex: 0, isFlipped: false, error: null };
+const resultState = {
+  jobs: null,
+  currentIndex: 0,
+  isFlipped: false,
+  error: null,
+};
 
 // 공고 원문 인용문을 innerHTML에 그대로 꽂기 전에 이스케이프한다.
 function escapeHtml(text) {
@@ -433,8 +497,14 @@ function escapeHtml(text) {
 }
 
 // 공고 원문 발췌용 한 줄이 너무 길면, 하이라이트 구간이 잘리지 않도록 그 주변을 중심으로 잘라낸다.
-function truncateAroundHighlight(line, highlightStart, highlightEnd, maxLength) {
-  if (line.length <= maxLength) return { text: line, start: highlightStart, end: highlightEnd };
+function truncateAroundHighlight(
+  line,
+  highlightStart,
+  highlightEnd,
+  maxLength,
+) {
+  if (line.length <= maxLength)
+    return { text: line, start: highlightStart, end: highlightEnd };
   const highlightLen = highlightEnd - highlightStart;
   const context = Math.max(0, Math.floor((maxLength - highlightLen) / 2));
   let start = Math.max(0, highlightStart - context);
@@ -475,12 +545,20 @@ function getMascotImage(score) {
 
 function hashCode(str) {
   let h = 0;
-  for (let i = 0; i < str.length; i++) h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+  for (let i = 0; i < str.length; i++)
+    h = ((h << 5) - h + str.charCodeAt(i)) | 0;
   return h;
 }
 
 // 카드 상단 배너 색 — job.id 기준으로 고정된 색을 골라 카드마다 자연스럽게 다양한 색이 나오게 한다.
-const CARD_BANNER_COLORS = ["#16a085", "#4a5a6a", "#a97142", "#7d00b8", "#c2185b", "#2e7d6e"];
+const CARD_BANNER_COLORS = [
+  "#16a085",
+  "#4a5a6a",
+  "#a97142",
+  "#7d00b8",
+  "#c2185b",
+  "#2e7d6e",
+];
 function getBannerColor(jobId) {
   const idx = Math.abs(hashCode(String(jobId))) % CARD_BANNER_COLORS.length;
   return CARD_BANNER_COLORS[idx];
@@ -503,9 +581,13 @@ function buildCardFrontHtml(job) {
   const dday = computeDday(job.deadline);
   const ddayText = dday === null ? "" : dday >= 0 ? `D-${dday}` : "마감";
 
-  const chips = job.matched_keywords.slice(0, 2).map((k) => `<span class="chip-front">${escapeHtml(k)}</span>`);
-  if (dday !== null && dday >= 0 && dday <= 14) chips.push(`<span class="chip-front chip-meta">마감 임박</span>`);
-  if (job.company_size === "D") chips.push(`<span class="chip-front chip-meta">성장 단계</span>`);
+  const chips = job.matched_keywords
+    .slice(0, 2)
+    .map((k) => `<span class="chip-front">${escapeHtml(k)}</span>`);
+  if (dday !== null && dday >= 0 && dday <= 14)
+    chips.push(`<span class="chip-front chip-meta">마감 임박</span>`);
+  if (job.company_size === "D")
+    chips.push(`<span class="chip-front chip-meta">성장 단계</span>`);
 
   return `
     <div class="card-top-badges">
@@ -527,25 +609,33 @@ function buildCardFrontHtml(job) {
       <p class="card-position-sub">${escapeHtml(job.job_title)}</p>
       <div class="card-chips-front">${chips.join("")}</div>
       <div class="card-rate-center-wrap">
-        <p class="card-rate-label">매칭률</p>
         <p class="card-rate-big">${job.match_rate}%</p>
         <div class="card-comment-bubble"><p class="card-comment">${getMatchComment(job.match_rate)}</p></div>
       </div>
       <div class="card-info-row">
         <span class="card-info-item">👆 탭해서 상세 보기</span>
         <span class="card-info-divider" aria-hidden="true"></span>
-        <span class="card-info-item">📅 지원 마감 ${escapeHtml(job.deadline)}</span>
+        <span class="card-info-item">지원 마감 📆 ${escapeHtml(job.deadline)}</span>
       </div>
     </div>`;
 }
 
 // 현재 카드 좌우로 살짝 보이는 이전/다음 공고 미리보기 카드를 채운다.
 function renderCardPeeks() {
-  const prevJob = resultState.jobs && resultState.currentIndex > 0 ? resultState.jobs[resultState.currentIndex - 1] : null;
+  const prevJob =
+    resultState.jobs && resultState.currentIndex > 0
+      ? resultState.jobs[resultState.currentIndex - 1]
+      : null;
   const nextJob =
-    resultState.jobs && resultState.currentIndex < resultState.jobs.length - 1 ? resultState.jobs[resultState.currentIndex + 1] : null;
-  document.getElementById("card-peek-prev").innerHTML = prevJob ? buildCardFrontHtml(prevJob) : "";
-  document.getElementById("card-peek-next").innerHTML = nextJob ? buildCardFrontHtml(nextJob) : "";
+    resultState.jobs && resultState.currentIndex < resultState.jobs.length - 1
+      ? resultState.jobs[resultState.currentIndex + 1]
+      : null;
+  document.getElementById("card-peek-prev").innerHTML = prevJob
+    ? buildCardFrontHtml(prevJob)
+    : "";
+  document.getElementById("card-peek-next").innerHTML = nextJob
+    ? buildCardFrontHtml(nextJob)
+    : "";
 }
 
 function renderCardDots() {
@@ -555,7 +645,10 @@ function renderCardDots() {
     return;
   }
   dotsEl.innerHTML = resultState.jobs
-    .map((_, i) => `<span class="card-dot ${i === resultState.currentIndex ? "active" : ""}"></span>`)
+    .map(
+      (_, i) =>
+        `<span class="card-dot ${i === resultState.currentIndex ? "active" : ""}"></span>`,
+    )
     .join("");
 }
 
@@ -591,7 +684,12 @@ function renderResultCard(direction = "forward") {
   resultState.isFlipped = false;
 
   // 매칭을 기다리는 동안에는 헤더/히어로/조작 버튼을 다 숨기고 대기 카드만 화면 가운데 크게 띄운다.
-  document.getElementById("screen-result").classList.toggle("is-loading", resultState.jobs === null && !resultState.error);
+  document
+    .getElementById("screen-result")
+    .classList.toggle(
+      "is-loading",
+      resultState.jobs === null && !resultState.error,
+    );
 
   // 대기 화면(마스코트/하트/효과음)을 벗어나는 모든 경우에 인터벌·오디오를 정리한다.
   stopMatchLoadingAnimation();
@@ -643,8 +741,13 @@ function renderResultCard(direction = "forward") {
   renderCardPeeks();
   renderCardDots();
 
-  const kw = job.matched_keywords.slice(0, 3).map((k) => `<span class="keyword-chip-back">#${escapeHtml(k)}</span>`).join("");
-  const reasons = job.match_reasons.map((r) => `<li class="reason-item-back">${escapeHtml(r)}</li>`).join("");
+  const kw = job.matched_keywords
+    .slice(0, 3)
+    .map((k) => `<span class="keyword-chip-back">#${escapeHtml(k)}</span>`)
+    .join("");
+  const reasons = job.match_reasons
+    .map((r) => `<li class="reason-item-back">${escapeHtml(r)}</li>`)
+    .join("");
   const safeUrl = /^https?:\/\//i.test(job.url) ? job.url : "#";
 
   // "공고 원문 발췌"는 매칭된 키워드 하나당 그 키워드가 실제로 등장하는 원문 한 줄을
@@ -652,13 +755,22 @@ function renderResultCard(direction = "forward") {
   const excerptRows =
     job.evidence_list && job.evidence_list.length > 0
       ? job.evidence_list.map(({ line, highlightStart, highlightEnd }) => {
-          const truncated = truncateAroundHighlight(line, highlightStart, highlightEnd, 46);
+          const truncated = truncateAroundHighlight(
+            line,
+            highlightStart,
+            highlightEnd,
+            46,
+          );
           const before = escapeHtml(truncated.text.slice(0, truncated.start));
-          const highlighted = escapeHtml(truncated.text.slice(truncated.start, truncated.end));
+          const highlighted = escapeHtml(
+            truncated.text.slice(truncated.start, truncated.end),
+          );
           const after = escapeHtml(truncated.text.slice(truncated.end));
           return `<p class="job-excerpt-line">${before}<mark class="match-evidence-highlight">${highlighted}</mark>${after}</p>`;
         })
-      : [`<p class="job-excerpt-line">${escapeHtml(job.short_description)}</p>`];
+      : [
+          `<p class="job-excerpt-line">${escapeHtml(job.short_description)}</p>`,
+        ];
 
   back.innerHTML = `
     <div class="back-header-row">
@@ -674,10 +786,14 @@ function renderResultCard(direction = "forward") {
     </div>
     <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="btn-original" id="btn-original-link">원본 채용공고 보기 →</a>
     <p class="flip-hint-back">👆 탭해서 앞면으로</p>`;
-  document.getElementById("btn-original-link")?.addEventListener("click", (e) => e.stopPropagation());
+  document
+    .getElementById("btn-original-link")
+    ?.addEventListener("click", (e) => e.stopPropagation());
 
-  document.getElementById("card-counter").textContent = `${resultState.currentIndex + 1} / ${resultState.jobs.length}`;
-  document.getElementById("btn-prev-card").disabled = resultState.currentIndex === 0;
+  document.getElementById("card-counter").textContent =
+    `${resultState.currentIndex + 1} / ${resultState.jobs.length}`;
+  document.getElementById("btn-prev-card").disabled =
+    resultState.currentIndex === 0;
 
   const wrap = document.getElementById("card-wrap");
   wrap.classList.remove("entering", "entering-reverse");
@@ -723,7 +839,8 @@ function showPreviousResultCard() {
 
 function openCurrentJobLink() {
   const job = resultState.jobs?.[resultState.currentIndex];
-  if (job && /^https?:\/\//i.test(job.url)) window.open(job.url, "_blank", "noopener,noreferrer");
+  if (job && /^https?:\/\//i.test(job.url))
+    window.open(job.url, "_blank", "noopener,noreferrer");
 }
 
 function showEndScreen() {
@@ -743,40 +860,76 @@ document.addEventListener("DOMContentLoaded", () => {
   bindBasicInfoInputs();
 
   document.getElementById("btn-reset-profile").addEventListener("click", () => {
-    if (!window.confirm("입력한 내용을 전부 지우고 처음부터 다시 시작할까요?")) return;
+    if (!window.confirm("입력한 내용을 전부 지우고 처음부터 다시 시작할까요?"))
+      return;
     AppState.reset();
     resultState.jobs = null;
     resultState.currentIndex = 0;
     showScreen("basic-info");
   });
 
-  ["btn-save-basic-info", "btn-save-work", "btn-save-extracurricular", "btn-save-awards", "btn-save-personality"].forEach(
-    wireInterimSaveButton
-  );
+  [
+    "btn-save-basic-info",
+    "btn-save-work",
+    "btn-save-extracurricular",
+    "btn-save-awards",
+    "btn-save-personality",
+  ].forEach(wireInterimSaveButton);
 
-  document.getElementById("btn-basic-info-next").addEventListener("click", () => {
-    if (isBasicInfoValid()) showScreen("work");
-  });
-  document.getElementById("btn-work-prev").addEventListener("click", () => showScreen("basic-info"));
-  document.getElementById("btn-work-next").addEventListener("click", () => showScreen("extracurricular"));
-  document.getElementById("btn-extracurricular-prev").addEventListener("click", () => showScreen("work"));
-  document.getElementById("btn-extracurricular-next").addEventListener("click", () => showScreen("awards"));
-  document.getElementById("btn-awards-prev").addEventListener("click", () => showScreen("extracurricular"));
-  document.getElementById("btn-awards-next").addEventListener("click", () => showScreen("personality"));
-  document.getElementById("btn-personality-prev").addEventListener("click", () => showScreen("awards"));
-  document.getElementById("btn-personality-next").addEventListener("click", () => showScreen("result"));
-  document.getElementById("btn-review-prev").addEventListener("click", () => showScreen("personality"));
-  document.getElementById("btn-review-restart").addEventListener("click", () => showScreen("basic-info"));
-  document.getElementById("btn-go-result").addEventListener("click", () => showScreen("result"));
-  document.getElementById("btn-result-back-to-review").addEventListener("click", () => showScreen("personality"));
+  document
+    .getElementById("btn-basic-info-next")
+    .addEventListener("click", () => {
+      if (isBasicInfoValid()) showScreen("work");
+    });
+  document
+    .getElementById("btn-work-prev")
+    .addEventListener("click", () => showScreen("basic-info"));
+  document
+    .getElementById("btn-work-next")
+    .addEventListener("click", () => showScreen("extracurricular"));
+  document
+    .getElementById("btn-extracurricular-prev")
+    .addEventListener("click", () => showScreen("work"));
+  document
+    .getElementById("btn-extracurricular-next")
+    .addEventListener("click", () => showScreen("awards"));
+  document
+    .getElementById("btn-awards-prev")
+    .addEventListener("click", () => showScreen("extracurricular"));
+  document
+    .getElementById("btn-awards-next")
+    .addEventListener("click", () => showScreen("personality"));
+  document
+    .getElementById("btn-personality-prev")
+    .addEventListener("click", () => showScreen("awards"));
+  document
+    .getElementById("btn-personality-next")
+    .addEventListener("click", () => showScreen("result"));
+  document
+    .getElementById("btn-review-prev")
+    .addEventListener("click", () => showScreen("personality"));
+  document
+    .getElementById("btn-review-restart")
+    .addEventListener("click", () => showScreen("basic-info"));
+  document
+    .getElementById("btn-go-result")
+    .addEventListener("click", () => showScreen("result"));
+  document
+    .getElementById("btn-result-back-to-review")
+    .addEventListener("click", () => showScreen("personality"));
 
-  document.getElementById("btn-add-work").addEventListener("click", openPeriodModal);
-  document.getElementById("btn-period-cancel").addEventListener("click", closePeriodModal);
+  document
+    .getElementById("btn-add-work")
+    .addEventListener("click", openPeriodModal);
+  document
+    .getElementById("btn-period-cancel")
+    .addEventListener("click", closePeriodModal);
 
   ["period-start-year", "period-start-month"].forEach((id) => {
     document.getElementById(id).addEventListener("change", () => {
       periodState.start_date = readYearMonthPicker("period-start");
-      document.getElementById("btn-period-next").disabled = !periodState.start_date;
+      document.getElementById("btn-period-next").disabled =
+        !periodState.start_date;
     });
   });
   ["period-end-year", "period-end-month"].forEach((id) => {
@@ -787,62 +940,97 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("period-ongoing").addEventListener("change", (e) => {
     document.getElementById("period-end-year").disabled = e.target.checked;
     document.getElementById("period-end-month").disabled = e.target.checked;
-    periodState.end_date = e.target.checked ? null : readYearMonthPicker("period-end");
+    periodState.end_date = e.target.checked
+      ? null
+      : readYearMonthPicker("period-end");
   });
   document.getElementById("btn-period-next").addEventListener("click", () => {
     if (!periodState.start_date) return;
     closePeriodModal();
-    document.getElementById("interview-modal-title").textContent = "직장 경험 기록하기";
+    document.getElementById("interview-modal-title").textContent =
+      "직장 경험 기록하기";
     openInterviewModal(WORK_INTERVIEW_QUESTIONS, (answers, keywords) => {
       AppState.addWorkExperience({ ...periodState }, answers, keywords);
       renderWork();
     });
   });
 
-  document.getElementById("btn-interview-cancel").addEventListener("click", closeInterviewModal);
-  document.getElementById("btn-interview-prev").addEventListener("click", goToPreviousInterviewAnswer);
+  document
+    .getElementById("btn-interview-cancel")
+    .addEventListener("click", closeInterviewModal);
+  document
+    .getElementById("btn-interview-prev")
+    .addEventListener("click", goToPreviousInterviewAnswer);
   document.getElementById("interview-form").addEventListener("submit", (e) => {
     e.preventDefault();
     submitInterviewAnswer();
   });
 
   // 학내외경험: 유형을 먼저 고르고 나서 인터뷰 챗봇으로 이어진다.
-  document.getElementById("btn-add-extracurricular").addEventListener("click", openExtracurricularTypeModal);
-  document.getElementById("btn-extracurricular-type-cancel").addEventListener("click", closeExtracurricularTypeModal);
-  document.getElementById("btn-extracurricular-type-next").addEventListener("click", () => {
-    closeExtracurricularTypeModal();
-    document.getElementById("interview-modal-title").textContent = "학내외경험 기록하기";
-    openInterviewModal(ACTIVITY_INTERVIEW_QUESTIONS, (answers, keywords) => {
-      AppState.addExtracurricular(extracurricularTypeState.type, answers, keywords);
-      renderExtracurricular();
+  document
+    .getElementById("btn-add-extracurricular")
+    .addEventListener("click", openExtracurricularTypeModal);
+  document
+    .getElementById("btn-extracurricular-type-cancel")
+    .addEventListener("click", closeExtracurricularTypeModal);
+  document
+    .getElementById("btn-extracurricular-type-next")
+    .addEventListener("click", () => {
+      closeExtracurricularTypeModal();
+      document.getElementById("interview-modal-title").textContent =
+        "학내외경험 기록하기";
+      openInterviewModal(ACTIVITY_INTERVIEW_QUESTIONS, (answers, keywords) => {
+        AppState.addExtracurricular(
+          extracurricularTypeState.type,
+          answers,
+          keywords,
+        );
+        renderExtracurricular();
+      });
     });
-  });
 
   // 수상/공모전: 별도 분류가 없어서 바로 인터뷰 챗봇으로 들어간다.
   document.getElementById("btn-add-award").addEventListener("click", () => {
-    document.getElementById("interview-modal-title").textContent = "수상·공모전 기록하기";
+    document.getElementById("interview-modal-title").textContent =
+      "수상·공모전 기록하기";
     openInterviewModal(ACTIVITY_INTERVIEW_QUESTIONS, (answers, keywords) => {
       AppState.addAward(answers, keywords);
       renderAwards();
     });
   });
 
-  document.getElementById("btn-copy-json").addEventListener("click", async () => {
-    await navigator.clipboard.writeText(JSON.stringify(AppState.profile, null, 2));
-    const btn = document.getElementById("btn-copy-json");
-    const original = btn.textContent;
-    btn.textContent = "복사됨!";
-    setTimeout(() => (btn.textContent = original), 1500);
-  });
+  document
+    .getElementById("btn-copy-json")
+    .addEventListener("click", async () => {
+      await navigator.clipboard.writeText(
+        JSON.stringify(AppState.profile, null, 2),
+      );
+      const btn = document.getElementById("btn-copy-json");
+      const original = btn.textContent;
+      btn.textContent = "복사됨!";
+      setTimeout(() => (btn.textContent = original), 1500);
+    });
 
   // 결과 카드 조작
   document.getElementById("job-card").addEventListener("click", flipResultCard);
-  document.getElementById("btn-prev-card").addEventListener("click", showPreviousResultCard);
-  document.getElementById("btn-next-card").addEventListener("click", showNextResultCard);
-  document.getElementById("card-peek-prev").addEventListener("click", showPreviousResultCard);
-  document.getElementById("card-peek-next").addEventListener("click", showNextResultCard);
-  document.getElementById("btn-skip-card").addEventListener("click", showNextResultCard);
-  document.getElementById("btn-view-card").addEventListener("click", openCurrentJobLink);
+  document
+    .getElementById("btn-prev-card")
+    .addEventListener("click", showPreviousResultCard);
+  document
+    .getElementById("btn-next-card")
+    .addEventListener("click", showNextResultCard);
+  document
+    .getElementById("card-peek-prev")
+    .addEventListener("click", showPreviousResultCard);
+  document
+    .getElementById("card-peek-next")
+    .addEventListener("click", showNextResultCard);
+  document
+    .getElementById("btn-skip-card")
+    .addEventListener("click", showNextResultCard);
+  document
+    .getElementById("btn-view-card")
+    .addEventListener("click", openCurrentJobLink);
   document.getElementById("btn-reset-cards").addEventListener("click", () => {
     resultState.currentIndex = 0;
     resultState.isFlipped = false;
@@ -855,7 +1043,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const tag = (document.activeElement?.tagName || "").toLowerCase();
     if (["input", "textarea", "select"].includes(tag)) return;
-    if (!document.getElementById("screen-result").classList.contains("active")) return;
+    if (!document.getElementById("screen-result").classList.contains("active"))
+      return;
     if (document.getElementById("end-screen").style.display === "flex") return;
 
     if (e.key === "ArrowRight") {
