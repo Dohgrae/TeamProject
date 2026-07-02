@@ -367,6 +367,9 @@ const interviewState = {
   answers: [],
   finishing: false,
   onComplete: null,
+  visibleCount: 0,
+  revealTimer: null,
+  animating: false,
 };
 
 // 문자열을 안정적인(같은 입력엔 항상 같은 결과) 숫자로 바꿔서 배열에서 하나를 고른다.
@@ -417,6 +420,9 @@ function openInterviewModal(questions, onComplete) {
   interviewState.answers = [];
   interviewState.finishing = false;
   interviewState.onComplete = onComplete;
+  interviewState.visibleCount = 0;
+  interviewState.animating = false;
+  clearInterviewRevealTimer();
   renderInterviewMessages();
   document.getElementById("interview-modal").hidden = false;
   document.getElementById("interview-input").value = "";
@@ -424,40 +430,96 @@ function openInterviewModal(questions, onComplete) {
 }
 
 function closeInterviewModal() {
+  clearInterviewRevealTimer();
   document.getElementById("interview-modal").hidden = true;
 }
 
-function renderInterviewMessages() {
+function clearInterviewRevealTimer() {
+  if (interviewState.revealTimer) {
+    clearTimeout(interviewState.revealTimer);
+    interviewState.revealTimer = null;
+  }
+}
+
+// 상담사 문장이 시간차를 두고 나오는 동안에는 입력을 막아서, 아직 안 보여준 대화 중간에
+// 사용자가 답을 보내 대화 순서가 꼬이는 걸 막는다(전송 버튼을 눌러도 조용히 씹히는 대신
+// 아예 비활성화해서 "지금은 기다려야 한다"는 게 눈에 보이게 한다).
+function setInterviewInputEnabled(enabled) {
+  document.getElementById("interview-input").disabled = !enabled;
+  document.querySelector("#interview-form button[type=submit]").disabled = !enabled;
+}
+
+// count개의 메시지만 실제로 그린다. showTyping이면 맨 끝에 "입력 중" 점 3개 말풍선을 덧붙인다.
+function paintInterviewMessages(messages, count, showTyping) {
   const box = document.getElementById("interview-messages");
-  const total = interviewState.questions.length;
-  const messages = buildInterviewMessages(
-    interviewState.questions,
-    interviewState.answers,
-  );
-  box.innerHTML = messages
+  const bubbles = messages
+    .slice(0, count)
     .map(
       (m) =>
         `<div class="msg ${m.role}">${m.text}${m.hint ? `<span class="msg-hint">${m.hint}</span>` : ""}</div>`,
     )
     .join("");
+  box.innerHTML = showTyping ? bubbles + `<div class="msg-typing"><span></span><span></span><span></span></div>` : bubbles;
+  box.scrollTop = box.scrollHeight;
+}
+
+// answers 배열이 바뀔 때마다 전체 대화 로그를 다시 계산한다. 상담사가 반응 문장과 다음 질문을
+// 동시에 던지면 실제 채팅 같지 않으므로, animate:true면 아직 안 보여준 문장들을 한 번에 다
+// 그리지 않고 "입력 중..." 표시 후 하나씩 시간차를 두고 등장시킨다.
+// animate:false(모달 열 때/"이전"으로 되돌아갈 때)는 지금까지의 대화를 즉시 그대로 보여준다.
+function renderInterviewMessages({ animate = false } = {}) {
+  clearInterviewRevealTimer();
+  const total = interviewState.questions.length;
+  const messages = buildInterviewMessages(interviewState.questions, interviewState.answers);
+
   document.getElementById("interview-progress").textContent =
     `${Math.min(interviewState.answers.length + 1, total)} / ${total}`;
   document.getElementById("btn-interview-prev").disabled =
     interviewState.answers.length === 0 || interviewState.finishing;
-  box.scrollTop = box.scrollHeight;
+
+  if (!animate) {
+    interviewState.visibleCount = messages.length;
+    interviewState.animating = false;
+    setInterviewInputEnabled(!interviewState.finishing);
+    paintInterviewMessages(messages, messages.length, false);
+    return;
+  }
+
+  interviewState.animating = true;
+  setInterviewInputEnabled(false);
+  const revealNext = (i) => {
+    if (i >= messages.length) {
+      interviewState.visibleCount = messages.length;
+      interviewState.animating = false;
+      setInterviewInputEnabled(true);
+      return;
+    }
+    const showThisOne = () => {
+      paintInterviewMessages(messages, i + 1, false);
+      interviewState.visibleCount = i + 1;
+      interviewState.revealTimer = setTimeout(() => revealNext(i + 1), messages[i].role === "assistant" ? 450 : 200);
+    };
+    if (messages[i].role === "assistant") {
+      paintInterviewMessages(messages, i, true);
+      interviewState.revealTimer = setTimeout(showThisOne, 550);
+    } else {
+      showThisOne();
+    }
+  };
+  revealNext(Math.min(interviewState.visibleCount, messages.length));
 }
 
 function submitInterviewAnswer() {
   const input = document.getElementById("interview-input");
   const answer = input.value.trim();
-  if (!answer || interviewState.finishing) return;
+  if (!answer || interviewState.finishing || interviewState.animating) return;
 
   interviewState.answers.push(answer);
   input.value = "";
-  renderInterviewMessages();
 
   if (interviewState.answers.length === interviewState.questions.length) {
     interviewState.finishing = true;
+    // 모달이 곧 닫히므로 마지막 감사 인사는 채팅 애니메이션 없이 바로 보여준다.
     renderInterviewMessages();
     // 서버가 없으므로 규칙 기반 mock 추출만 사용 (Dohgrae의 keywordExtractionMock과 동일한 방식)
     const keywords = mockExtractKeywords(interviewState.answers);
@@ -466,12 +528,14 @@ function submitInterviewAnswer() {
       closeInterviewModal();
       onComplete(interviewState.answers, keywords);
     }, 400);
+  } else {
+    renderInterviewMessages({ animate: true });
   }
 }
 
 // 직전 질문으로 돌아가서 방금 쓴 답변을 입력창에 다시 채워 수정할 수 있게 한다.
 function goToPreviousInterviewAnswer() {
-  if (interviewState.answers.length === 0 || interviewState.finishing) return;
+  if (interviewState.answers.length === 0 || interviewState.finishing || interviewState.animating) return;
   const lastAnswer = interviewState.answers.pop();
   renderInterviewMessages();
   const input = document.getElementById("interview-input");
