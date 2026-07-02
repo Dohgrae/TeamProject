@@ -486,7 +486,12 @@ function buildCardFrontHtml(job) {
   return `
     <div class="card-top-badges">
       <span class="card-badge-hiring">● 지금 채용중</span>
-      <span class="card-badge-ddate">${ddayText}</span>
+      <div class="card-top-right">
+        <span class="card-badge-ddate">${ddayText}</span>
+        <button type="button" class="card-bookmark-btn" aria-label="관심 공고 저장" aria-pressed="false" tabindex="-1">
+          <svg width="16" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        </button>
+      </div>
     </div>
     <div class="card-avatar-wrap">
       <div class="card-avatar">
@@ -498,11 +503,15 @@ function buildCardFrontHtml(job) {
       <p class="card-position-sub">${escapeHtml(job.job_title)}</p>
       <div class="card-chips-front">${chips.join("")}</div>
       <div class="card-rate-center-wrap">
+        <p class="card-rate-label">매칭률</p>
         <p class="card-rate-big">${job.match_rate}%</p>
-        <p class="card-comment">${getMatchComment(job.match_rate)}</p>
+        <div class="card-comment-bubble"><p class="card-comment">${getMatchComment(job.match_rate)}</p></div>
       </div>
-      <p class="flip-hint">👆 탭해서 상세 보기</p>
-      <p class="card-deadline-front">📅 지원 마감 · ${escapeHtml(job.deadline)}</p>
+      <div class="card-info-row">
+        <span class="card-info-item">👆 탭해서 상세 보기</span>
+        <span class="card-info-divider" aria-hidden="true"></span>
+        <span class="card-info-item">📅 지원 마감 ${escapeHtml(job.deadline)}</span>
+      </div>
     </div>`;
 }
 
@@ -598,6 +607,12 @@ function renderResultCard(direction = "forward") {
   const job = resultState.jobs[resultState.currentIndex];
 
   front.innerHTML = buildCardFrontHtml(job);
+  front.querySelector(".card-bookmark-btn")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const btn = e.currentTarget;
+    const active = btn.classList.toggle("is-active");
+    btn.setAttribute("aria-pressed", String(active));
+  });
   renderCardPeeks();
   renderCardDots();
 

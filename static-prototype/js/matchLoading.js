@@ -32,16 +32,25 @@ function startMatchLoadingAnimation(container, name) {
       <button type="button" class="match-loading-sound-toggle" id="match-loading-sound-toggle" aria-label="두근두근 효과음 끄기">🔊</button>
       <div class="match-loading-particles" aria-hidden="true">
         <span class="match-loading-particle p0">💗</span>
-        <span class="match-loading-particle p1">💗</span>
+        <span class="match-loading-particle p1">✨</span>
         <span class="match-loading-particle p2">💗</span>
-        <span class="match-loading-particle p3">💗</span>
+        <span class="match-loading-particle p3">✨</span>
         <span class="match-loading-particle p4">💗</span>
-        <span class="match-loading-particle p5">💗</span>
+        <span class="match-loading-particle p5">✨</span>
       </div>
       <div class="match-loading-hero">
-        <span class="match-loading-heart" aria-hidden="true">❤️</span>
-        <img src="img/qpi-mascot-side-b.png" alt="큐피" class="match-loading-mascot-side match-loading-mascot-a" />
-        <img src="img/qpi-mascot-side-a.png" alt="큐피" class="match-loading-mascot-side match-loading-mascot-b" />
+        <svg class="match-loading-heart" viewBox="0 0 32 29" aria-hidden="true">
+          <defs>
+            <radialGradient id="matchLoadingHeartGrad" cx="50%" cy="28%" r="85%">
+              <stop offset="0%" stop-color="#ff8ad4" />
+              <stop offset="55%" stop-color="#ec3fa0" />
+              <stop offset="100%" stop-color="#a8127e" />
+            </radialGradient>
+          </defs>
+          <path d="M16 29 C 6 21, 0 14, 0 8 C 0 2, 5 0, 9 0 C 12.5 0, 15 2, 16 5 C 17 2, 19.5 0, 23 0 C 27 0, 32 2, 32 8 C 32 14, 26 21, 16 29 Z" fill="url(#matchLoadingHeartGrad)" />
+        </svg>
+        <img src="img/qpi-mascot-tier-5.png" alt="큐피" class="match-loading-mascot-side match-loading-mascot-a" />
+        <img src="img/qpi-mascot-tier-5.png" alt="큐피" class="match-loading-mascot-side match-loading-mascot-b" />
       </div>
       <h2 class="match-loading-title">두근두근, 매칭 중이에요</h2>
       <p class="match-loading-message" id="match-loading-message">${messages[0]}</p>

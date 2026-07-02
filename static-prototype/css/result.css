@@ -101,7 +101,7 @@ body:has(#screen-result.active) {
   flex: 1;
   /* 안의 형제 요소(제목/패널/뒤로가기 링크)들이 서로 겹치지 않도록,
      패널의 최소 높이를 포함한 실제 필요 높이를 min-height로 보장한다. */
-  min-height: 791px;
+  min-height: 704px;
 }
 
 /* 제목/부제는 연보라 캐러셀 바깥, .main 안에 그대로 두고 가운데 정렬만 준다 */
@@ -184,7 +184,7 @@ body:has(#screen-result.active) {
   flex: 1;
   /* 안의 형제 요소(진행률/카드 영역/버튼 영역)가 서로 겹치지 않도록
      card-area의 최소 높이를 포함한 실제 필요 높이를 보장한다. */
-  min-height: 677px;
+  min-height: 590px;
 }
 
 #screen-result.is-loading .card-carousel-panel {
@@ -211,7 +211,7 @@ body:has(#screen-result.active) {
   flex: 1;
   /* 안의 형제 요소(카드 캐러셀/캐러셀 컨트롤)가 서로 겹치지 않도록
      card-carousel의 최소 높이를 포함한 실제 필요 높이를 보장한다. */
-  min-height: 574px;
+  min-height: 487px;
 }
 
 /* 카드 캐러셀 — 가운데 카드(.card-wrap)는 실제 뒤집기가 되는 카드, 양옆의 .card-peek는
@@ -227,7 +227,7 @@ body:has(#screen-result.active) {
   flex: 1;
   /* 카드 내용(아바타·본문 텍스트)이 다 들어갈 최소 높이는 보장한다.
      화면이 아주 낮으면 이 아래로는 body의 overflow:auto가 받아 스크롤된다. */
-  min-height: 526px;
+  min-height: 440px;
 }
 
 .card-wrap {
@@ -294,9 +294,17 @@ body:has(#screen-result.active) {
 }
 .card-peek .card-rate-center-wrap,
 .card-peek .card-chips-front,
-.card-peek .flip-hint,
-.card-peek .card-deadline-front {
+.card-peek .card-info-row {
   display: none;
+}
+
+/* 미리보기 카드는 상단에 채용중 배지/북마크 대신 마감일(D-day)만 오른쪽에 보여준다 */
+.card-peek .card-badge-hiring,
+.card-peek .card-bookmark-btn {
+  display: none;
+}
+.card-peek .card-badge-ddate {
+  display: inline-block;
 }
 
 /* 카드 아래 원형 이전/다음 버튼 + 점 페이지네이션 */
@@ -489,7 +497,7 @@ body:has(#screen-result.active) {
 
 /* 상단 배지 줄: 색 배너 없이 채용중 배지 + D-day만 흰 카드 위에 얹는다 */
 .card-top-badges {
-  padding: 18px 20px 0;
+  padding: 14px 20px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -511,28 +519,59 @@ body:has(#screen-result.active) {
   font-size: 12px;
   font-weight: 700;
   color: var(--text-mid);
+  /* 포커스된 메인 카드에서는 마감일 대신 북마크 버튼을 보여주고,
+     이 배지는 미리보기 카드(.card-peek)에서만 다시 켠다. */
+  display: none;
+}
+
+.card-top-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-bookmark-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--point);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.card-bookmark-btn:hover {
+  transform: scale(1.1);
+}
+
+.card-bookmark-btn.is-active svg {
+  fill: currentColor;
 }
 
 /* 마스코트 아바타 — 색 배너가 없어졌으니 그냥 카드 상단에 자연스럽게 얹는다 */
 .card-avatar-wrap {
   display: flex;
   justify-content: center;
-  margin-top: 14px;
+  margin-top: 8px;
   position: relative;
   z-index: 2;
 }
 
 .card-avatar {
   position: relative;
-  width: 132px;
-  height: 132px;
+  width: 104px;
+  height: 104px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .card-avatar-mascot {
-  width: 104px;
+  width: 82px;
   height: auto;
 }
 
@@ -542,7 +581,7 @@ body:has(#screen-result.active) {
   display: flex;
   flex-direction: column;
   text-align: center;
-  padding: 18px 26px 24px;
+  padding: 12px 26px 18px;
 }
 
 /* 회사명 */
@@ -572,23 +611,54 @@ body:has(#screen-result.active) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-bottom: 28px;
+  padding-bottom: 12px;
 }
 
-.card-rate-big {
-  font-size: 68px;
-  font-weight: 900;
-  color: var(--point);
-  line-height: 1.1;
-  margin-top: 24px;
-}
-
-/* 한 줄 코멘트 — 매칭률 구간별 멘트, 포인트 컬러로 강조 */
-.card-comment {
-  font-size: 17px;
+/* 큰 숫자 위에 얹는 작은 라벨 */
+.card-rate-label {
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-mid);
   margin-top: 6px;
+}
+
+.card-rate-big {
+  font-size: 62px;
+  font-weight: 900;
+  color: var(--point);
+  line-height: 1.1;
+}
+
+/* 매칭률 아래 한 줄 코멘트 — 말풍선 모양으로 감싸서 마스코트가 직접 말하는 느낌을 준다 */
+.card-comment-bubble {
+  position: relative;
+  margin-top: 6px;
+  background: #ffffff;
+  border: 1.5px solid #ece2f7;
+  border-radius: 16px;
+  padding: 6px 16px;
+}
+
+.card-comment-bubble::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  border-top: 1.5px solid #ece2f7;
+  border-left: 1.5px solid #ece2f7;
+  border-radius: 2px 0 0 0;
+}
+
+.card-comment {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-mid);
+  line-height: 1.4;
+  text-align: center;
 }
 
 /* 앞면 태그 칩(매칭 키워드 + 마감임박/성장단계 같은 메타 태그) */
@@ -597,7 +667,7 @@ body:has(#screen-result.active) {
   flex-wrap: wrap;
   justify-content: center;
   gap: 6px;
-  margin-top: 16px;
+  margin-top: 10px;
 }
 
 .chip-front {
@@ -611,23 +681,23 @@ body:has(#screen-result.active) {
   letter-spacing: -0.1px;
 }
 
-/* 지원 마감일 (앞면) */
-.card-deadline-front {
-  text-align: center;
+/* 카드 하단 정보 바 — 좌: 상세보기 안내, 우: 지원 마감일 (구분선으로 분리) */
+.card-info-row {
+  margin-top: auto;
+  padding-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
   font-size: 13px;
   color: var(--text-mid);
   font-weight: 600;
-  padding-top: 10px;
 }
 
-/* 뒤집기 힌트 */
-.flip-hint {
-  margin-top: auto;
-  padding-top: 14px;
-  text-align: center;
-  font-size: 12px;
-  color: var(--text-light);
-  letter-spacing: 0.2px;
+.card-info-divider {
+  width: 1px;
+  height: 14px;
+  background: #e5e7eb;
 }
 
 /* ============================================================
@@ -990,9 +1060,10 @@ body:has(#screen-result.active) {
 .match-loading-heart {
   position: absolute;
   z-index: 1;
-  font-size: 190px;
-  line-height: 1;
-  opacity: 0.5;
+  width: 190px;
+  height: auto;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 26px rgba(236, 63, 160, 0.55));
   animation: heartbeat 1.28s ease-in-out infinite;
 }
 
@@ -1170,8 +1241,8 @@ body:has(#screen-result.active) {
 
 /* 하트가 캐릭터 전신을 다 감쌀 만큼 훨씬 크고, 흐릿하지 않게 진하게 보이도록 함 */
 #screen-result.is-loading .match-loading-heart {
-  font-size: 380px;
-  opacity: 0.9;
+  width: 380px;
+  opacity: 0.95;
 }
 
 #screen-result.is-loading .match-loading-title {
@@ -1361,7 +1432,7 @@ body:has(#screen-result.active) {
     width: 88px;
   }
   .match-loading-heart {
-    font-size: 130px;
+    width: 130px;
   }
   .match-loading-title {
     font-size: 17px;
