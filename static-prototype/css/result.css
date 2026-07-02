@@ -174,6 +174,8 @@ body:has(#screen-result.active) {
   width: 720px;
   max-width: 90vw;
   min-height: 520px;
+  height: calc(100vh - 190px);
+  max-height: 760px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1349,18 +1351,17 @@ body:has(#screen-result.active) {
   transform: scale(0.96);
 }
 
-.end-restart-guide {
-  margin-top: 18px;
-  font-size: 13px;
-  color: var(--text-light);
-  line-height: 1.6;
-  max-width: 280px;
+/* .btn-reset과 모양(패딩/둥근 정도/글자 크기)은 완전히 동일하되 배경만 흰색으로 바꾼 버전 */
+.btn-reset.btn-reset-white {
+  background: #ffffff;
+  color: var(--point);
+  border: 1.5px solid #e5d9f7;
+  box-shadow: 0 2px 10px rgba(125, 0, 184, 0.1);
 }
 
-#btn-end-restart-basic-info {
-  margin-top: 6px;
-  padding: 10px 24px;
-  font-size: 13px;
+.btn-reset.btn-reset-white:hover {
+  background: #faf5ff;
+  box-shadow: 0 4px 16px rgba(125, 0, 184, 0.18);
 }
 
 /* ============================================================
