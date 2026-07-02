@@ -773,8 +773,7 @@ body:has(#screen-result.active) {
 }
 
 .reason-item-back {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13px;
   line-height: 1.55;
   color: var(--text-dark);
   padding-left: 20px;
@@ -786,9 +785,9 @@ body:has(#screen-result.active) {
   position: absolute;
   left: 0;
   top: 0;
-  font-size: 20px;
-  font-weight: 900;
-  color: #374151;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--point);
 }
 
 /* 공고 원문 발췌 — 실제로 매칭된 원문 한 줄(겹치는 부분 하이라이트) */
