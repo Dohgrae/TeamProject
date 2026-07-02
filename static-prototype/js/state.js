@@ -16,7 +16,12 @@ function emptyProfile() {
       name: "",
       gender: "",
       birth_date: "",
-      education: { level: "", major_category: "", major_detail: "" },
+      education: {
+        level: "",
+        undergraduate: { major_category: "", major_detail: "" },
+        graduate: { major_category: "", major_detail: "", same_as_undergraduate: false },
+        doctorate: { major_category: "", major_detail: "", same_as_undergraduate: false, same_as_graduate: false },
+      },
       contact: { phone: "", email: "" },
     },
     // job_subcategory: { M4: "백엔드", ... } 형태로 job_category 코드별 선택된 세부직무를 담는다.
@@ -92,6 +97,17 @@ function migrateProfile(profile) {
     for (const code of Object.keys(jobSub)) {
       if (!Array.isArray(jobSub[code])) jobSub[code] = jobSub[code] ? [jobSub[code]] : [];
     }
+  }
+  // 학력을 단일 전공(major_category/major_detail)으로만 저장하던 예전 버전의 draft를
+  // 학부/석사/박사 단계별 구조로 옮겨준다.
+  const edu = profile?.basic_info?.education;
+  if (edu && !edu.undergraduate) {
+    profile.basic_info.education = {
+      level: edu.level || "",
+      undergraduate: { major_category: edu.major_category || "", major_detail: edu.major_detail || "" },
+      graduate: { major_category: "", major_detail: "", same_as_undergraduate: false },
+      doctorate: { major_category: "", major_detail: "", same_as_undergraduate: false, same_as_graduate: false },
+    };
   }
   return profile;
 }

@@ -79,6 +79,150 @@ function renderStepNav(currentScreenId) {
 }
 
 // ============================================================
+// 학력 단계별 전공 입력 (학부 / 석사 / 박사)
+// 고졸(H1)은 전공 입력이 없고, 전문학사·학사(H2/H3)는 전공 하나만, 석사(H4)는 학부+석사,
+// 박사(H5)는 학부+석사+박사 전공을 순서대로 물어본다. 상위 학력의 전공은 "OO와 동일해요"
+// 체크박스로 하위(먼저 입력한) 학력의 전공을 그대로 가져와 보여줄 수 있다.
+// ============================================================
+const EDUCATION_MAJOR_TIER_LABELS = { undergraduate: "학부", graduate: "석사", doctorate: "박사" };
+
+function educationMajorTiersForLevel(level) {
+  if (!level || level === "H1") return [];
+  if (level === "H2" || level === "H3") return ["undergraduate"];
+  if (level === "H4") return ["undergraduate", "graduate"];
+  if (level === "H5") return ["undergraduate", "graduate", "doctorate"];
+  return [];
+}
+
+// 학부 전공을 그대로 물려받은(same_as 체크된) 학력 단계라면 그 원본 전공 값을 돌려준다.
+function effectiveEducationMajor(key) {
+  const edu = AppState.profile.basic_info.education;
+  if (key === "graduate") return edu.graduate.same_as_undergraduate ? edu.undergraduate : edu.graduate;
+  if (key === "doctorate") {
+    if (edu.doctorate.same_as_undergraduate) return edu.undergraduate;
+    if (edu.doctorate.same_as_graduate) return effectiveEducationMajor("graduate");
+    return edu.doctorate;
+  }
+  return edu.undergraduate;
+}
+
+function isEducationMajorDisabled(key) {
+  const edu = AppState.profile.basic_info.education;
+  if (key === "graduate") return edu.graduate.same_as_undergraduate;
+  if (key === "doctorate") return edu.doctorate.same_as_undergraduate || edu.doctorate.same_as_graduate;
+  return false;
+}
+
+function educationMajorSameAsCheckboxesHtml(key) {
+  const edu = AppState.profile.basic_info.education;
+  if (key === "graduate") {
+    return `<label style="margin-top: 8px; font-weight: 400">
+      <input type="checkbox" id="chk-major-same-graduate-undergraduate" ${edu.graduate.same_as_undergraduate ? "checked" : ""} />
+      학부와 동일해요
+    </label>`;
+  }
+  if (key === "doctorate") {
+    return `<label style="margin-top: 8px; font-weight: 400">
+      <input type="checkbox" id="chk-major-same-doctorate-undergraduate" ${edu.doctorate.same_as_undergraduate ? "checked" : ""} />
+      학부와 동일해요
+    </label>
+    <label style="margin-top: 4px; font-weight: 400">
+      <input type="checkbox" id="chk-major-same-doctorate-graduate" ${edu.doctorate.same_as_graduate ? "checked" : ""} />
+      석사와 동일해요
+    </label>`;
+  }
+  return "";
+}
+
+function educationMajorSectionHtml(key, isMultiTier) {
+  const label = isMultiTier ? EDUCATION_MAJOR_TIER_LABELS[key] + " 전공" : "전공";
+  const disabled = isEducationMajorDisabled(key);
+  const disabledStyle = disabled ? ' style="pointer-events: none; opacity: 0.55;"' : "";
+  return `
+    <div data-major-key="${key}">
+      <label style="margin-top: 16px">${label} 대분류 *</label>
+      <div class="chip-group" id="major-category-chips-${key}"${disabledStyle}></div>
+      <label for="input-major-detail-${key}" style="margin-top: 16px">${label} *</label>
+      <input
+        type="text"
+        id="input-major-detail-${key}"
+        placeholder="예: 컴퓨터공학과"
+        ${disabled ? "disabled" : ""}
+      />
+      ${educationMajorSameAsCheckboxesHtml(key)}
+    </div>`;
+}
+
+function renderEducationMajors() {
+  const p = AppState.profile;
+  const level = p.basic_info.education.level;
+  const tiers = educationMajorTiersForLevel(level);
+  const container = document.getElementById("education-major-sections");
+
+  container.innerHTML = tiers.map((key) => educationMajorSectionHtml(key, tiers.length > 1)).join("");
+
+  tiers.forEach((key) => bindEducationMajorSection(key));
+}
+
+function bindEducationMajorSection(key) {
+  const edu = AppState.profile.basic_info.education;
+  const disabled = isEducationMajorDisabled(key);
+  const effective = effectiveEducationMajor(key);
+  const input = document.getElementById(`input-major-detail-${key}`);
+
+  if (disabled) {
+    document.getElementById(`major-category-chips-${key}`).innerHTML = chipGroupHtml(
+      MAJOR_CATEGORY_OPTIONS,
+      effective.major_category ? [effective.major_category] : []
+    );
+    input.value = effective.major_detail;
+  } else {
+    bindChipGroup(
+      `major-category-chips-${key}`,
+      MAJOR_CATEGORY_OPTIONS,
+      () => (edu[key].major_category ? [edu[key].major_category] : []),
+      (v) => {
+        edu[key].major_category = edu[key].major_category === v ? "" : v;
+        AppState.save();
+        renderBasicInfo();
+      }
+    );
+    input.value = edu[key].major_detail;
+    input.addEventListener("input", (e) => {
+      edu[key].major_detail = e.target.value;
+      AppState.save();
+      document.getElementById("btn-basic-info-next").disabled = !isBasicInfoValid();
+    });
+    input.addEventListener("blur", () => maybeAdvanceAfterEducationMajors());
+  }
+
+  if (key === "graduate") {
+    document.getElementById("chk-major-same-graduate-undergraduate").addEventListener("change", (e) => {
+      edu.graduate.same_as_undergraduate = e.target.checked;
+      AppState.save();
+      renderBasicInfo();
+      maybeAdvanceAfterEducationMajors();
+    });
+  }
+  if (key === "doctorate") {
+    document.getElementById("chk-major-same-doctorate-undergraduate").addEventListener("change", (e) => {
+      edu.doctorate.same_as_undergraduate = e.target.checked;
+      if (e.target.checked) edu.doctorate.same_as_graduate = false;
+      AppState.save();
+      renderBasicInfo();
+      maybeAdvanceAfterEducationMajors();
+    });
+    document.getElementById("chk-major-same-doctorate-graduate").addEventListener("change", (e) => {
+      edu.doctorate.same_as_graduate = e.target.checked;
+      if (e.target.checked) edu.doctorate.same_as_undergraduate = false;
+      AppState.save();
+      renderBasicInfo();
+      maybeAdvanceAfterEducationMajors();
+    });
+  }
+}
+
+// ============================================================
 // 1. 기본 인적사항
 // ============================================================
 function renderBasicInfo() {
@@ -86,7 +230,6 @@ function renderBasicInfo() {
 
   document.getElementById("input-name").value = p.basic_info.name;
   document.getElementById("input-birth").value = p.basic_info.birth_date;
-  document.getElementById("input-major-detail").value = p.basic_info.education.major_detail;
   document.getElementById("input-phone").value = p.basic_info.contact.phone;
   document.getElementById("input-email").value = p.basic_info.contact.email;
 
@@ -110,19 +253,12 @@ function renderBasicInfo() {
       p.basic_info.education.level = p.basic_info.education.level === v ? "" : v;
       AppState.save();
       renderBasicInfo();
+      // '고졸'처럼 전공 입력이 아예 없는 학력을 고르면 바로 다음 카드로 넘어간다.
+      if (p.basic_info.education.level === "H1") maybeAdvanceAfterEducationMajors();
     }
   );
 
-  bindChipGroup(
-    "major-category-chips",
-    MAJOR_CATEGORY_OPTIONS,
-    () => (p.basic_info.education.major_category ? [p.basic_info.education.major_category] : []),
-    (v) => {
-      p.basic_info.education.major_category = p.basic_info.education.major_category === v ? "" : v;
-      AppState.save();
-      renderBasicInfo();
-    }
-  );
+  renderEducationMajors();
 
   // 자격증
   const certList = document.getElementById("cert-list");

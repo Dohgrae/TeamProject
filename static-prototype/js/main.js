@@ -106,38 +106,47 @@ function setupFocusCards() {
   setupAutoAdvance(list);
 }
 
+// 기본 인적사항 카드 목록에서 index번째 카드를 강조하고 그쪽으로 스크롤한다.
+// setupAutoAdvance뿐 아니라, 학력 카드처럼 내용이 동적으로 바뀌는 카드에서도
+// (render.js) 같은 방식으로 다음 카드로 넘어가야 해서 전역 함수로 뺐다.
+function advanceBasicInfoCard(index) {
+  const list = document.getElementById("basic-info-focus-list");
+  const target = list?.querySelectorAll(".focus-card")[index];
+  if (!target) return;
+  setActiveFocusCard(list, target);
+  target.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+// 카드2(학력/전공)는 학력 단계에 따라 물어보는 전공 입력창 개수가 달라지므로,
+// "마지막 전공 입력을 마쳤는지"를 매번 다시 판단해야 한다. 필수 전공 입력이
+// 모두 채워졌을 때만(= isEducationMajorsComplete) 카드3으로 넘어간다.
+function maybeAdvanceAfterEducationMajors() {
+  if (isEducationMajorsComplete(AppState.profile)) advanceBasicInfoCard(2);
+}
+
 // 각 카드의 마지막 항목을 입력/선택하면, 사용자가 직접 클릭하지 않아도
 // 자동으로 다음 카드가 위로 떠오르며 강조되고 화면도 그쪽으로 스크롤된다.
 function setupAutoAdvance(list) {
-  function advanceTo(index) {
-    const target = list.querySelectorAll(".focus-card")[index];
-    if (!target) return;
-    setActiveFocusCard(list, target);
-    target.scrollIntoView({ behavior: "smooth", block: "center" });
-  }
-
   // 카드1(이름~이메일) 마지막 항목: 이메일
   document
     .getElementById("input-email")
-    .addEventListener("blur", () => advanceTo(1));
-  // 카드2(학력/전공) 마지막 항목: 학과
-  document
-    .getElementById("input-major-detail")
-    .addEventListener("blur", () => advanceTo(2));
+    .addEventListener("blur", () => advanceBasicInfoCard(1));
+  // 카드2(학력/전공)는 render.js의 bindEducationMajorSection에서
+  // maybeAdvanceAfterEducationMajors()로 처리한다.
   // 카드3(자격증/어학) 마지막 항목: 어학 점수/등급
   // "추가" 버튼을 누르면 그 클릭 자체가 이 입력의 blur를 먼저 발생시키는데, 그 즉시 카드가
   // scrollIntoView로 이동해버리면 클릭 중간에 버튼이 밀려나 첫 클릭이 씹힌 것처럼 보인다.
   // 그래서 "추가" 클릭이 완전히 처리될 시간을 준 뒤에 넘어가도록 살짝 지연시킨다.
   document
     .getElementById("input-lang-score")
-    .addEventListener("blur", () => setTimeout(() => advanceTo(3), 200));
+    .addEventListener("blur", () => setTimeout(() => advanceBasicInfoCard(3), 200));
   // 칩 클릭은 onToggle 안에서 바로 컨테이너를 다시 그려 자기 자신을 DOM에서 떼어내므로,
   // 여기서도 버블링을 기다리지 않고 캡처링 단계에서 먼저 판단해야 한다.
   // 카드4(기술스택) 마지막 항목: 협업툴·형상관리 칩 (컨테이너에 위임, 안에서 매번 다시 그려지므로)
   document.getElementById("tech-stack-container").addEventListener(
     "click",
     (e) => {
-      if (e.target.closest('[id="tech-협업툴_형상관리"]')) advanceTo(4);
+      if (e.target.closest('[id="tech-협업툴_형상관리"]')) advanceBasicInfoCard(4);
     },
     true,
   );
@@ -145,7 +154,7 @@ function setupAutoAdvance(list) {
   document.getElementById("filter-job-category-chips").addEventListener(
     "click",
     (e) => {
-      if (e.target.tagName === "BUTTON") advanceTo(5);
+      if (e.target.tagName === "BUTTON") advanceBasicInfoCard(5);
     },
     true,
   );
@@ -203,13 +212,31 @@ function wireInterimSaveButton(buttonId) {
   });
 }
 
-// 필수 항목(이름/출생년월일/학력단계)만 유효성 검사, 나머지는 비워도 다음 단계로 넘어갈 수 있다.
+// 학력 단계에서 필요로 하는 전공 입력이 전부 채워졌는지 검사한다.
+// 고졸(H1)은 전공 입력이 아예 없어 통과, 그 외 단계는 학부 전공이 필수이고
+// 석사·박사 전공은 "OO와 동일해요" 체크로 대체될 수 있다.
+function isEducationMajorsComplete(profile) {
+  const edu = profile.basic_info.education;
+  const isFilled = (m) => m.major_category !== "" && m.major_detail.trim() !== "";
+  const tiers = educationMajorTiersForLevel(edu.level);
+  if (tiers.includes("undergraduate") && !isFilled(edu.undergraduate)) return false;
+  if (tiers.includes("graduate") && !(edu.graduate.same_as_undergraduate || isFilled(edu.graduate))) return false;
+  if (
+    tiers.includes("doctorate") &&
+    !(edu.doctorate.same_as_undergraduate || edu.doctorate.same_as_graduate || isFilled(edu.doctorate))
+  )
+    return false;
+  return true;
+}
+
+// 필수 항목(이름/출생년월일/학력단계/학력별 전공)만 유효성 검사, 나머지는 비워도 다음 단계로 넘어갈 수 있다.
 function isBasicInfoValid() {
   const p = AppState.profile;
   return (
     p.basic_info.name.trim() !== "" &&
     p.basic_info.birth_date !== "" &&
-    p.basic_info.education.level !== ""
+    p.basic_info.education.level !== "" &&
+    isEducationMajorsComplete(p)
   );
 }
 
@@ -240,12 +267,6 @@ function bindBasicInfoInputs() {
     document.getElementById("btn-basic-info-next").disabled =
       !isBasicInfoValid();
   });
-  document
-    .getElementById("input-major-detail")
-    .addEventListener("input", (e) => {
-      p().basic_info.education.major_detail = e.target.value;
-      AppState.save();
-    });
   document.getElementById("input-phone").addEventListener("input", (e) => {
     p().basic_info.contact.phone = e.target.value;
     AppState.save();
