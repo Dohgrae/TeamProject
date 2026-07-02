@@ -761,7 +761,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-review-prev").addEventListener("click", () => showScreen("personality"));
   document.getElementById("btn-review-restart").addEventListener("click", () => showScreen("basic-info"));
   document.getElementById("btn-go-result").addEventListener("click", () => showScreen("result"));
-  document.getElementById("btn-result-back-to-review").addEventListener("click", () => showScreen("review"));
+  document.getElementById("btn-result-back-to-review").addEventListener("click", () => showScreen("personality"));
 
   document.getElementById("btn-add-work").addEventListener("click", openPeriodModal);
   document.getElementById("btn-period-cancel").addEventListener("click", closePeriodModal);
