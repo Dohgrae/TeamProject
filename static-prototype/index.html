@@ -1,342 +1,556 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>뽑아듀오 — 사용자 정보 입력</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/wizard.css" />
-  <link rel="stylesheet" href="css/result.css" />
-</head>
-<body>
-
-  <header class="app-header">
-    <div class="logo"><img src="img/logo.png" alt="" class="logo-icon" aria-hidden="true" /> 뽑아듀오</div>
-    <nav class="step-nav" id="step-nav"></nav>
-    <button type="button" class="btn-text" id="btn-reset-profile" title="입력한 내용을 전부 지우고 처음부터 다시 시작">
-      🔄 초기화
-    </button>
-  </header>
-
-  <main class="wizard-main">
-
-    <!-- ===== 1. 기본 인적사항 (전체가 한 화면에, 포커스한 구역만 강조) ===== -->
-    <section class="screen active" id="screen-basic-info">
-      <h1>기본 인적사항</h1>
-      <p class="sub">취업 방향 추천을 위한 기본 정보를 입력해주세요. 입력 중인 항목이 살짝 떠오르며 강조돼요.</p>
-
-      <div class="focus-card-list">
-        <!-- 1. 이름/출생년월일/성별/전화번호/이메일 -->
-        <div class="focus-card">
-          <label for="input-name">이름 *</label>
-          <input type="text" id="input-name" placeholder="이름을 입력해주세요" />
-          <label for="input-birth" style="margin-top: 16px">출생년월일 *</label>
-          <input type="date" id="input-birth" />
-          <label style="margin-top: 16px">성별</label>
-          <div class="chip-group" id="gender-chips"></div>
-          <label for="input-phone" style="margin-top: 16px">전화번호</label>
-          <input type="text" id="input-phone" placeholder="010-0000-0000" />
-          <label for="input-email" style="margin-top: 16px">이메일</label>
-          <input type="text" id="input-email" placeholder="example@email.com" />
-        </div>
-
-        <!-- 2. 학력/전공 -->
-        <div class="focus-card">
-          <label>학력 단계 *</label>
-          <div class="chip-group" id="education-level-chips"></div>
-          <label style="margin-top: 16px">전공 대분류</label>
-          <div class="chip-group" id="major-category-chips"></div>
-          <label for="input-major-detail" style="margin-top: 16px">학과</label>
-          <input type="text" id="input-major-detail" placeholder="예: 컴퓨터공학과" />
-        </div>
-
-        <!-- 3. 자격증/어학 -->
-        <div class="focus-card">
-          <label for="input-cert">보유 자격증</label>
-          <div class="input-with-button">
-            <input type="text" id="input-cert" placeholder="예: 정보처리기사 (Enter로 추가)" />
-            <button type="button" id="btn-add-cert">추가</button>
-          </div>
-          <div class="chip-list" id="cert-list"></div>
-          <label style="margin-top: 16px">어학 능력</label>
-          <div class="input-with-button">
-            <select id="select-lang-test"></select>
-            <input type="text" id="input-lang-score" placeholder="점수/등급" style="max-width: 120px" />
-            <button type="button" id="btn-add-lang">추가</button>
-          </div>
-          <div class="chip-list" id="lang-list"></div>
-        </div>
-
-        <!-- 4. 기술스택 -->
-        <div class="focus-card">
-          <label>기술스택</label>
-          <div id="tech-stack-container"></div>
-        </div>
-
-        <!-- 5. 직무 + 세부직무 -->
-        <div class="focus-card">
-          <label>직무</label>
-          <p class="sub">채용공고 1차 필터링에 쓰이는 선호 조건이에요. 선택 안 하면 전체를 대상으로 매칭해요.</p>
-          <div class="chip-group" id="filter-job-category-chips"></div>
-          <div id="job-subcategory-container"></div>
-        </div>
-
-        <!-- 6. 희망지역/기업규모/희망고용형태 -->
-        <div class="focus-card">
-          <label>희망 지역</label>
-          <div class="chip-group" id="filter-region-chips"></div>
-          <label style="margin-top: 16px">기업규모</label>
-          <div class="chip-group" id="filter-company-size-chips"></div>
-          <label style="margin-top: 16px">희망 고용형태</label>
-          <div class="chip-group" id="filter-employment-type-chips"></div>
-        </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>뽑아듀오 — 사용자 정보 입력</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/wizard.css" />
+    <link rel="stylesheet" href="css/result.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="logo">
+        <img src="img/logo.png" alt="" class="logo-icon" aria-hidden="true" />
+        뽑아듀오
       </div>
+      <nav class="step-nav" id="step-nav"></nav>
+      <button
+        type="button"
+        class="btn-text"
+        id="btn-reset-profile"
+        title="입력한 내용을 전부 지우고 처음부터 다시 시작"
+      >
+        🔄 초기화
+      </button>
+    </header>
 
-      <button type="button" class="btn-save-tab" id="btn-save-basic-info">중간 저장</button>
+    <main class="wizard-main">
+      <!-- ===== 1. 기본 인적사항 (전체가 한 화면에, 포커스한 구역만 강조) ===== -->
+      <section class="screen active" id="screen-basic-info">
+        <h1>기본 인적사항</h1>
+        <p class="sub">
+          취업 방향 추천을 위한 기본 정보를 입력해주세요. 입력 중인 항목이 살짝
+          떠오르며 강조돼요.
+        </p>
 
-      <div class="nav-row-end">
-        <button type="button" class="btn btn-primary" id="btn-basic-info-next">다음</button>
-      </div>
-    </section>
-
-    <!-- ===== 2. 직장 경험 ===== -->
-    <section class="screen" id="screen-work">
-      <h1>직장 경험 <span class="title-hint">(정규직, 계약직, 인턴 등)</span></h1>
-      <p class="sub">직장 경험이 있으면 자동으로 "경력"으로 분류되고, 근무기간을 합산해 총 경력연차를 계산해요.</p>
-
-      <div class="career-badge" id="career-badge"></div>
-      <div id="work-experience-list"></div>
-
-      <button type="button" class="btn btn-dashed" id="btn-add-work">+ 직장 경험 추가</button>
-
-      <button type="button" class="btn-save-tab" id="btn-save-work">중간 저장</button>
-
-      <div class="nav-row">
-        <button type="button" class="btn btn-outline" id="btn-work-prev">이전</button>
-        <button type="button" class="btn btn-primary" id="btn-work-next">다음</button>
-      </div>
-    </section>
-
-    <!-- ===== 3. 학내외경험 ===== -->
-    <section class="screen" id="screen-extracurricular">
-      <h1>학내외경험 <span class="title-hint">(프로젝트, 동아리·학생회, 대외활동, 해외경험, 교육 수강경험)</span></h1>
-      <p class="sub">항목을 추가하면 챗봇이 몇 가지 질문을 물어봐요.</p>
-
-      <div id="extracurricular-list"></div>
-      <button type="button" class="btn btn-dashed" id="btn-add-extracurricular">+ 학내외경험 추가</button>
-
-      <button type="button" class="btn-save-tab" id="btn-save-extracurricular">중간 저장</button>
-
-      <div class="nav-row">
-        <button type="button" class="btn btn-outline" id="btn-extracurricular-prev">이전</button>
-        <button type="button" class="btn btn-primary" id="btn-extracurricular-next">다음</button>
-      </div>
-    </section>
-
-    <!-- ===== 4. 수상/공모전 ===== -->
-    <section class="screen" id="screen-awards">
-      <h1>수상/공모전 경험</h1>
-      <p class="sub">항목을 추가하면 챗봇이 몇 가지 질문을 물어봐요. 없다면 그냥 다음 단계로 넘어가도 돼요.</p>
-
-      <div id="award-list"></div>
-      <button type="button" class="btn btn-dashed" id="btn-add-award">+ 수상/공모전 항목 추가</button>
-
-      <button type="button" class="btn-save-tab" id="btn-save-awards">중간 저장</button>
-
-      <div class="nav-row">
-        <button type="button" class="btn btn-outline" id="btn-awards-prev">이전</button>
-        <button type="button" class="btn btn-primary" id="btn-awards-next">다음</button>
-      </div>
-    </section>
-
-    <!-- ===== 5. 성향 질문 ===== -->
-    <section class="screen" id="screen-personality">
-      <h1>성향 질문</h1>
-      <p class="sub" id="personality-progress-text"></p>
-      <div class="progress-bar-wrap"><div class="progress-bar" id="personality-progress-bar"></div></div>
-
-      <div id="personality-questions" class="focus-card-list"></div>
-
-      <button type="button" class="btn-save-tab" id="btn-save-personality">중간 저장</button>
-
-      <div class="nav-row">
-        <button type="button" class="btn btn-outline" id="btn-personality-prev">이전</button>
-        <button type="button" class="btn btn-primary" id="btn-personality-next">완료</button>
-      </div>
-    </section>
-
-    <!-- ===== 6. 완료(JSON 확인) ===== -->
-    <section class="screen" id="screen-review">
-      <h1>입력 완료</h1>
-      <p class="sub">아래 JSON이 매칭 계산에 쓰이는 최종 프로필입니다.</p>
-      <div class="draft-id-row">
-        <span id="draft-id-label"></span>
-        <button type="button" class="btn btn-dark" id="btn-copy-json">JSON 복사</button>
-      </div>
-      <pre class="json-view" id="json-view"></pre>
-
-      <div class="nav-row-center">
-        <button type="button" class="btn btn-accent" id="btn-go-result">카드로 결과 보기 →</button>
-      </div>
-
-      <div class="nav-row">
-        <button type="button" class="btn btn-outline" id="btn-review-prev">이전</button>
-        <button type="button" class="btn btn-primary" id="btn-review-restart">처음으로</button>
-      </div>
-    </section>
-
-    <!-- ===== 7. 결과 카드 (feature3 이식) ===== -->
-    <section class="screen" id="screen-result">
-      <div class="result-page">
-        <main class="main" role="main">
-          <div class="result-title-block">
-            <h1 id="result-title">✨ 오늘의 매칭 결과 💼</h1>
-            <p class="sub" id="result-subtitle">경험과 선호 조건에 꼭 맞는 공고를 찾았어요!</p>
+        <div class="focus-card-list">
+          <!-- 1. 이름/출생년월일/성별/전화번호/이메일 -->
+          <div class="focus-card">
+            <label for="input-name">이름 *</label>
+            <input
+              type="text"
+              id="input-name"
+              placeholder="이름을 입력해주세요."
+            />
+            <label for="input-birth" style="margin-top: 16px">생년월일 *</label>
+            <input type="date" id="input-birth" />
+            <label style="margin-top: 16px">성별</label>
+            <div class="chip-group" id="gender-chips"></div>
+            <label for="input-phone" style="margin-top: 16px">전화번호</label>
+            <input type="text" id="input-phone" placeholder="010-0000-0000" />
+            <label for="input-email" style="margin-top: 16px">이메일</label>
+            <input
+              type="text"
+              id="input-email"
+              placeholder="example@email.com"
+            />
           </div>
 
-          <div class="card-carousel-panel" id="card-carousel-panel">
-            <div class="progress-area" id="result-progress-area">
-              <span class="card-counter" id="card-counter"></span>
-              <div class="progress-bar-wrap" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-                <div class="progress-bar" id="result-progress-bar"></div>
-              </div>
+          <!-- 2. 학력/전공 -->
+          <div class="focus-card">
+            <label>최종 학력 *</label>
+            <div class="chip-group" id="education-level-chips"></div>
+            <label style="margin-top: 16px">전공 대분류</label>
+            <div class="chip-group" id="major-category-chips"></div>
+            <label for="input-major-detail" style="margin-top: 16px"
+              >학과</label
+            >
+            <input
+              type="text"
+              id="input-major-detail"
+              placeholder="예: 컴퓨터공학과"
+            />
+          </div>
+
+          <!-- 3. 자격증/어학 -->
+          <div class="focus-card">
+            <label for="input-cert">보유 자격증</label>
+            <div class="input-with-button">
+              <input
+                type="text"
+                id="input-cert"
+                placeholder="예: 정보처리기사 (Enter로 추가)"
+              />
+              <button type="button" id="btn-add-cert">추가</button>
+            </div>
+            <div class="chip-list" id="cert-list"></div>
+            <label style="margin-top: 16px">어학 능력</label>
+            <div class="input-with-button">
+              <select id="select-lang-test"></select>
+              <input
+                type="text"
+                id="input-lang-score"
+                placeholder="점수/등급"
+                style="max-width: 120px"
+              />
+              <button type="button" id="btn-add-lang">추가</button>
+            </div>
+            <div class="chip-list" id="lang-list"></div>
+          </div>
+
+          <!-- 4. 기술스택 -->
+          <div class="focus-card">
+            <label>기술스택</label>
+            <div id="tech-stack-container"></div>
+          </div>
+
+          <!-- 5. 직무 + 세부직무 -->
+          <div class="focus-card">
+            <label>직무</label>
+            <p class="sub">
+              관심있는 직무를 골라주세요. 중복 선택도 가능해요. 선택하지 않으면
+              전체를 대상으로 매칭돼요.
+            </p>
+            <div class="chip-group" id="filter-job-category-chips"></div>
+            <div id="job-subcategory-container"></div>
+          </div>
+
+          <!-- 6. 희망지역/기업규모/희망고용형태 -->
+          <div class="focus-card">
+            <label>희망 지역</label>
+            <div class="chip-group" id="filter-region-chips"></div>
+            <label style="margin-top: 16px">기업규모</label>
+            <div class="chip-group" id="filter-company-size-chips"></div>
+            <label style="margin-top: 16px">희망 고용형태</label>
+            <div class="chip-group" id="filter-employment-type-chips"></div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-save-tab" id="btn-save-basic-info">
+          중간 저장
+        </button>
+
+        <div class="nav-row-end">
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="btn-basic-info-next"
+          >
+            다음
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== 2. 직장 경험 ===== -->
+      <section class="screen" id="screen-work">
+        <h1>
+          직장 경험 <span class="title-hint">(정규직, 계약직, 인턴 등)</span>
+        </h1>
+        <p class="sub">
+          직장 경험이 있으면 자동으로 "경력"으로 분류되고, 근무기간을 합산해 총
+          경력연차를 계산해요.
+        </p>
+
+        <div class="career-badge" id="career-badge"></div>
+        <div id="work-experience-list"></div>
+
+        <button type="button" class="btn btn-dashed" id="btn-add-work">
+          + 직장 경험 추가
+        </button>
+
+        <button type="button" class="btn-save-tab" id="btn-save-work">
+          중간 저장
+        </button>
+
+        <div class="nav-row">
+          <button type="button" class="btn btn-outline" id="btn-work-prev">
+            이전
+          </button>
+          <button type="button" class="btn btn-primary" id="btn-work-next">
+            다음
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== 3. 학내외경험 ===== -->
+      <section class="screen" id="screen-extracurricular">
+        <h1>
+          학내외경험
+          <span class="title-hint"
+            >(프로젝트, 동아리·학생회, 대외활동, 해외경험, 교육 수강경험)</span
+          >
+        </h1>
+        <p class="sub">항목을 추가하면 챗봇이 몇 가지 질문을 물어봐요.</p>
+
+        <div id="extracurricular-list"></div>
+        <button
+          type="button"
+          class="btn btn-dashed"
+          id="btn-add-extracurricular"
+        >
+          + 학내외경험 추가
+        </button>
+
+        <button
+          type="button"
+          class="btn-save-tab"
+          id="btn-save-extracurricular"
+        >
+          중간 저장
+        </button>
+
+        <div class="nav-row">
+          <button
+            type="button"
+            class="btn btn-outline"
+            id="btn-extracurricular-prev"
+          >
+            이전
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="btn-extracurricular-next"
+          >
+            다음
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== 4. 수상/공모전 ===== -->
+      <section class="screen" id="screen-awards">
+        <h1>수상/공모전 경험</h1>
+        <p class="sub">
+          항목을 추가하면 챗봇이 몇 가지 질문을 물어봐요. 없다면 그냥 다음
+          단계로 넘어가도 돼요.
+        </p>
+
+        <div id="award-list"></div>
+        <button type="button" class="btn btn-dashed" id="btn-add-award">
+          + 수상/공모전 항목 추가
+        </button>
+
+        <button type="button" class="btn-save-tab" id="btn-save-awards">
+          중간 저장
+        </button>
+
+        <div class="nav-row">
+          <button type="button" class="btn btn-outline" id="btn-awards-prev">
+            이전
+          </button>
+          <button type="button" class="btn btn-primary" id="btn-awards-next">
+            다음
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== 5. 업무 성향 테스트 ===== -->
+      <section class="screen" id="screen-personality">
+        <h1>업무 성향 테스트</h1>
+        <p class="sub" id="personality-progress-text"></p>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="personality-progress-bar"></div>
+        </div>
+
+        <div id="personality-questions" class="focus-card-list"></div>
+
+        <button type="button" class="btn-save-tab" id="btn-save-personality">
+          중간 저장
+        </button>
+
+        <div class="nav-row">
+          <button
+            type="button"
+            class="btn btn-outline"
+            id="btn-personality-prev"
+          >
+            이전
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="btn-personality-next"
+          >
+            완료
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== 6. 완료(JSON 확인) ===== -->
+      <section class="screen" id="screen-review">
+        <h1>입력 완료</h1>
+        <p class="sub">아래 JSON이 매칭 계산에 쓰이는 최종 프로필입니다.</p>
+        <div class="draft-id-row">
+          <span id="draft-id-label"></span>
+          <button type="button" class="btn btn-dark" id="btn-copy-json">
+            JSON 복사
+          </button>
+        </div>
+        <pre class="json-view" id="json-view"></pre>
+
+        <div class="nav-row-center">
+          <button type="button" class="btn btn-accent" id="btn-go-result">
+            카드로 결과 보기 →
+          </button>
+        </div>
+
+        <div class="nav-row">
+          <button type="button" class="btn btn-outline" id="btn-review-prev">
+            이전
+          </button>
+          <button type="button" class="btn btn-primary" id="btn-review-restart">
+            처음으로
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== 7. 결과 카드 (feature3 이식) ===== -->
+      <section class="screen" id="screen-result">
+        <div class="result-page">
+          <main class="main" role="main">
+            <div class="result-title-block">
+              <h1 id="result-title">✨ 오늘의 매칭 결과 💼</h1>
+              <p class="sub" id="result-subtitle">꼭 맞는 공고를 찾았어요!</p>
             </div>
 
-            <div class="card-area" id="card-area">
-              <div class="card-carousel" id="card-carousel">
-                <div class="card-peek card-peek-prev" id="card-peek-prev" aria-hidden="true"></div>
+            <div class="card-carousel-panel" id="card-carousel-panel">
+              <div class="progress-area" id="result-progress-area">
+                <span class="card-counter" id="card-counter"></span>
+                <div
+                  class="progress-bar-wrap"
+                  role="progressbar"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                >
+                  <div class="progress-bar" id="result-progress-bar"></div>
+                </div>
+              </div>
 
-                <div class="card-wrap" id="card-wrap">
-                  <div class="card" id="job-card" role="button" tabindex="0" aria-label="카드 뒤집기 (스페이스바로도 가능)">
-                    <div class="card-inner" id="card-inner">
-                      <div class="card-front" id="card-front">
-                        <div class="loading-state">
-                          <div class="loading-spinner" aria-hidden="true"></div>
-                          <p class="loading-text">채용공고를 찾는 중이에요...</p>
+              <div class="card-area" id="card-area">
+                <div class="card-carousel" id="card-carousel">
+                  <div
+                    class="card-peek card-peek-prev"
+                    id="card-peek-prev"
+                    aria-hidden="true"
+                  ></div>
+
+                  <div class="card-wrap" id="card-wrap">
+                    <div
+                      class="card"
+                      id="job-card"
+                      role="button"
+                      tabindex="0"
+                      aria-label="카드 뒤집기 (스페이스바로도 가능)"
+                    >
+                      <div class="card-inner" id="card-inner">
+                        <div class="card-front" id="card-front">
+                          <div class="loading-state">
+                            <div
+                              class="loading-spinner"
+                              aria-hidden="true"
+                            ></div>
+                            <p class="loading-text">
+                              채용공고를 찾는 중이에요...
+                            </p>
+                          </div>
                         </div>
+                        <div class="card-back" id="card-back"></div>
                       </div>
-                      <div class="card-back" id="card-back"></div>
                     </div>
                   </div>
+
+                  <div
+                    class="card-peek card-peek-next"
+                    id="card-peek-next"
+                    aria-hidden="true"
+                  ></div>
                 </div>
 
-                <div class="card-peek card-peek-next" id="card-peek-next" aria-hidden="true"></div>
+                <div class="card-carousel-controls" id="card-carousel-controls">
+                  <button
+                    type="button"
+                    class="card-nav-btn"
+                    id="btn-prev-card"
+                    aria-label="이전 공고 다시 보기 (왼쪽 방향키)"
+                  >
+                    ‹
+                  </button>
+                  <div class="card-dots" id="card-dots"></div>
+                  <button
+                    type="button"
+                    class="card-nav-btn"
+                    id="btn-next-card"
+                    aria-label="다음 공고 (오른쪽 방향키)"
+                  >
+                    ›
+                  </button>
+                </div>
               </div>
 
-              <div class="card-carousel-controls" id="card-carousel-controls">
-                <button type="button" class="card-nav-btn" id="btn-prev-card" aria-label="이전 공고 다시 보기 (왼쪽 방향키)">‹</button>
-                <div class="card-dots" id="card-dots"></div>
-                <button type="button" class="card-nav-btn" id="btn-next-card" aria-label="다음 공고 (오른쪽 방향키)">›</button>
+              <div class="end-screen" id="end-screen" aria-hidden="true">
+                <div class="end-emoji" aria-hidden="true">🎉</div>
+                <h2 class="end-title">모든 추천 공고를<br />확인했어요!</h2>
+                <p class="end-desc">
+                  마음에 드는 공고를 찾으셨나요?<br />저장한 결과에서 다시
+                  확인할 수 있어요.
+                </p>
+                <button class="btn-reset" id="btn-reset-cards">
+                  🔄 처음으로 돌아가기
+                </button>
+              </div>
+
+              <div
+                class="button-area"
+                id="button-area"
+                role="group"
+                aria-label="카드 조작 버튼"
+              >
+                <button
+                  class="btn btn-skip"
+                  id="btn-skip-card"
+                  aria-label="관심 없어요 — 다음 공고 (오른쪽 방향키)"
+                >
+                  <span class="btn-icon" aria-hidden="true">✕</span
+                  ><span class="btn-label">관심 없어요</span>
+                </button>
+                <button
+                  class="btn btn-view"
+                  id="btn-view-card"
+                  aria-label="공고 보기 — 원본 채용공고 열기 (엔터키)"
+                >
+                  <span class="btn-label">공고 자세히 보기 →</span>
+                </button>
               </div>
             </div>
 
-            <div class="end-screen" id="end-screen" aria-hidden="true">
-              <div class="end-emoji" aria-hidden="true">🎉</div>
-              <h2 class="end-title">모든 추천 공고를<br />확인했어요!</h2>
-              <p class="end-desc">마음에 드는 공고를 찾으셨나요?<br />저장한 결과에서 다시 확인할 수 있어요.</p>
-              <button class="btn-reset" id="btn-reset-cards">🔄 처음으로 돌아가기</button>
-            </div>
-
-            <div class="button-area" id="button-area" role="group" aria-label="카드 조작 버튼">
-              <button class="btn btn-skip" id="btn-skip-card" aria-label="관심 없어요 — 다음 공고 (오른쪽 방향키)">
-                <span class="btn-icon" aria-hidden="true">✕</span><span class="btn-label">관심 없어요</span>
-              </button>
-              <button class="btn btn-view" id="btn-view-card" aria-label="공고 보기 — 원본 채용공고 열기 (엔터키)">
-                <span class="btn-label">공고 자세히 보기 →</span>
+            <div class="nav-row-back">
+              <button
+                type="button"
+                class="btn btn-outline"
+                id="btn-result-back-to-review"
+              >
+                ← 입력으로 돌아가기
               </button>
             </div>
+          </main>
+        </div>
+      </section>
+    </main>
+
+    <!-- ===== 직장경험: 기간/고용형태 먼저 입력하는 모달 ===== -->
+    <div class="modal-overlay" id="period-modal" hidden>
+      <div class="modal-box">
+        <div class="modal-header">
+          <div>
+            <h2>근무 기간을 알려주세요</h2>
           </div>
-
-          <div class="nav-row-back">
-            <button type="button" class="btn btn-outline" id="btn-result-back-to-review">← 입력으로 돌아가기</button>
+          <button type="button" class="btn-text" id="btn-period-cancel">
+            취소
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-field">
+            <label>고용형태</label>
+            <div class="chip-group" id="period-emptype-chips"></div>
           </div>
-        </main>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- ===== 직장경험: 기간/고용형태 먼저 입력하는 모달 ===== -->
-  <div class="modal-overlay" id="period-modal" hidden>
-    <div class="modal-box">
-      <div class="modal-header">
-        <div>
-          <h2>근무 기간을 알려주세요</h2>
+          <div class="form-field">
+            <label>입사년월 *</label>
+            <div class="year-month-picker">
+              <select id="period-start-year"></select>
+              <select id="period-start-month"></select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>퇴사년월</label>
+            <div class="year-month-picker">
+              <select id="period-end-year"></select>
+              <select id="period-end-month"></select>
+            </div>
+            <label style="margin-top: 8px; font-weight: 400">
+              <input type="checkbox" id="period-ongoing" /> 재직중
+            </label>
+          </div>
         </div>
-        <button type="button" class="btn-text" id="btn-period-cancel">취소</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-field">
-          <label>고용형태</label>
-          <div class="chip-group" id="period-emptype-chips"></div>
+        <div class="modal-form">
+          <button
+            type="button"
+            class="btn btn-primary modal-cta-btn"
+            id="btn-period-next"
+            disabled
+            style="width: 100%"
+          >
+            다음: 경험 인터뷰 시작하기 →
+          </button>
         </div>
-        <div class="form-field">
-          <label for="period-start">입사년월 *</label>
-          <input type="month" id="period-start" />
-        </div>
-        <div class="form-field">
-          <label for="period-end">퇴사년월</label>
-          <input type="month" id="period-end" />
-          <label style="margin-top: 8px; font-weight: 400">
-            <input type="checkbox" id="period-ongoing" /> 재직중
-          </label>
-        </div>
-      </div>
-      <div class="modal-form">
-        <button type="button" class="btn btn-primary modal-cta-btn" id="btn-period-next" disabled style="width: 100%">
-          다음: 경험 인터뷰 시작하기 →
-        </button>
       </div>
     </div>
-  </div>
 
-  <!-- ===== 학내외경험: 유형 먼저 고르는 모달 ===== -->
-  <div class="modal-overlay" id="extracurricular-type-modal" hidden>
-    <div class="modal-box">
-      <div class="modal-header">
-        <div>
-          <h2>어떤 경험인가요?</h2>
+    <!-- ===== 학내외경험: 유형 먼저 고르는 모달 ===== -->
+    <div class="modal-overlay" id="extracurricular-type-modal" hidden>
+      <div class="modal-box">
+        <div class="modal-header">
+          <div>
+            <h2>어떤 경험인가요?</h2>
+          </div>
+          <button
+            type="button"
+            class="btn-text"
+            id="btn-extracurricular-type-cancel"
+          >
+            취소
+          </button>
         </div>
-        <button type="button" class="btn-text" id="btn-extracurricular-type-cancel">취소</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-field">
-          <label>경험 유형</label>
-          <div class="chip-group" id="extracurricular-type-chips"></div>
+        <div class="modal-body">
+          <div class="form-field">
+            <label>경험 유형</label>
+            <div class="chip-group" id="extracurricular-type-chips"></div>
+          </div>
         </div>
-      </div>
-      <div class="modal-form">
-        <button type="button" class="btn btn-primary modal-cta-btn" id="btn-extracurricular-type-next" style="width: 100%">
-          다음: 경험 인터뷰 시작하기 →
-        </button>
+        <div class="modal-form">
+          <button
+            type="button"
+            class="btn btn-primary modal-cta-btn"
+            id="btn-extracurricular-type-next"
+            style="width: 100%"
+          >
+            다음: 경험 인터뷰 시작하기 →
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- ===== 직장경험/학내외경험/수상공모전이 공통으로 쓰는 인터뷰 모달 ===== -->
-  <div class="modal-overlay" id="interview-modal" hidden>
-    <div class="modal-box">
-      <div class="modal-header">
-        <div>
-          <h2 id="interview-modal-title">직장 경험 기록하기</h2>
-          <p class="modal-progress" id="interview-progress"></p>
+    <!-- ===== 직장경험/학내외경험/수상공모전이 공통으로 쓰는 인터뷰 모달 ===== -->
+    <div class="modal-overlay" id="interview-modal" hidden>
+      <div class="modal-box">
+        <div class="modal-header">
+          <div>
+            <h2 id="interview-modal-title">직장 경험 기록하기</h2>
+            <p class="modal-progress" id="interview-progress"></p>
+          </div>
+          <button type="button" class="btn-text" id="btn-interview-cancel">
+            취소
+          </button>
         </div>
-        <button type="button" class="btn-text" id="btn-interview-cancel">취소</button>
+        <div class="modal-messages" id="interview-messages"></div>
+        <form class="modal-form" id="interview-form">
+          <button type="button" id="btn-interview-prev" disabled>이전</button>
+          <input
+            type="text"
+            id="interview-input"
+            placeholder="답변을 입력해주세요"
+            autocomplete="off"
+          />
+          <button type="submit">전송</button>
+        </form>
       </div>
-      <div class="modal-messages" id="interview-messages"></div>
-      <form class="modal-form" id="interview-form">
-        <button type="button" id="btn-interview-prev" disabled>이전</button>
-        <input type="text" id="interview-input" placeholder="답변을 입력해주세요" autocomplete="off" />
-        <button type="submit">전송</button>
-      </form>
     </div>
-  </div>
 
-  <script src="js/constants.js"></script>
-  <script src="js/state.js"></script>
-  <script src="js/matching.js"></script>
-  <script src="js/render.js"></script>
-  <script src="js/matchLoading.js"></script>
-  <script src="js/main.js"></script>
-</body>
+    <script src="js/constants.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/matching.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/matchLoading.js"></script>
+    <script src="js/main.js"></script>
+  </body>
 </html>

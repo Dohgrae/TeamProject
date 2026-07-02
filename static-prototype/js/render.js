@@ -20,6 +20,53 @@ function bindChipGroup(containerId, options, getSelected, onToggle) {
 }
 
 // ============================================================
+// 연도/월 select 쌍 — <input type="month">은 Safari에서 지원하지 않아 일반
+// 텍스트칸으로 풀려버려서(아무 글자나 입력 가능) 두 개의 select로 대체한다.
+// 값은 기존과 동일하게 "YYYY-MM" 문자열로 다룬다.
+// ============================================================
+function yearOptionsHtml(selectedYear) {
+  const currentYear = new Date().getFullYear();
+  let html = '<option value="">연도</option>';
+  for (let y = currentYear; y >= currentYear - 60; y--) {
+    html += `<option value="${y}" ${String(y) === String(selectedYear) ? "selected" : ""}>${y}년</option>`;
+  }
+  return html;
+}
+
+function monthOptionsHtml(selectedMonth) {
+  let html = '<option value="">월</option>';
+  for (let m = 1; m <= 12; m++) {
+    const mm = String(m).padStart(2, "0");
+    html += `<option value="${mm}" ${mm === selectedMonth ? "selected" : ""}>${m}월</option>`;
+  }
+  return html;
+}
+
+function splitYearMonth(value) {
+  if (!value) return { year: "", month: "" };
+  const [year, month] = value.split("-");
+  return { year: year || "", month: month || "" };
+}
+
+// idPrefix로 "${idPrefix}-year"/"${idPrefix}-month" select 두 개를 만든다.
+function yearMonthPickerHtml(idPrefix, value, disabled) {
+  const { year, month } = splitYearMonth(value);
+  const disabledAttr = disabled ? "disabled" : "";
+  return `
+    <div class="year-month-picker">
+      <select id="${idPrefix}-year" ${disabledAttr}>${yearOptionsHtml(year)}</select>
+      <select id="${idPrefix}-month" ${disabledAttr}>${monthOptionsHtml(month)}</select>
+    </div>`;
+}
+
+// 두 select의 현재 값을 합쳐 "YYYY-MM"(둘 다 채워졌을 때) 또는 ""을 돌려준다.
+function readYearMonthPicker(idPrefix) {
+  const year = document.getElementById(`${idPrefix}-year`).value;
+  const month = document.getElementById(`${idPrefix}-month`).value;
+  return year && month ? `${year}-${month}` : "";
+}
+
+// ============================================================
 // 상단 스텝 네비게이션
 // ============================================================
 function renderStepNav(currentScreenId) {
@@ -223,8 +270,8 @@ function renderWork() {
         <button type="button" class="entry-card-remove" data-remove="${exp.id}">삭제</button>
       </div>
       <div class="entry-date-row">
-        입사 <input type="month" data-field="start_date" value="${exp.start_date}" />
-        퇴사 <input type="month" data-field="end_date" value="${exp.end_date ?? ""}" ${exp.end_date === null ? "disabled" : ""} />
+        입사 ${yearMonthPickerHtml(`start-${exp.id}`, exp.start_date)}
+        퇴사 ${yearMonthPickerHtml(`end-${exp.id}`, exp.end_date ?? "", exp.end_date === null)}
         <label><input type="checkbox" data-field="ongoing" ${exp.end_date === null ? "checked" : ""} /> 재직중</label>
       </div>
       <div class="interview-answers">
@@ -247,12 +294,16 @@ function renderWork() {
         renderWork();
       })
     );
-    card.querySelector('[data-field="start_date"]').addEventListener("change", (e) => {
-      AppState.updateWorkExperience(exp.id, { start_date: e.target.value });
-      renderWork();
+    [`start-${exp.id}-year`, `start-${exp.id}-month`].forEach((id) => {
+      document.getElementById(id).addEventListener("change", () => {
+        AppState.updateWorkExperience(exp.id, { start_date: readYearMonthPicker(`start-${exp.id}`) });
+        renderWork();
+      });
     });
-    card.querySelector('[data-field="end_date"]').addEventListener("change", (e) => {
-      AppState.updateWorkExperience(exp.id, { end_date: e.target.value });
+    [`end-${exp.id}-year`, `end-${exp.id}-month`].forEach((id) => {
+      document.getElementById(id).addEventListener("change", () => {
+        AppState.updateWorkExperience(exp.id, { end_date: readYearMonthPicker(`end-${exp.id}`) });
+      });
     });
     card.querySelector('[data-field="ongoing"]').addEventListener("change", (e) => {
       AppState.updateWorkExperience(exp.id, { end_date: e.target.checked ? null : "" });
@@ -337,7 +388,7 @@ function renderAwards() {
 }
 
 // ============================================================
-// 5. 성향 질문
+// 5. 업무 성향 테스트
 // ============================================================
 function renderPersonality() {
   const p = AppState.profile;
