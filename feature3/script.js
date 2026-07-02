@@ -582,22 +582,26 @@ function resetCards() {
 // getMatchComment(score): 매칭률에 따라 소개팅 앱 스타일 친구 리액션 멘트 반환
 // fitScore(0~100) → 단계별 멘트 (소개팅 앱 컨셉)
 function getMatchComment(score) {
-  if (score >= 95) {
-    return "이건 운명입니다. 놓치지 마세요! 💘";
-  } else if (score >= 90) {
-    return "이 정도면 바로 만나봐야 해!";
-  } else if (score >= 85) {
-    return "어? 생각보다 진짜 잘 맞아요!";
-  } else if (score >= 80) {
-    return "오, 첫 만남 잡아봐도 되겠어요!";
-  } else if (score >= 70) {
-    return "나쁘지 않아요! 공고 한 번 보세요!";
-  } else if (score >= 60) {
-    return "조금 애매한데, 조건은 더 봐야 할 거 같아요.";
-  } else if (score >= 50) {
-    return "끌리는 포인트는 있는데 신중히 보셔야 해요.";
+  if (score >= 91) {
+    return "천생연분! 뽑아듀오가 맺어준 최고의 궁합이에요 💯🔮";
+  } else if (score >= 81) {
+    return "심장이 쿵! 이건 운명이에요 🔥";
+  } else if (score >= 71) {
+    return "이 정도면 애프터 각! 서로에게 딱이에요 💕";
+  } else if (score >= 61) {
+    return "대화가 술술 풀릴 궁합이에요. 적극 추천! 💬";
+  } else if (score >= 51) {
+    return "어? 은근 잘 맞는데요? 소개팅 성공 예감 👀";
+  } else if (score >= 41) {
+    return "나쁘지 않은 인연! 한 번쯤 만나볼 만해요 ☕";
+  } else if (score >= 31) {
+    return "대화는 통할 것 같은데, 케미는 조금 더 지켜봐야겠어요";
+  } else if (score >= 21) {
+    return "살짝 관심이 가긴 하는데, 확신은 아직이에요 🤔";
+  } else if (score >= 11) {
+    return "아직은 서로 낯설어요. 다른 상대를 좀 더 살펴볼까요?";
   } else {
-    return "음… 더 좋은 상대가 있을거에요 ^^;;";
+    return "이 인연은... 스쳐 지나가는 사이인가 봐요 👋";
   }
 }
 

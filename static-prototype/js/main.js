@@ -450,14 +450,16 @@ function truncateAroundHighlight(line, highlightStart, highlightEnd, maxLength) 
 }
 
 function getMatchComment(score) {
-  if (score >= 95) return "이건 운명입니다. 놓치지 마세요! 💘";
-  if (score >= 90) return "이 정도면 바로 만나봐야 해!";
-  if (score >= 85) return "어? 생각보다 진짜 잘 맞아요!";
-  if (score >= 80) return "오, 첫 만남 잡아봐도 되겠어요!";
-  if (score >= 70) return "나쁘지 않아요! 공고 한 번 보세요!";
-  if (score >= 60) return "조금 애매한데, 조건은 더 봐야 할 거 같아요.";
-  if (score >= 50) return "끌리는 포인트는 있는데 신중히 보셔야 해요.";
-  return "음… 더 좋은 상대가 있을거에요 ^^;;";
+  if (score >= 91) return "천생연분! 뽑아듀오가 맺어준 최고의 궁합이에요 💯🔮";
+  if (score >= 81) return "심장이 쿵! 이건 운명이에요 🔥";
+  if (score >= 71) return "이 정도면 애프터 각! 서로에게 딱이에요 💕";
+  if (score >= 61) return "대화가 술술 풀릴 궁합이에요. 적극 추천! 💬";
+  if (score >= 51) return "어? 은근 잘 맞는데요? 소개팅 성공 예감 👀";
+  if (score >= 41) return "나쁘지 않은 인연! 한 번쯤 만나볼 만해요 ☕";
+  if (score >= 31) return "대화는 통할 것 같은데, 케미는 조금 더 지켜봐야겠어요";
+  if (score >= 21) return "살짝 관심이 가긴 하는데, 확신은 아직이에요 🤔";
+  if (score >= 11) return "아직은 서로 낯설어요. 다른 상대를 좀 더 살펴볼까요?";
+  return "이 인연은... 스쳐 지나가는 사이인가 봐요 👋";
 }
 
 // 매칭률 구간별로 표정이 다른 큐피 이미지를 보여준다(5=제일 좋아함 ~ 1=제일 시무룩).
