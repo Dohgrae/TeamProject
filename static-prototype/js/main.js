@@ -292,11 +292,22 @@ function bindBasicInfoInputs() {
     }
   });
 
+  // "해외 대학/대학원 졸업"은 매길 점수/등급이 없으므로, 선택하면 점수 입력칸이 필요 없다는 걸
+  // 바로 알 수 있도록 placeholder를 바꾸고 비활성화해준다.
+  document.getElementById("select-lang-test").addEventListener("change", (e) => {
+    const scoreInput = document.getElementById("input-lang-score");
+    const isGraduation = e.target.value === "해외 대학/대학원 졸업";
+    scoreInput.disabled = isGraduation;
+    scoreInput.value = "";
+    scoreInput.placeholder = isGraduation ? "점수/등급 필요 없음" : "점수/등급";
+  });
+
   document.getElementById("btn-add-lang").addEventListener("click", () => {
     const scoreInput = document.getElementById("input-lang-score");
     const score = scoreInput.value.trim();
-    if (!score) return;
     const test = document.getElementById("select-lang-test").value;
+    // "해외 대학/대학원 졸업"은 매길 점수/등급이 없으므로 점수 입력 없이도 추가할 수 있게 한다.
+    if (!score && test !== "해외 대학/대학원 졸업") return;
     p().qualifications.languages.push({ test, score });
     AppState.save();
     scoreInput.value = "";

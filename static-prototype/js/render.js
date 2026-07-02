@@ -281,7 +281,7 @@ function renderBasicInfo() {
   }
   const langList = document.getElementById("lang-list");
   langList.innerHTML = p.qualifications.languages
-    .map((l, i) => `<span class="tag">${l.test} ${l.score}<button type="button" data-index="${i}">×</button></span>`)
+    .map((l, i) => `<span class="tag">${l.test}${l.score ? ` ${l.score}` : ""}<button type="button" data-index="${i}">×</button></span>`)
     .join("");
   langList.querySelectorAll("button").forEach((btn) =>
     btn.addEventListener("click", () => {
